@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // === 1. REGISTRO DE USUARIOS ===
+    
     const formRegistro = document.getElementById('formRegistro');
 
     if (formRegistro) {
         formRegistro.addEventListener('submit', (e) => {
-            e.preventDefault(); // Evita la recarga automática de la página
+            e.preventDefault(); 
 
             const nombreInput = document.getElementById('nombreCompleto');
             const emailInput = document.getElementById('regEmail');
@@ -17,10 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = passInput.value;
             const confirmPassword = confirmPassInput.value;
 
-            // Requisito: Mínimo 8 caracteres, 1 mayúscula y 1 número
+            
             const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
-            // Limpiar errores visuales previos
+            
             formRegistro.querySelectorAll('.form-control').forEach(input => input.classList.remove('is-invalid'));
 
             let esValido = true;
@@ -45,13 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 esValido = false;
             }
 
-            // Si falla alguna regla, detiene la ejecución
+            
             if (!esValido) {
                 alert("Por favor completa los campos correctamente. La contraseña requiere 8 caracteres, una mayúscula y un número.");
                 return;
             }
 
-            // Guardar usuario en localStorage
+            
             const usuario = { nombre, email, password };
             localStorage.setItem('usuarioRegistrado', JSON.stringify(usuario));
 
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // === 2. INICIO DE SESIÓN CON CONTROL DE ROLES ===
+    
     const formLogin = document.getElementById('formLogin');
 
     if (formLogin) {
@@ -73,17 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = emailInput.value.trim();
             const password = passInput.value;
 
-            // Limpiar errores previos
+            
             formLogin.querySelectorAll('.form-control').forEach(input => input.classList.remove('is-invalid'));
 
-            // CREDENCIALES DE ADMINISTRADOR
+            
             if (email === "admin@admin.cl" && password === "Admin123") {
                 alert('¡Bienvenido, Administrador!');
                 window.location.href = 'admin.html';
                 return;
             }
 
-            // CREDENCIALES DE CLIENTE REGISTRADO
+            
             const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioRegistrado'));
 
             if (!usuarioGuardado) {
@@ -102,4 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
 });
+
+
