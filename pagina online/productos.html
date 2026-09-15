@@ -11,107 +11,136 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
-<body>
-   
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">Moda & Estilo</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="collapsibleNavbar">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="bio.html">Nosotros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="productos.html">Productos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="login.html">Iniciar Sesión</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="registro.html">Registrarse</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<body class="d-flex flex-column min-vh-100">
 
+
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">Moda & Estilo</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="nosotros.html">Nosotros</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="productos.html">Productos</a>
+                </li>
+            </ul>
+
+            
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="login.html">Iniciar Sesión</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="registro.html">Registrarse</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
     
-    <div class="p-5 bg-dark text-white text-center">
+    <header class="p-5 bg-dark text-white text-center">
         <h1>Catálogo de Temporada</h1>
         <p>Explora nuestras prendas exclusivas al mejor precio y renueva tu closet hoy mismo.</p>
-    </div>
+    </header>
 
     
-    <div class="container-fluid my-4">
+    
+    <main class="container-fluid my-4 flex-grow-1">
         <div class="row mb-3">
             
             
             <div class="col-md-3 mt-2">
-                <div class="card">
-                    <img class="card-img-top" src="img/urbana.jpg" alt="Polera Oversize Urbana">
-                    <div class="card-body bg-dark text-light">
-                        <h4 class="card-title">Polera Oversize Negra</h4>
-                        <p class="card-text">Polera de algodón 100% con estilo urbano holgado, ideal para un look cómodo y moderno.</p>
-                        <h5 class="text-warning">$19.990</h5>
-                        <a href="#" class="btn btn-primary w-100 mt-2">Añadir al Carrito</a>
+                <div class="card h-100">
+                    <a href="producto-detalle.html">
+                        <img class="card-img-top" src="img/urbana.jpg" alt="Polera Oversize Negra">
+                    </a>
+                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+                        <div>
+                            <h4 class="card-title">Polera Oversize Negra</h4>
+                            <p class="card-text">Polera de algodón 100% con estilo urbano holgado, ideal para un look cómodo y moderno.</p>
+                        </div>
+                        <div>
+                            <h5 class="text-warning">$19.990</h5>
+                            <a href="producto-detalle.html" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
+                        </div>
                     </div>
                 </div>
             </div>
 
             
             <div class="col-md-3 mt-2">
-                <div class="card">
-                    <img class="card-img-top" src="img/casual.jpg" alt="Pantalón Jean Classic">
-                    <div class="card-body bg-dark text-light">
-                        <h4 class="card-title">Pantalón Jean Classic</h4>
-                        <p class="card-text">Jeans de corte recto con material resistente y flexible, perfecto para combinar a diario.</p>
-                        <h5 class="text-warning">$29.990</h5>
-                        <a href="#" class="btn btn-primary w-100 mt-2">Añadir al Carrito</a>
+                <div class="card h-100">
+                    <a href="producto-detalle.html">
+                        <img class="card-img-top" src="img/casual.jpg" alt="Pantalón Jean Classic">
+                    </a>
+                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+                        <div>
+                            <h4 class="card-title">Pantalón Jean Classic</h4>
+                            <p class="card-text">Jeans de corte recto con material resistente y flexible, perfecto para combinar a diario.</p>
+                        </div>
+                        <div>
+                            <h5 class="text-warning">$29.990</h5>
+                            <a href="producto-detalle.html" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
+                        </div>
                     </div>
                 </div>
             </div>
 
             
             <div class="col-md-3 mt-2">
-                <div class="card">
-                    <img class="card-img-top" src="img/formal.jpg" alt="Chaqueta Formal Fit">
-                    <div class="card-body bg-dark text-light">
-                        <h4 class="card-title">Chaqueta Formal Fit</h4>
-                        <p class="card-text">Chaqueta de diseño elegante para eventos especiales, confeccionada con terminaciones finas.</p>
-                        <h5 class="text-warning">$45.990</h5>
-                        <a href="#" class="btn btn-primary w-100 mt-2">Añadir al Carrito</a>
+                <div class="card h-100">
+                    <a href="producto-detalle.html">
+                        <img class="card-img-top" src="img/formal.jpg" alt="Chaqueta Formal Fit">
+                    </a>
+                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+                        <div>
+                            <h4 class="card-title">Chaqueta Formal Fit</h4>
+                            <p class="card-text">Chaqueta de diseño elegante para eventos especiales, confeccionada con terminaciones finas.</p>
+                        </div>
+                        <div>
+                            <h5 class="text-warning">$45.990</h5>
+                            <a href="producto-detalle.html" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
+                        </div>
                     </div>
                 </div>
             </div>
 
             
             <div class="col-md-3 mt-2">
-                <div class="card">
-                    <img class="card-img-top" src="img/accesorios.jpg" alt="Gorro Beanie Urbano">
-                    <div class="card-body bg-dark text-light">
-                        <h4 class="card-title">Gorro Beanie Urbano</h4>
-                        <p class="card-text">Gorro tejido de lana acrílica, el accesorio perfecto para complementar tu vestimenta.</p>
-                        <h5 class="text-warning">$8.990</h5>
-                        <a href="#" class="btn btn-primary w-100 mt-2">Añadir al Carrito</a>
+                <div class="card h-100">
+                    <a href="producto-detalle.html">
+                        <img class="card-img-top" src="img/accesorios.jpg" alt="Gorro Beanie Urbano">
+                    </a>
+                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+                        <div>
+                            <h4 class="card-title">Gorro Beanie Urbano</h4>
+                            <p class="card-text">Gorro tejido de lana acrílica, el accesorio perfecto para complementar tu vestimenta.</p>
+                        </div>
+                        <div>
+                            <h5 class="text-warning">$8.990</h5>
+                            <a href="producto-detalle.html" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
+                        </div>
                     </div>
                 </div>
             </div>
 
         </div>
-    </div>
-
+    </main>
     
-    <footer class="bg-dark text-light pt-5 pb-4">
+    <footer class="bg-dark text-light pt-5 pb-4 mt-auto">
         <div class="container">
             <div class="row">
 
-                
                 <div class="col-md-4 mb-4">
                     <h5 class="text-uppercase fw-bold">Moda & Estilo</h5>
                     <p class="text-white">
@@ -119,108 +148,55 @@
                     </p>
                 </div>
 
-               
                 <div class="col-md-4 mb-4">
                     <h5 class="text-uppercase fw-bold">Contacto</h5>
-
-                    <p class="mb-2">
-                        <i class="bi bi-geo-alt-fill me-2"></i>
-                        Santiago, Chile
-                    </p>
-
+                    <p class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> Santiago, Chile</p>
                     <p class="mb-2">
                         <i class="bi bi-telephone-fill me-2"></i>
-                        <a href="tel:+56912345678" class="text-white text-decoration-none">
-                            +56 9 1234 5678
-                        </a>
+                        <a href="tel:+56912345678" class="text-white text-decoration-none">+56 9 1234 5678</a>
                     </p>
-
                     <p class="mb-2">
                         <i class="bi bi-envelope-fill me-2"></i>
-                        <a href="mailto:contacto@tiendaderopa.cl" class="text-white text-decoration-none">
-                            contacto@tiendaderopa.cl
-                        </a>
+                        <a href="mailto:contacto@tiendaderopa.cl" class="text-white text-decoration-none">contacto@tiendaderopa.cl</a>
                     </p>
-
-                    
                     <p class="mb-0">
                         <i class="bi bi-whatsapp me-2"></i>
-                        <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer"
-                            class="text-white text-decoration-none">
+                        <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">
                             Escríbenos por WhatsApp
                         </a>
                     </p>
                 </div>
 
-                
                 <div class="col-md-4 mb-4">
                     <h5 class="text-uppercase fw-bold">Síguenos</h5>
-
                     <div class="mb-3">
-                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer"
-                            class="text-white me-3 fs-4" aria-label="Facebook">
-                            <i class="bi bi-facebook"></i>
-                        </a>
-
-                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer"
-                            class="text-white me-3 fs-4" aria-label="Instagram">
-                            <i class="bi bi-instagram"></i>
-                        </a>
-
-                        <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer"
-                            class="text-white me-3 fs-4" aria-label="LinkedIn">
-                            <i class="bi bi-linkedin"></i>
-                        </a>
-
-                        <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
-                            class="text-white fs-4" aria-label="YouTube">
-                            <i class="bi bi-youtube"></i>
-                        </a>
+                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" class="text-white me-3 fs-4" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="text-white me-3 fs-4" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" class="text-white me-3 fs-4" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" class="text-white fs-4" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
                     </div>
-
                     <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <a href="#" class="text-white-50 text-decoration-none">
-                                Términos y condiciones
-                            </a>
-                        </li>
-
-                        <li class="mb-2">
-                            <a href="#" class="text-white-50 text-decoration-none">
-                                Política de privacidad
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="#" class="text-white-50 text-decoration-none">
-                                Contáctanos
-                            </a>
-                        </li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Términos y condiciones</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Política de privacidad</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Contáctanos</a></li>
                     </ul>
                 </div>
 
             </div>
 
-            
             <hr class="border-secondary">
 
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
-                    <p class="mb-0 text-white-50">
-                        &copy; 2026 Moda & Estilo. Todos los derechos reservados.
-                    </p>
+                    <p class="mb-0 text-white-50">&copy; 2026 Moda & Estilo. Todos los derechos reservados.</p>
                 </div>
-
                 <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
-                    <span class="text-white-50">
-                        Diseñado con Bootstrap 5
-                    </span>
+                    <span class="text-white-50">Diseñado con Bootstrap 5</span>
                 </div>
             </div>
         </div>
     </footer>
 
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/main.js"></script>
 </body>
