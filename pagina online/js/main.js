@@ -103,6 +103,126 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+        // === CARRITO ===
+    actualizarContadorCarrito();
+    renderizarCarrito();
+
+    const btnVaciarCarrito = document.getElementById('btnVaciarCarrito');
+    if (btnVaciarCarrito) btnVaciarCarrito.addEventListener('click', vaciarCarrito);
+
+    const btnPagar = document.getElementById('btnPagar');
+    if (btnPagar) {
+        btnPagar.addEventListener('click', () => {
+            if (obtenerCarrito().length === 0) {
+                alert('Tu carrito está vacío.');
+                return;
+            }
+            alert('¡Gracias por tu compra! (Simulación de pago)');
+            guardarCarrito([]);
+            renderizarCarrito();
+        });
+    }
+
 });
 
+const CARRITO_KEY = 'carritoCompras';
+
+function obtenerCarrito() {
+    return JSON.parse(localStorage.getItem(CARRITO_KEY)) || [];
+}
+
+function guardarCarrito(carrito) {
+    localStorage.setItem(CARRITO_KEY, JSON.stringify(carrito));
+    actualizarContadorCarrito();
+}
+
+function actualizarContadorCarrito() {
+    const carrito = obtenerCarrito();
+    const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+    document.querySelectorAll('#contadorCarrito').forEach(span => {
+        span.textContent = totalItems;
+    });
+}
+
+function agregarAlCarrito(producto) {
+    const carrito = obtenerCarrito();
+    const existente = carrito.find(item => item.id === producto.id && item.talla === producto.talla);
+
+    if (existente) {
+        existente.cantidad += producto.cantidad;
+    } else {
+        carrito.push(producto);
+    }
+
+    guardarCarrito(carrito);
+    alert(`"${producto.nombre}" se agregó al carrito.`);
+}
+
+function eliminarDelCarrito(index) {
+    const carrito = obtenerCarrito();
+    carrito.splice(index, 1);
+    guardarCarrito(carrito);
+    renderizarCarrito();
+}
+
+function cambiarCantidad(index, cambio) {
+    const carrito = obtenerCarrito();
+    carrito[index].cantidad += cambio;
+    if (carrito[index].cantidad < 1) carrito[index].cantidad = 1;
+    guardarCarrito(carrito);
+    renderizarCarrito();
+}
+
+function vaciarCarrito() {
+    if (confirm('¿Seguro que deseas vaciar el carrito?')) {
+        guardarCarrito([]);
+        renderizarCarrito();
+    }
+}
+
+function renderizarCarrito() {
+    const contenedor = document.getElementById('listaCarrito');
+    if (!contenedor) return;
+
+    const carrito = obtenerCarrito();
+    contenedor.innerHTML = '';
+
+    if (carrito.length === 0) {
+        contenedor.innerHTML = '<tr><td colspan="5" class="text-center py-4">Tu carrito está vacío.</td></tr>';
+        document.getElementById('totalCarrito').textContent = '$0';
+        return;
+    }
+
+    let total = 0;
+
+    carrito.forEach((item, index) => {
+        const subtotal = item.precio * item.cantidad;
+        total += subtotal;
+
+        contenedor.innerHTML += `
+            <tr>
+                <td class="d-flex align-items-center gap-2">
+                    <img src="${item.imagen}" alt="${item.nombre}" width="60" class="rounded">
+                    <span>${item.nombre}${item.talla ? ' (' + item.talla + ')' : ''}</span>
+                </td>
+                <td>$${item.precio.toLocaleString('es-CL')}</td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${index}, -1)">-</button>
+                        <span>${item.cantidad}</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${index}, 1)">+</button>
+                    </div>
+                </td>
+                <td>$${subtotal.toLocaleString('es-CL')}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarDelCarrito(${index})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    document.getElementById('totalCarrito').textContent = '$' + total.toLocaleString('es-CL');
+}
 
