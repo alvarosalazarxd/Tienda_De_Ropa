@@ -7,193 +7,269 @@
     <title>Catálogo de Productos - Moda & Estilo</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/estilos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
 
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <nav class="navbar navbar-expand-sm navbar-dark navbar-custom sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">Moda & Estilo</a>
+            <a class="navbar-brand fw-bold text-uppercase fs-4" href="index.html">Moda & Estilo</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
             <div class="collapse navbar-collapse" id="collapsibleNavbar">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="nosotros.html">Nosotros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="productos.html">Productos</a>
-                    </li>
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="nosotros.html">Nosotros</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-semibold" href="productos.html">Productos</a></li>
                 </ul>
-
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link position-relative" href="carrito.html">
+                        <a class="nav-link position-relative me-3" href="carrito.html">
                             <i class="bi bi-cart3 fs-5"></i>
                             <span id="contadorCarrito" class="badge rounded-pill bg-warning text-dark position-absolute top-0 start-100 translate-middle" style="font-size:0.65rem;">0</span>
                         </a>
                     </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="login.html">Iniciar Sesión</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="registro.html">Registrarse</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="login.html">Iniciar Sesión</a></li>
+                    <li class="nav-item"><a class="nav-link" href="registro.html">Registrarse</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-    
-    <header class="p-5 bg-dark text-white text-center">
-        <h1>Catálogo de Temporada</h1>
-        <p>Explora nuestras prendas exclusivas al mejor precio y renueva tu closet hoy mismo.</p>
+
+    <header class="bg-dark text-white py-4 border-bottom border-gold mb-4">
+        <div class="container d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <h2 class="h3 fw-bold text-uppercase mb-1" id="titulo-catalogo" style="letter-spacing: 1px;">Catálogo de Productos</h2>
+                <p class="text-white-50 small mb-0" id="subtitulo-catalogo">Descubre las últimas tendencias en moda urbana e indumentaria de alta calidad</p>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2">
+                <a href="productos.html" id="btn-ver-todos" class="btn btn-outline-light btn-sm rounded-pill px-3 d-none">
+                    <i class="bi bi-x-circle me-1"></i> Ver todos los productos
+                </a>
+            </div>
+        </div>
     </header>
 
-    <main class="container-fluid my-4 flex-grow-1">
-        <div class="row mb-3">
+    <main class="container mb-5 flex-grow-1">
+        <div class="row g-4 justify-content-start" id="contenedor-productos">
             
-            
-            <div class="col-md-3 mt-2">
-                <div class="card h-100">
-                    <a href="producto-detalle.html?id=1">
-                        <img class="card-img-top" src="img/urbana.jpg" alt="Polera Oversize Negra">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 tarjeta-producto" data-categoria="urbano">
+                <div class="card card-custom h-100 shadow-sm rounded-3 overflow-hidden position-relative">
+                    <span class="badge bg-dark text-gold border border-gold rounded-pill position-absolute top-0 start-0 m-2 z-1 px-2 py-1 fs-7">30% OFF</span>
+                    <button type="button" class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm border-0 z-1" aria-label="Favorito">
+                        <i class="bi bi-heart text-gold"></i>
+                    </button>
+
+                    <a href="producto-detalle.html?id=1" class="text-decoration-none text-dark d-flex flex-column h-100">
+                        <div class="bg-white text-center p-2" style="height: 250px;">
+                            <img src="img/urbana.jpg" class="card-img-top h-100 w-100 object-fit-cover rounded" alt="Polera Oversize Negra">
+                        </div>
+                        <div class="card-body d-flex flex-column p-3">
+                            <span class="badge bg-light text-dark border align-self-start mb-2" style="font-size: 0.7rem;">Estilo Urbano</span>
+                            <h5 class="card-title h6 fw-bold mb-1 text-truncate">Polera Oversize Negra</h5>
+                            <p class="text-muted small mb-3">Algodón 100% corte holgado</p>
+
+                            <div class="mt-auto">
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="fs-5 fw-bold text-gold">$19.990</span>
+                                    <span class="text-muted text-decoration-line-through small">$28.990</span>
+                                </div>
+                                <div class="small text-secondary mt-1">
+                                    <i class="bi bi-box-seam me-1 text-gold"></i> Envío disponible
+                                </div>
+                                <div class="d-flex align-items-center gap-1 text-gold small mt-2">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                    <span class="text-muted small ms-1">(4.5)</span>
+                                </div>
+                            </div>
+                        </div>
                     </a>
-                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
-                        <div>
-                            <h4 class="card-title">Polera Oversize Negra</h4>
-                            <p class="card-text">Polera de algodón 100% con estilo urbano holgado, ideal para un look cómodo y moderno.</p>
-                        </div>
-                        <div>
-                            <h5 class="text-warning">$19.990</h5>
-                            <a href="producto-detalle.html?id=1" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            
-            <div class="col-md-3 mt-2">
-                <div class="card h-100">
-                    <a href="producto-detalle.html?id=2">
-                        <img class="card-img-top" src="img/casual.jpg" alt="Pantalón Jean Classic">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 tarjeta-producto" data-categoria="casual">
+                <div class="card card-custom h-100 shadow-sm rounded-3 overflow-hidden position-relative">
+                    <span class="badge bg-dark text-gold border border-gold rounded-pill position-absolute top-0 start-0 m-2 z-1 px-2 py-1 fs-7">25% OFF</span>
+                    <button type="button" class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm border-0 z-1" aria-label="Favorito">
+                        <i class="bi bi-heart text-gold"></i>
+                    </button>
+
+                    <a href="producto-detalle.html?id=2" class="text-decoration-none text-dark d-flex flex-column h-100">
+                        <div class="bg-white text-center p-2" style="height: 250px;">
+                            <img src="img/casual.jpg" class="card-img-top h-100 w-100 object-fit-cover rounded" alt="Pantalón Jean Classic">
+                        </div>
+                        <div class="card-body d-flex flex-column p-3">
+                            <span class="badge bg-light text-dark border align-self-start mb-2" style="font-size: 0.7rem;">Colección Casual</span>
+                            <h5 class="card-title h6 fw-bold mb-1 text-truncate">Pantalón Jean Classic</h5>
+                            <p class="text-muted small mb-3">Corte recto mezclilla flexible</p>
+
+                            <div class="mt-auto">
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="fs-5 fw-bold text-gold">$29.990</span>
+                                    <span class="text-muted text-decoration-line-through small">$39.990</span>
+                                </div>
+                                <div class="small text-secondary mt-1">
+                                    <i class="bi bi-shop me-1 text-gold"></i> Retiro en tienda
+                                </div>
+                                <div class="d-flex align-items-center gap-1 text-gold small mt-2">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star"></i>
+                                    <span class="text-muted small ms-1">(4.0)</span>
+                                </div>
+                            </div>
+                        </div>
                     </a>
-                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
-                        <div>
-                            <h4 class="card-title">Pantalón Jean Classic</h4>
-                            <p class="card-text">Jeans de corte recto con material resistente y flexible, perfecto para combinar a diario.</p>
-                        </div>
-                        <div>
-                            <h5 class="text-warning">$29.990</h5>
-                            <a href="producto-detalle.html?id=2" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            
-            <div class="col-md-3 mt-2">
-                <div class="card h-100">
-                    <a href="producto-detalle.html?id=3">
-                        <img class="card-img-top" src="img/formal.jpg" alt="Chaqueta Formal Fit">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 tarjeta-producto" data-categoria="formal">
+                <div class="card card-custom h-100 shadow-sm rounded-3 overflow-hidden position-relative">
+                    <span class="badge bg-dark text-gold border border-gold rounded-pill position-absolute top-0 start-0 m-2 z-1 px-2 py-1 fs-7">15% OFF</span>
+                    <button type="button" class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm border-0 z-1" aria-label="Favorito">
+                        <i class="bi bi-heart text-gold"></i>
+                    </button>
+
+                    <a href="producto-detalle.html?id=3" class="text-decoration-none text-dark d-flex flex-column h-100">
+                        <div class="bg-white text-center p-2" style="height: 250px;">
+                            <img src="img/formal.jpg" class="card-img-top h-100 w-100 object-fit-cover rounded" alt="Chaqueta Formal Fit">
+                        </div>
+                        <div class="card-body d-flex flex-column p-3">
+                            <span class="badge bg-light text-dark border align-self-start mb-2" style="font-size: 0.7rem;">Línea Formal</span>
+                            <h5 class="card-title h6 fw-bold mb-1 text-truncate">Chaqueta Formal Fit</h5>
+                            <p class="text-muted small mb-3">Diseño elegante para eventos</p>
+
+                            <div class="mt-auto">
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="fs-5 fw-bold text-gold">$45.990</span>
+                                    <span class="text-muted text-decoration-line-through small">$54.990</span>
+                                </div>
+                                <div class="small text-secondary mt-1">
+                                    <i class="bi bi-truck me-1 text-gold"></i> Envío a domicilio
+                                </div>
+                                <div class="d-flex align-items-center gap-1 text-gold small mt-2">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <span class="text-muted small ms-1">(5.0)</span>
+                                </div>
+                            </div>
+                        </div>
                     </a>
-                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
-                        <div>
-                            <h4 class="card-title">Chaqueta Formal Fit</h4>
-                            <p class="card-text">Chaqueta de diseño elegante para eventos especiales, confeccionada con terminaciones finas.</p>
-                        </div>
-                        <div>
-                            <h5 class="text-warning">$45.990</h5>
-                            <a href="producto-detalle.html?id=3" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            
-            <div class="col-md-3 mt-2">
-                <div class="card h-100">
-                    <a href="producto-detalle.html?id=4">
-                        <img class="card-img-top" src="img/accesorios.jpg" alt="Gorro Beanie Urbano">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 tarjeta-producto" data-categoria="accesorios">
+                <div class="card card-custom h-100 shadow-sm rounded-3 overflow-hidden position-relative">
+                    <button type="button" class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm border-0 z-1" aria-label="Favorito">
+                        <i class="bi bi-heart text-gold"></i>
+                    </button>
+
+                    <a href="producto-detalle.html?id=4" class="text-decoration-none text-dark d-flex flex-column h-100">
+                        <div class="bg-white text-center p-2" style="height: 250px;">
+                            <img src="img/accesorios.jpg" class="card-img-top h-100 w-100 object-fit-cover rounded" alt="Gorro Beanie Urbano">
+                        </div>
+                        <div class="card-body d-flex flex-column p-3">
+                            <span class="badge bg-light text-dark border align-self-start mb-2" style="font-size: 0.7rem;">Accesorios</span>
+                            <h5 class="card-title h6 fw-bold mb-1 text-truncate">Gorro Beanie Urbano</h5>
+                            <p class="text-muted small mb-3">Lana acrílica de alta densidad</p>
+
+                            <div class="mt-auto">
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="fs-5 fw-bold text-gold">$8.990</span>
+                                </div>
+                                <div class="small text-secondary mt-1">
+                                    <i class="bi bi-box-seam me-1 text-gold"></i> Stock disponible
+                                </div>
+                                <div class="d-flex align-items-center gap-1 text-gold small mt-2">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                    <span class="text-muted small ms-1">(4.8)</span>
+                                </div>
+                            </div>
+                        </div>
                     </a>
-                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
-                        <div>
-                            <h4 class="card-title">Gorro Beanie Urbano</h4>
-                            <p class="card-text">Gorro tejido de lana acrílica, el accesorio perfecto para complementar tu vestimenta.</p>
-                        </div>
-                        <div>
-                            <h5 class="text-warning">$8.990</h5>
-                            <a href="producto-detalle.html?id=4" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
-                        </div>
-                    </div>
                 </div>
             </div>
 
         </div>
     </main>
-    
-    <footer class="bg-dark text-light pt-5 pb-4 mt-auto">
-        <div class="container">
-            <div class="row">
 
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-uppercase fw-bold">Moda & Estilo</h5>
-                    <p class="text-white">
-                        Somos una tienda enfocada en entregar las últimas tendencias de ropa y accesorios con la mejor calidad y atención personalizada.
-                    </p>
+    <footer class="footer-custom pt-5 pb-3 mt-auto">
+        <div class="container">
+            <div class="row g-4 align-items-start mb-4">
+                
+                <div class="col-12 col-md-4">
+                    <h6 class="fw-bold text-uppercase mb-3">MODA & ESTILO</h6>
+                    <p class="small text-white-50 mb-3">Somos una tienda enfocada en entregar las últimas tendencias de ropa y accesorios con la mejor calidad, estilo y servicio en la región.</p>
+                    <div class="d-flex gap-2 text-white-50 small">
+                        <i class="bi bi-shield-check text-gold"></i>
+                        <span>Compra 100% Segura y Garantizada</span>
+                    </div>
                 </div>
 
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-uppercase fw-bold">Contacto</h5>
-                    <p class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> Santiago, Chile</p>
-                    <p class="mb-2">
-                        <i class="bi bi-telephone-fill me-2"></i>
-                        <a href="tel:+56912345678" class="text-white text-decoration-none">+56 9 1234 5678</a>
+                <div class="col-12 col-md-4">
+                    <h6 class="fw-bold text-uppercase mb-3">CONTACTO</h6>
+                    <p class="small text-white-50 mb-2">
+                        <i class="bi bi-geo-alt-fill text-gold me-2"></i> Concepción, Chile
                     </p>
-                    <p class="mb-2">
-                        <i class="bi bi-envelope-fill me-2"></i>
-                        <a href="mailto:contacto@tiendaderopa.cl" class="text-white text-decoration-none">contacto@tiendaderopa.cl</a>
-                    </p>
-                    <p class="mb-0">
-                        <i class="bi bi-whatsapp me-2"></i>
-                        <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">
-                            Escríbenos por WhatsApp
+                    <p class="small mb-2">
+                        <a href="https://wa.me/56912345678" target="_blank" class="text-white-50 text-decoration-none hover-link">
+                            <i class="bi bi-whatsapp text-gold me-2"></i> +56 9 1234 5678
                         </a>
                     </p>
+                    <p class="small mb-2">
+                        <a href="mailto:contacto@modaestilo.cl" class="text-white-50 text-decoration-none hover-link">
+                            <i class="bi bi-envelope-fill text-gold me-2"></i> contacto@modaestilo.cl
+                        </a>
+                    </p>
+                    <p class="small text-white-50 mb-0">
+                        <i class="bi bi-clock-fill text-gold me-2"></i> Lun - Sáb: 10:00 - 20:00 hrs
+                    </p>
                 </div>
 
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-uppercase fw-bold">Síguenos</h5>
-                    <div class="mb-3">
-                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" class="text-white me-3 fs-4" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="text-white me-3 fs-4" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-                        <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" class="text-white me-3 fs-4" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
-                        <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" class="text-white fs-4" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+                <div class="col-12 col-md-4">
+                    <h6 class="fw-bold text-uppercase mb-3">SÍGUENOS</h6>
+                    <div class="d-flex gap-3 fs-5 mb-3">
+                        <a href="https://facebook.com" target="_blank" class="text-white-50 hover-link"><i class="bi bi-facebook"></i></a>
+                        <a href="https://instagram.com" target="_blank" class="text-white-50 hover-link"><i class="bi bi-instagram"></i></a>
+                        <a href="https://linkedin.com" target="_blank" class="text-white-50 hover-link"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://youtube.com" target="_blank" class="text-white-50 hover-link"><i class="bi bi-youtube"></i></a>
+                        <a href="https://tiktok.com" target="_blank" class="text-white-50 hover-link"><i class="bi bi-tiktok"></i></a>
                     </div>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Términos y condiciones</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Política de privacidad</a></li>
-                        <li><a href="#" class="text-white-50 text-decoration-none">Contáctanos</a></li>
-                    </ul>
+
+                    <div class="small">
+                        <a href="#" class="text-white-50 text-decoration-none me-3 hover-link">Centro de ayuda</a>
+                        <a href="#" class="text-white-50 text-decoration-none hover-link">Devoluciones</a>
+                    </div>
                 </div>
 
             </div>
 
-            <hr class="border-secondary">
+            <hr class="border-secondary border-opacity-25 my-3">
 
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start">
-                    <p class="mb-0 text-white-50">&copy; 2026 Moda & Estilo. Todos los derechos reservados.</p>
-                </div>
-                <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
-                    <span class="text-white-50">Diseñado con Bootstrap 5</span>
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 text-white-50 small">
+                <p class="mb-0">&copy; 2026 Moda & Estilo. Todos los derechos reservados.</p>
+                <div class="d-flex gap-3 text-gold">
+                    <i class="bi bi-credit-card-2-front fs-5" title="Tarjetas de Crédito / Débito"></i>
+                    <i class="bi bi-cash-coin fs-5" title="Transferencia Directa"></i>
+                    <i class="bi bi-truck fs-5" title="Envíos a todo Chile"></i>
                 </div>
             </div>
         </div>
@@ -201,6 +277,35 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/main.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoriaSeleccionada = urlParams.get('categoria');
+
+            const nombresCategorias = {
+                'urbano': 'Estilo Urbano',
+                'casual': 'Colección Casual',
+                'formal': 'Línea Formal',
+                'accesorios': 'Accesorios'
+            };
+
+            if (categoriaSeleccionada && nombresCategorias[categoriaSeleccionada]) {
+                document.getElementById('titulo-catalogo').textContent = "Categoría: " + nombresCategorias[categoriaSeleccionada];
+                document.getElementById('subtitulo-catalogo').textContent = "Mostrando únicamente prendas de " + nombresCategorias[categoriaSeleccionada];
+                
+                document.getElementById('btn-ver-todos').classList.remove('d-none');
+
+                const tarjetas = document.querySelectorAll('.tarjeta-producto');
+                tarjetas.forEach(tarjeta => {
+                    const catProducto = tarjeta.getAttribute('data-categoria');
+                    if (catProducto !== categoriaSeleccionada) {
+                        tarjeta.classList.add('d-none');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

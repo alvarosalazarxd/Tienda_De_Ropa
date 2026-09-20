@@ -6,17 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración - Moda & Estilo</title>
     
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/estilos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
 
-<body class="bg-light d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100">
 
     
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <nav class="navbar navbar-expand-sm navbar-dark navbar-custom sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand text-warning fw-bold" href="index.html">
+            <a class="navbar-brand text-gold fw-bold" href="index.html">
                 <i class="bi bi-shield-lock-fill me-2"></i>Moda & Estilo (Admin)
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
@@ -32,7 +35,7 @@
                     </li>
                 </ul>
                 <span class="navbar-text text-white me-3">
-                    <i class="bi bi-person-circle me-1"></i> Admin: Juan Pérez
+                    <i class="bi bi-person-circle me-1 text-gold"></i> Admin: Juan Pérez
                 </span>
                 <a href="login.html" class="btn btn-outline-danger btn-sm">Cerrar Sesión</a>
             </div>
@@ -45,54 +48,54 @@
         
         <div class="row g-4 mb-4">
             <div class="col-md-4">
-                <div class="card bg-primary text-white shadow-sm border-0">
+                <div class="card card-custom bg-dark text-white shadow-sm border-gold">
                     <div class="card-body d-flex align-items-center justify-content-between p-4">
                         <div>
-                            <h6 class="text-uppercase mb-1 small fw-bold">Total Stock</h6>
+                            <h6 class="text-uppercase mb-1 small fw-bold text-gold">Total Stock</h6>
                             <h2 class="mb-0 fw-bold">142 prendas</h2>
                         </div>
-                        <i class="bi bi-box-seam fs-1 opacity-50"></i>
+                        <i class="bi bi-box-seam fs-1 text-gold opacity-75"></i>
                     </div>
                 </div>
             </div>
             
             <div class="col-md-4">
-                <div class="card bg-success text-white shadow-sm border-0">
+                <div class="card card-custom bg-dark text-white shadow-sm border-gold">
                     <div class="card-body d-flex align-items-center justify-content-between p-4">
                         <div>
-                            <h6 class="text-uppercase mb-1 small fw-bold">Ventas del Mes</h6>
+                            <h6 class="text-uppercase mb-1 small fw-bold text-gold">Ventas del Mes</h6>
                             <h2 class="mb-0 fw-bold">$1.450.000</h2>
                         </div>
-                        <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
+                        <i class="bi bi-currency-dollar fs-1 text-gold opacity-75"></i>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="card bg-warning text-dark shadow-sm border-0">
+                <div class="card card-custom bg-dark text-white shadow-sm border-gold">
                     <div class="card-body d-flex align-items-center justify-content-between p-4">
                         <div>
-                            <h6 class="text-uppercase mb-1 small fw-bold">Alertas de Reposición</h6>
+                            <h6 class="text-uppercase mb-1 small fw-bold text-gold">Alertas de Reposición</h6>
                             <h2 class="mb-0 fw-bold">2 ítems bajos</h2>
                         </div>
-                        <i class="bi bi-exclamation-triangle-fill fs-1 opacity-50"></i>
+                        <i class="bi bi-exclamation-triangle-fill fs-1 text-gold opacity-75"></i>
                     </div>
                 </div>
             </div>
         </div>
 
         
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-table me-2"></i>Gestión de Stock de Productos</h5>
-                <button class="btn btn-warning btn-sm fw-bold">
+        <div class="card card-custom shadow-sm border-0">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3 border-bottom border-gold">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-table me-2 text-gold"></i>Gestión de Stock de Productos</h5>
+                <button class="btn btn-fashion btn-sm fw-bold">
                     <i class="bi bi-plus-lg me-1"></i> Agregar Producto
                 </button>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-secondary">
+                        <thead class="table-dark">
                             <tr>
                                 <th>ID</th>
                                 <th>Producto</th>
@@ -112,7 +115,7 @@
                                 <td>15 unidades</td>
                                 <td><span class="badge bg-success">Disponible</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-sm btn-outline-dark me-1"><i class="bi bi-pencil-square"></i></button>
                                     <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                                 </td>
                             </tr>
@@ -124,7 +127,7 @@
                                 <td>3 unidades</td>
                                 <td><span class="badge bg-warning text-dark">Poco Stock</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-sm btn-outline-dark me-1"><i class="bi bi-pencil-square"></i></button>
                                     <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                                 </td>
                             </tr>
@@ -136,7 +139,7 @@
                                 <td>8 unidades</td>
                                 <td><span class="badge bg-success">Disponible</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-sm btn-outline-dark me-1"><i class="bi bi-pencil-square"></i></button>
                                     <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                                 </td>
                             </tr>
@@ -148,7 +151,7 @@
                                 <td>0 unidades</td>
                                 <td><span class="badge bg-danger">Agotado</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-sm btn-outline-dark me-1"><i class="bi bi-pencil-square"></i></button>
                                     <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                                 </td>
                             </tr>
@@ -161,7 +164,7 @@
     </div>
 
     
-    <footer class="bg-dark text-light pt-4 pb-3 mt-auto">
+    <footer class="footer-custom pt-4 pb-3 mt-auto">
         <div class="container text-center">
             <p class="mb-0 text-white-50">&copy; 2026 Moda & Estilo - Panel Administrativo</p>
         </div>
