@@ -1,66 +1,107 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    
+    // LÓGICA MOSTRAR / OCULTAR CONTRASEÑA (OJO)
+    document.querySelectorAll('.btn-toggle-password').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Busca el input de tipo password dentro del mismo grupo
+            const inputGroup = btn.closest('.input-group');
+            const input = inputGroup.querySelector('input');
+            const icon = btn.querySelector('i');
+
+            if (input) {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('bi-eye-slash-fill');
+                    icon.classList.add('bi-eye-fill');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('bi-eye-fill');
+                    icon.classList.add('bi-eye-slash-fill');
+                }
+            }
+        });
+    });
+
+    // VALIDACIÓN DE REGISTRO
     const formRegistro = document.getElementById('formRegistro');
 
     if (formRegistro) {
         formRegistro.addEventListener('submit', (e) => {
-            e.preventDefault(); 
+            e.preventDefault();
 
-            const nombreInput = document.getElementById('nombreCompleto');
+            const nombresInput = document.getElementById('regNombres');
+            const apellidosInput = document.getElementById('regApellidos');
             const emailInput = document.getElementById('regEmail');
             const passInput = document.getElementById('regPassword');
             const confirmPassInput = document.getElementById('confirmPassword');
+            const alerta = document.getElementById('alertaRegistro');
 
-            const nombre = nombreInput.value.trim();
-            const email = emailInput.value.trim();
-            const password = passInput.value;
-            const confirmPassword = confirmPassInput.value;
+            const nombres = nombresInput ? nombresInput.value.trim() : '';
+            const apellidos = apellidosInput ? apellidosInput.value.trim() : '';
+            const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+            const password = passInput ? passInput.value : '';
+            const confirmPassword = confirmPassInput ? confirmPassInput.value : '';
 
-            
-            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+            const mostrarAlerta = (mensaje, tipo = 'danger') => {
+                if (alerta) {
+                    alerta.className = `alert alert-${tipo} mb-4`;
+                    alerta.textContent = mensaje;
+                    alerta.classList.remove('d-none');
+                } else {
+                    alert(mensaje);
+                }
+            };
 
-            
-            formRegistro.querySelectorAll('.form-control').forEach(input => input.classList.remove('is-invalid'));
-
-            let esValido = true;
-
-            if (nombre === "") {
-                nombreInput.classList.add('is-invalid');
-                esValido = false;
-            }
-
-            if (email === "" || !email.includes('@')) {
-                emailInput.classList.add('is-invalid');
-                esValido = false;
-            }
-
-            if (!passwordRegex.test(password)) {
-                passInput.classList.add('is-invalid');
-                esValido = false;
-            }
-
-            if (password !== confirmPassword || confirmPassword === "") {
-                confirmPassInput.classList.add('is-invalid');
-                esValido = false;
-            }
-
-            
-            if (!esValido) {
-                alert("Por favor completa los campos correctamente. La contraseña requiere 8 caracteres, una mayúscula y un número.");
+            if (!nombres || !apellidos || !email || !password || !confirmPassword) {
+                mostrarAlerta('Por favor completa todos los campos.');
                 return;
             }
 
-            
-            const usuario = { nombre, email, password };
-            localStorage.setItem('usuarioRegistrado', JSON.stringify(usuario));
+            if (password !== confirmPassword) {
+                mostrarAlerta('Las contraseñas no coinciden.');
+                return;
+            }
 
-            alert('¡Registro exitoso! Redirigiendo a Iniciar Sesión...');
-            window.location.href = 'login.html';
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!passwordRegex.test(password)) {
+                mostrarAlerta('La contraseña requiere al menos 8 caracteres, una mayúscula y un número.');
+                return;
+            }
+
+            let usuarios = JSON.parse(localStorage.getItem('usuarios_registrados')) || [];
+
+            const usuarioExistente = usuarios.find(u => u.email === email);
+            if (usuarioExistente) {
+                mostrarAlerta('El correo electrónico ya se encuentra registrado. Intenta con otro.');
+                return;
+            }
+
+            const passwordExistente = usuarios.find(u => u.password === password);
+            if (passwordExistente) {
+                mostrarAlerta('La contraseña ingresada ya está en uso. Por seguridad, utiliza otra contraseña.');
+                return;
+            }
+
+            usuarios.push({
+                nombres,
+                apellidos,
+                email,
+                password
+            });
+
+            localStorage.setItem('usuarios_registrados', JSON.stringify(usuarios));
+
+            mostrarAlerta('¡Cuenta creada con éxito! Redirigiendo a inicio de sesión...', 'success');
+
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
         });
     }
 
-    
+    // VALIDACIÓN DE INICIO DE SESIÓN
     const formLogin = document.getElementById('formLogin');
 
     if (formLogin) {
@@ -70,40 +111,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const emailInput = document.getElementById('email');
             const passInput = document.getElementById('password');
 
-            const email = emailInput.value.trim();
-            const password = passInput.value;
+            const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+            const password = passInput ? passInput.value : '';
 
-            
-            formLogin.querySelectorAll('.form-control').forEach(input => input.classList.remove('is-invalid'));
-
-            
-            if (email === "admin@admin.cl" && password === "Admin123") {
-                alert('¡Bienvenido, Administrador!');
+            if (email === 'admin@modaestilo.cl' && password === 'admin123') {
+                alert('¡Bienvenido Administrador!');
                 window.location.href = 'admin.html';
                 return;
             }
 
-            
-            const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioRegistrado'));
+            const usuarios = JSON.parse(localStorage.getItem('usuarios_registrados')) || [];
+            const usuarioEncontrado = usuarios.find(u => u.email === email && u.password === password);
 
-            if (!usuarioGuardado) {
-                alert('No hay usuarios registrados. Por favor regístrate primero.');
-                window.location.href = 'registro.html';
-                return;
-            }
-
-            if (email === usuarioGuardado.email && password === usuarioGuardado.password) {
-                alert(`¡Bienvenido de nuevo, ${usuarioGuardado.nombre}!`);
+            if (usuarioEncontrado) {
+                alert(`¡Bienvenido de nuevo, ${usuarioEncontrado.nombres}!`);
                 window.location.href = 'productos.html';
             } else {
-                emailInput.classList.add('is-invalid');
-                passInput.classList.add('is-invalid');
+                if (emailInput) emailInput.classList.add('is-invalid');
+                if (passInput) passInput.classList.add('is-invalid');
                 alert('Correo o contraseña incorrectos.');
             }
         });
     }
 
-        // === CARRITO ===
+    // CARRITO DE COMPRAS
     actualizarContadorCarrito();
     renderizarCarrito();
 
@@ -189,7 +220,8 @@ function renderizarCarrito() {
 
     if (carrito.length === 0) {
         contenedor.innerHTML = '<tr><td colspan="5" class="text-center py-4">Tu carrito está vacío.</td></tr>';
-        document.getElementById('totalCarrito').textContent = '$0';
+        const totalElem = document.getElementById('totalCarrito');
+        if (totalElem) totalElem.textContent = '$0';
         return;
     }
 
@@ -223,6 +255,6 @@ function renderizarCarrito() {
         `;
     });
 
-    document.getElementById('totalCarrito').textContent = '$' + total.toLocaleString('es-CL');
+    const totalElem = document.getElementById('totalCarrito');
+    if (totalElem) totalElem.textContent = '$' + total.toLocaleString('es-CL');
 }
-
