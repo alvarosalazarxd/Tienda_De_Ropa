@@ -40,7 +40,6 @@
         </div>
     </nav>
 
-    
     <main class="container my-5 flex-grow-1">
         
         <nav aria-label="breadcrumb" class="mb-4">
@@ -159,17 +158,18 @@
         </div>
     </footer>
 
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/main.js"></script>
 
-    
     <script>
+        const CLAVE_STORAGE = "carrito_moda_estilo";
+
         const productos = {
             "1": {
+                id: 1,
                 nombre: "Polera Oversize Negra",
                 ref: "Ref: #001",
-                precio: "$19.990",
+                precio: 19990,
                 categoria: "Colección Urbana",
                 img: "img/urbana.jpg",
                 desc: "Polera de algodón 100% con estilo urbano holgado, ideal para un look cómodo y moderno.",
@@ -177,9 +177,10 @@
                 stock: 15
             },
             "2": {
+                id: 2,
                 nombre: "Pantalón Jean Classic",
                 ref: "Ref: #002",
-                precio: "$29.990",
+                precio: 29990,
                 categoria: "Colección Casual",
                 img: "img/casual.jpg",
                 desc: "Jeans de corte recto con material resistente y flexible, perfecto para combinar a diario.",
@@ -187,19 +188,21 @@
                 stock: 8
             },
             "3": {
+                id: 3,
                 nombre: "Chaqueta Formal Fit",
                 ref: "Ref: #003",
-                precio: "$45.990",
+                precio: 45990,
                 categoria: "Colección Formal",
                 img: "img/formal.jpg",
                 desc: "Chaqueta de diseño elegante para eventos especiales, confeccionada con terminaciones finas.",
                 tallas: ["S - Small", "M - Medium", "L - Large"],
-                stock: 0
+                stock: 10
             },
             "4": {
+                id: 4,
                 nombre: "Gorro Beanie Urbano",
                 ref: "Ref: #004",
-                precio: "$8.990",
+                precio: 8990,
                 categoria: "Accesorios",
                 img: "img/accesorios.jpg",
                 desc: "Gorro tejido de lana acrílica, el accesorio perfecto para complementar tu vestimenta.",
@@ -208,16 +211,17 @@
             }
         };
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const prodId = urlParams.get('id') || "1"; 
+        const formatoCLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
 
-        const p = productos[prodId] || productos["1"];
+        const urlParams = new URLSearchParams(window.location.search);
+        const prodIdParam = urlParams.get('id') || "1"; 
+        const p = productos[prodIdParam] || productos["1"];
 
         document.getElementById("pageTitle").innerText = `${p.nombre} - Moda & Estilo`;
         document.getElementById("breadcrumbNombre").innerText = p.nombre;
         document.getElementById("prodNombre").innerText = p.nombre;
         document.getElementById("prodRef").innerText = p.ref;
-        document.getElementById("prodPrecio").innerText = p.precio;
+        document.getElementById("prodPrecio").innerText = formatoCLP.format(p.precio);
         document.getElementById("prodCategoria").innerText = p.categoria;
         document.getElementById("prodDesc").innerText = p.desc;
         document.getElementById("prodImg").src = p.img;
@@ -229,7 +233,7 @@
             const opt = document.createElement("option");
             opt.value = talla;
             opt.innerText = talla;
-            if (p.tallas.length > 1 && index === 1) opt.selected = true;
+            if (p.tallas.length > 1 && index === 0) opt.selected = true;
             selectTalla.appendChild(opt);
         });
 
@@ -250,24 +254,23 @@
 
         cantidadInput.closest(".mb-4").after(infoStock);
 
-        const precioNumero = parseInt(p.precio.replace(/\D/g, ""), 10);
-
-        document.getElementById("btnAgregarCarrito").addEventListener("click", () => {
-            const talla = document.getElementById("tallaSelect").value;
-            const cantidad = parseInt(document.getElementById("cantidadInput").value, 10) || 1;
+        btnAgregar.addEventListener("click", () => {
+            const talla = selectTalla.value;
+            const cantidad = parseInt(cantidadInput.value, 10) || 1;
 
             if (!talla) {
                 alert("Por favor selecciona una talla.");
                 return;
             }
 
-            if (cantidad > p.stock) {
-                alert(`Solo quedan ${p.stock} unidades disponibles.`);
-                return;
+            let carritoActual = [];
+            if (typeof obtenerCarrito === "function") {
+                carritoActual = obtenerCarrito();
+            } else {
+                carritoActual = JSON.parse(localStorage.getItem(CLAVE_STORAGE)) || [];
             }
 
-            const carritoActual = obtenerCarrito();
-            const yaEnCarrito = carritoActual.find(item => item.id === prodId && item.talla === talla);
+            const yaEnCarrito = carritoActual.find(item => Number(item.id) === Number(p.id) && item.talla === talla);
             const cantidadTotal = (yaEnCarrito ? yaEnCarrito.cantidad : 0) + cantidad;
 
             if (cantidadTotal > p.stock) {
@@ -275,14 +278,31 @@
                 return;
             }
 
-            agregarAlCarrito({
-                id: prodId,
-                nombre: p.nombre,
-                precio: precioNumero,
-                imagen: p.img,
-                talla: talla,
-                cantidad: cantidad
-            });
+            if (yaEnCarrito) {
+                yaEnCarrito.cantidad += cantidad;
+            } else {
+                carritoActual.push({
+                    id: Number(p.id),
+                    nombre: p.nombre,
+                    precio: Number(p.precio),
+                    img: p.img,
+                    imagen: p.img,
+                    talla: talla,
+                    cantidad: cantidad
+                });
+            }
+
+            if (typeof guardarCarrito === "function") {
+                guardarCarrito(carritoActual);
+            } else {
+                localStorage.setItem(CLAVE_STORAGE, JSON.stringify(carritoActual));
+            }
+
+            if (typeof actualizarContador === "function") {
+                actualizarContador();
+            }
+
+            alert("Producto añadido al carrito exitosamente.");
         });
     </script>
 </body>
