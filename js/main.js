@@ -42,62 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
     vincularBotonVaciar();
     vincularBotonPagar();
 
-    // 3. Panel Administrador (Productos)
-    const tbodyProductos = document.querySelector('#tablaAdminProductos tbody') || document.querySelector('#tablaAdminProductos');
-    if (tbodyProductos) {
-        tbodyProductos.querySelectorAll('tr').forEach(fila => {
-            asignarAccionesFila(fila);
-        });
-    }
-
-    const btnAgregar = document.getElementById('btnAbrirModalAgregar') || document.querySelector('.card-header button');
-    if (btnAgregar && btnAgregar.textContent.includes('Agregar')) {
-        btnAgregar.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            const nombre = prompt('Nombre del nuevo producto:');
-            if (!nombre || !nombre.trim()) return;
-
-            const categoria = prompt('Categoría (Urbana, Casual, Formal, Accesorios):', 'Ropa Urbana');
-            const precio = prompt('Precio unitario ($):', '29990');
-            const stock = prompt('Cantidad en stock:', '10');
-
-            const tbody = document.querySelector('#tablaAdminProductos tbody') || document.getElementById('tablaAdminProductos') || document.querySelector('table tbody');
-            if (tbody) {
-                const numFilas = tbody.querySelectorAll('tr').length + 1;
-                const idProd = `#00${numFilas}`;
-                const numStock = parseInt(stock, 10) || 0;
-                const precioNum = parsearPrecio(precio);
-
-                let badgeEstado = '<span class="badge bg-success">Disponible</span>';
-                if (numStock === 0) {
-                    badgeEstado = '<span class="badge bg-danger">Agotado</span>';
-                } else if (numStock <= 5) {
-                    badgeEstado = '<span class="badge bg-warning text-dark">Poco Stock</span>';
-                }
-
-                const nuevaFila = document.createElement('tr');
-                nuevaFila.innerHTML = `
-                    <td>${escaparHTML(idProd)}</td>
-                    <td class="fw-bold">${escaparHTML(nombre.trim())}</td>
-                    <td>${escaparHTML(categoria ? categoria.trim() : 'Ropa Urbana')}</td>
-                    <td>$${precioNum.toLocaleString('es-CL')}</td>
-                    <td>${numStock} unidades</td>
-                    <td>${badgeEstado}</td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
-                    </td>
-                `;
-
-                tbody.appendChild(nuevaFila);
-                asignarAccionesFila(nuevaFila);
-                actualizarMetricasAdmin();
-            }
-        });
-    }
-
-    actualizarMetricasAdmin();
+    // 3. Panel Administrador (Productos) — ahora persistido en localStorage
+    inicializarPanelAdminProductos();
 
     // 4. Panel Administrador (Usuarios)
     cargarTablaUsuarios();
@@ -547,73 +493,243 @@ function cerrarSesion(e) {
 // FUNCIONES ADMIN (PRODUCTOS Y USUARIOS)
 // ==========================================
 
-function asignarAccionesFila(fila) {
-    const celdas = fila.querySelectorAll('td');
-    if (celdas.length < 6) return;
+// ==========================================
+// PRODUCTOS (base de datos simulada en localStorage)
+// ==========================================
 
-    const btnEditar = fila.querySelector('button:first-of-type, .btn-outline-secondary, .btn-outline-dark');
-    if (btnEditar) {
-        btnEditar.addEventListener('click', () => {
-            const nombreActual = celdas[1].textContent.trim();
-            const stockTexto = celdas[4].textContent.trim();
-            const stockActual = parseInt(stockTexto, 10) || 0;
+const PRODUCTOS_KEY = 'productos_moda_estilo';
 
-            const nuevoNombre = prompt('Editar nombre del producto:', nombreActual);
-            if (nuevoNombre === null || !nuevoNombre.trim()) return;
-
-            const nuevoStockStr = prompt('Editar stock (unidades):', stockActual);
-            if (nuevoStockStr === null) return;
-
-            const nuevoStock = parseInt(nuevoStockStr, 10) || 0;
-
-            celdas[1].textContent = nuevoNombre.trim();
-            celdas[4].textContent = `${nuevoStock} unidades`;
-
-            if (nuevoStock === 0) {
-                celdas[5].innerHTML = '<span class="badge bg-danger">Agotado</span>';
-            } else if (nuevoStock <= 5) {
-                celdas[5].innerHTML = '<span class="badge bg-warning text-dark">Poco Stock</span>';
-            } else {
-                celdas[5].innerHTML = '<span class="badge bg-success">Disponible</span>';
-            }
-
-            actualizarMetricasAdmin();
-        });
+const productosPorDefecto = [
+    {
+        id: 1,
+        nombre: "Polera Oversize Negra",
+        categoria: "Colección Urbana",
+        categoriaSlug: "urbano",
+        precio: 19990,
+        img: "img/urbana.jpg",
+        desc: "Polera de algodón 100% con estilo urbano holgado, ideal para un look cómodo y moderno.",
+        tallas: ["S - Small", "M - Medium", "L - Large", "XL - Extra Large"],
+        stock: 15
+    },
+    {
+        id: 2,
+        nombre: "Pantalón Jean Classic",
+        categoria: "Colección Casual",
+        categoriaSlug: "casual",
+        precio: 29990,
+        img: "img/casual.jpg",
+        desc: "Jeans de corte recto con material resistente y flexible, perfecto para combinar a diario.",
+        tallas: ["38 - S", "40 - M", "42 - L", "44 - XL"],
+        stock: 8
+    },
+    {
+        id: 3,
+        nombre: "Chaqueta Formal Fit",
+        categoria: "Colección Formal",
+        categoriaSlug: "formal",
+        precio: 45990,
+        img: "img/formal.jpg",
+        desc: "Chaqueta de diseño elegante para eventos especiales, confeccionada con terminaciones finas.",
+        tallas: ["S - Small", "M - Medium", "L - Large"],
+        stock: 10
+    },
+    {
+        id: 4,
+        nombre: "Gorro Beanie Urbano",
+        categoria: "Accesorios",
+        categoriaSlug: "accesorios",
+        precio: 8990,
+        img: "img/accesorios.jpg",
+        desc: "Gorro tejido de lana acrílica, el accesorio perfecto para complementar tu vestimenta.",
+        tallas: ["Talla Única (Estandard)"],
+        stock: 20
     }
+];
 
-    const btnEliminar = fila.querySelector('button:last-of-type, .btn-outline-danger');
-    if (btnEliminar) {
-        btnEliminar.addEventListener('click', () => {
-            const nombreProd = celdas[1].textContent.trim();
-            if (confirm(`¿Estás seguro de que deseas eliminar "${nombreProd}"?`)) {
-                fila.remove();
-                actualizarMetricasAdmin();
-            }
-        });
+function inicializarProductos() {
+    if (!localStorage.getItem(PRODUCTOS_KEY)) {
+        localStorage.setItem(PRODUCTOS_KEY, JSON.stringify(productosPorDefecto));
     }
 }
 
-function actualizarMetricasAdmin() {
-    let totalStock = 0;
-    let alertasCount = 0;
+function obtenerProductos() {
+    inicializarProductos();
+    try {
+        return JSON.parse(localStorage.getItem(PRODUCTOS_KEY)) || [];
+    } catch (e) {
+        return [];
+    }
+}
 
-    const tablaProductos = document.querySelector('#tablaAdminProductos tbody') || document.querySelector('#tablaAdminProductos');
-    if (!tablaProductos) return;
+function guardarProductos(lista) {
+    localStorage.setItem(PRODUCTOS_KEY, JSON.stringify(lista));
+}
 
-    tablaProductos.querySelectorAll('tr').forEach(fila => {
-        const celdas = fila.querySelectorAll('td');
-        if (celdas.length >= 5) {
-            const cant = parseInt(celdas[4].textContent, 10) || 0;
-            totalStock += cant;
-            if (cant <= 5) alertasCount++;
+function obtenerProductoPorId(id) {
+    return obtenerProductos().find(p => Number(p.id) === Number(id));
+}
+
+function agregarProducto(producto) {
+    const productos = obtenerProductos();
+    productos.push(producto);
+    guardarProductos(productos);
+}
+
+function actualizarProducto(productoActualizado) {
+    const productos = obtenerProductos();
+    const index = productos.findIndex(p => Number(p.id) === Number(productoActualizado.id));
+    if (index !== -1) {
+        productos[index] = productoActualizado;
+        guardarProductos(productos);
+    }
+}
+
+function eliminarProducto(id) {
+    const productos = obtenerProductos().filter(p => Number(p.id) !== Number(id));
+    guardarProductos(productos);
+}
+
+function calcularEstadoStock(stock) {
+    if (stock === 0) return { texto: 'Agotado', clase: 'bg-danger' };
+    if (stock <= 5) return { texto: 'Poco Stock', clase: 'bg-warning text-dark' };
+    return { texto: 'Disponible', clase: 'bg-success' };
+}
+
+// ==========================================
+// PANEL ADMIN — GESTIÓN DE PRODUCTOS (conectado al modal real)
+// ==========================================
+
+function inicializarPanelAdminProductos() {
+    const tbody = document.getElementById('tablaAdminProductos');
+    if (!tbody) return; // Esta lógica solo corre en admin.html
+
+    const modalEl = document.getElementById('modalProducto');
+    const modalProducto = modalEl ? new bootstrap.Modal(modalEl) : null;
+    const form = document.getElementById('formProductoAdmin');
+    const tituloModal = document.getElementById('modalProductoTitulo');
+    const inputIdEditar = document.getElementById('filaIndexEditar');
+
+    const mapaCategoriaSlug = {
+        'Ropa Urbana': 'urbano',
+        'Ropa Casual': 'casual',
+        'Ropa Formal': 'formal',
+        'Accesorios': 'accesorios'
+    };
+
+    function renderTablaAdmin() {
+        const productos = obtenerProductos();
+        tbody.innerHTML = '';
+
+        let totalStock = 0;
+        let alertas = 0;
+
+        productos.forEach(p => {
+            totalStock += p.stock;
+            const estado = calcularEstadoStock(p.stock);
+            if (p.stock <= 5) alertas++;
+
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>#${String(p.id).padStart(3, '0')}</td>
+                <td class="fw-bold">${escaparHTML(p.nombre)}</td>
+                <td>${escaparHTML(p.categoria)}</td>
+                <td>$${p.precio.toLocaleString('es-CL')}</td>
+                <td>${p.stock} unidades</td>
+                <td><span class="badge ${estado.clase}">${estado.texto}</span></td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1 btn-editar-producto" data-id="${p.id}" title="Editar"><i class="bi bi-pencil-square"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar-producto" data-id="${p.id}" title="Eliminar"><i class="bi bi-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(fila);
+        });
+
+        const dashStock = document.getElementById('dashTotalStock');
+        const dashAlertas = document.getElementById('dashAlertas');
+        if (dashStock) dashStock.textContent = `${totalStock} prendas`;
+        if (dashAlertas) dashAlertas.textContent = `${alertas} ítems bajos`;
+    }
+
+    function abrirModalAgregar() {
+        form.reset();
+        inputIdEditar.value = '';
+        tituloModal.textContent = 'Agregar Producto';
+        if (modalProducto) modalProducto.show();
+    }
+
+    function abrirModalEditar(id) {
+        const p = obtenerProductoPorId(id);
+        if (!p) return;
+
+        inputIdEditar.value = p.id;
+        document.getElementById('prodNombre').value = p.nombre;
+        document.getElementById('prodCategoria').value = p.categoria;
+        document.getElementById('prodPrecio').value = p.precio;
+        document.getElementById('prodStock').value = p.stock;
+        document.getElementById('prodImagen').value = p.img;
+        document.getElementById('prodDescripcion').value = p.desc || '';
+        document.getElementById('prodTallas').value = (p.tallas || []).join(', ');
+
+        tituloModal.textContent = 'Editar Producto';
+        if (modalProducto) modalProducto.show();
+    }
+
+    const btnAbrir = document.getElementById('btnAbrirModalAgregar');
+    if (btnAbrir) btnAbrir.addEventListener('click', abrirModalAgregar);
+
+    tbody.addEventListener('click', (e) => {
+        const btnEditar = e.target.closest('.btn-editar-producto');
+        const btnEliminar = e.target.closest('.btn-eliminar-producto');
+
+        if (btnEditar) {
+            abrirModalEditar(btnEditar.dataset.id);
+        }
+
+        if (btnEliminar) {
+            const p = obtenerProductoPorId(btnEliminar.dataset.id);
+            const nombre = p ? p.nombre : 'este producto';
+            if (confirm(`¿Estás seguro de que deseas eliminar "${nombre}"?`)) {
+                eliminarProducto(btnEliminar.dataset.id);
+                renderTablaAdmin();
+            }
         }
     });
 
-    const dashStock = document.getElementById('dashTotalStock');
-    const dashAlertas = document.getElementById('dashAlertas');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
 
-    if (dashStock) dashStock.textContent = `${totalStock} prendas`;
-    if (dashAlertas) dashAlertas.textContent = `${alertasCount} ítems bajos`;
+            const idEditando = inputIdEditar.value;
+            const categoria = document.getElementById('prodCategoria').value;
+            const tallas = document.getElementById('prodTallas').value
+                .split(',')
+                .map(t => t.trim())
+                .filter(t => t !== '');
+
+            const producto = {
+                id: idEditando ? Number(idEditando) : Date.now(),
+                nombre: document.getElementById('prodNombre').value.trim(),
+                categoria: categoria,
+                categoriaSlug: mapaCategoriaSlug[categoria] || 'urbano',
+                precio: parsearPrecio(document.getElementById('prodPrecio').value),
+                stock: parseInt(document.getElementById('prodStock').value, 10) || 0,
+                img: document.getElementById('prodImagen').value.trim() || 'img/urbana.jpg',
+                desc: document.getElementById('prodDescripcion').value.trim(),
+                tallas: tallas.length ? tallas : ['Talla Única']
+            };
+
+            if (idEditando) {
+                actualizarProducto(producto);
+            } else {
+                agregarProducto(producto);
+            }
+
+            if (modalProducto) modalProducto.hide();
+            renderTablaAdmin();
+        });
+    }
+
+    renderTablaAdmin();
 }
 
 function cargarTablaUsuarios() {

@@ -163,64 +163,16 @@
 
     <script>
         const CLAVE_STORAGE = "carrito_moda_estilo";
-
-        const productos = {
-            "1": {
-                id: 1,
-                nombre: "Polera Oversize Negra",
-                ref: "Ref: #001",
-                precio: 19990,
-                categoria: "Colección Urbana",
-                img: "img/urbana.jpg",
-                desc: "Polera de algodón 100% con estilo urbano holgado, ideal para un look cómodo y moderno.",
-                tallas: ["S - Small", "M - Medium", "L - Large", "XL - Extra Large"],
-                stock: 15
-            },
-            "2": {
-                id: 2,
-                nombre: "Pantalón Jean Classic",
-                ref: "Ref: #002",
-                precio: 29990,
-                categoria: "Colección Casual",
-                img: "img/casual.jpg",
-                desc: "Jeans de corte recto con material resistente y flexible, perfecto para combinar a diario.",
-                tallas: ["38 - S", "40 - M", "42 - L", "44 - XL"],
-                stock: 8
-            },
-            "3": {
-                id: 3,
-                nombre: "Chaqueta Formal Fit",
-                ref: "Ref: #003",
-                precio: 45990,
-                categoria: "Colección Formal",
-                img: "img/formal.jpg",
-                desc: "Chaqueta de diseño elegante para eventos especiales, confeccionada con terminaciones finas.",
-                tallas: ["S - Small", "M - Medium", "L - Large"],
-                stock: 10
-            },
-            "4": {
-                id: 4,
-                nombre: "Gorro Beanie Urbano",
-                ref: "Ref: #004",
-                precio: 8990,
-                categoria: "Accesorios",
-                img: "img/accesorios.jpg",
-                desc: "Gorro tejido de lana acrílica, el accesorio perfecto para complementar tu vestimenta.",
-                tallas: ["Talla Única (Estandard)"],
-                stock: 20
-            }
-        };
-
         const formatoCLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
 
         const urlParams = new URLSearchParams(window.location.search);
-        const prodIdParam = urlParams.get('id') || "1"; 
-        const p = productos[prodIdParam] || productos["1"];
+        const prodIdParam = urlParams.get('id') || "1";
+        const p = obtenerProductoPorId(prodIdParam) || obtenerProductoPorId(1);
 
         document.getElementById("pageTitle").innerText = `${p.nombre} - Moda & Estilo`;
         document.getElementById("breadcrumbNombre").innerText = p.nombre;
         document.getElementById("prodNombre").innerText = p.nombre;
-        document.getElementById("prodRef").innerText = p.ref;
+        document.getElementById("prodRef").innerText = `Ref: #${String(p.id).padStart(3, '0')}`;
         document.getElementById("prodPrecio").innerText = formatoCLP.format(p.precio);
         document.getElementById("prodCategoria").innerText = p.categoria;
         document.getElementById("prodDesc").innerText = p.desc;

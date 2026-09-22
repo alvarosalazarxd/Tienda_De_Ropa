@@ -84,54 +84,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaAdminProductos">
-                        <tr>
-                            <td>#001</td>
-                            <td class="fw-bold">Chaqueta Urbana Oversize</td>
-                            <td>Ropa Urbana</td>
-                            <td>$29.990</td>
-                            <td>15 unidades</td>
-                            <td><span class="badge bg-success">Disponible</span></td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-outline-secondary me-1 btn-editar" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                                <button class="btn btn-sm btn-outline-danger btn-eliminar" title="Eliminar"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#002</td>
-                            <td class="fw-bold">Polera Casual Fit</td>
-                            <td>Ropa Casual</td>
-                            <td>$14.990</td>
-                            <td>3 unidades</td>
-                            <td><span class="badge bg-warning text-dark">Poco Stock</span></td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-outline-secondary me-1 btn-editar" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                                <button class="btn btn-sm btn-outline-danger btn-eliminar" title="Eliminar"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#003</td>
-                            <td class="fw-bold">Traje Formal Slim</td>
-                            <td>Ropa Formal</td>
-                            <td>$59.990</td>
-                            <td>8 unidades</td>
-                            <td><span class="badge bg-success">Disponible</span></td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-outline-secondary me-1 btn-editar" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                                <button class="btn btn-sm btn-outline-danger btn-eliminar" title="Eliminar"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#004</td>
-                            <td class="fw-bold">Gorro de Lana Urbano</td>
-                            <td>Accesorios</td>
-                            <td>$9.990</td>
-                            <td>0 unidades</td>
-                            <td><span class="badge bg-danger">Agotado</span></td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-outline-secondary me-1 btn-editar" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                                <button class="btn btn-sm btn-outline-danger btn-eliminar" title="Eliminar"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
+                        <!-- Se renderiza dinámicamente desde localStorage vía main.js -->
                     </tbody>
                 </table>
             </div>
@@ -206,6 +159,17 @@
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Ruta Imagen (URL / Local)</label>
                             <input type="text" id="prodImagen" class="form-control" placeholder="img/ejemplo.jpg">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Descripción</label>
+                            <textarea id="prodDescripcion" class="form-control" rows="2" placeholder="Descripción breve de la prenda"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tallas disponibles</label>
+                            <input type="text" id="prodTallas" class="form-control" placeholder="S - Small, M - Medium, L - Large">
+                            <small class="text-muted">Sepáralas con coma.</small>
                         </div>
                     </div>
                     <div class="modal-footer">
