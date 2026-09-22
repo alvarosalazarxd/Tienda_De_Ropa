@@ -17,6 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const passInput = document.getElementById('regPassword');
             const confirmPassInput = document.getElementById('confirmPassword');
 
+            if (!nombreInput || !emailInput || !passInput || !confirmPassInput) {
+                return;
+            }
+
             const nombre = nombreInput.value.trim();
             const email = emailInput.value.trim();
             const password = passInput.value;
@@ -94,6 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const emailInput = document.getElementById('email');
             const passInput = document.getElementById('password');
+
+            if (!emailInput || !passInput) {
+                return;
+            }
 
             const email = emailInput.value.trim();
             const password = passInput.value;
@@ -184,14 +192,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     /* =========================================================
+       OBTENER CARRITO
+    ========================================================= */
+
+    window.obtenerCarrito = function () {
+
+        return carrito;
+
+    };
+
+
+    /* =========================================================
        ACTUALIZAR CARRITO
     ========================================================= */
 
     function actualizarCarrito() {
 
-        const listaCarrito = document.getElementById('listaCarrito');
-        const contadorCarrito = document.getElementById('contadorCarrito');
-        const totalCarrito = document.getElementById('totalCarrito');
+        const listaCarrito =
+            document.getElementById('listaCarrito');
+
+        const contadorCarrito =
+            document.getElementById('contadorCarrito');
+
+        const totalCarrito =
+            document.getElementById('totalCarrito');
 
 
         /*
@@ -199,8 +223,14 @@ document.addEventListener('DOMContentLoaded', () => {
          * simplemente no hacemos nada.
          */
 
-        if (!listaCarrito || !contadorCarrito || !totalCarrito) {
+        if (
+            !listaCarrito ||
+            !contadorCarrito ||
+            !totalCarrito
+        ) {
+
             return;
+
         }
 
 
@@ -214,7 +244,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (carrito.length === 0) {
 
             listaCarrito.innerHTML = `
-                <div id="carritoVacio" class="text-center text-muted mt-5">
+                <div id="carritoVacio"
+                    class="text-center text-muted mt-5">
 
                     <i class="bi bi-cart-x fs-1"></i>
 
@@ -249,7 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
             cantidadTotal += producto.cantidad;
 
 
-            const productoHTML = document.createElement('div');
+            const productoHTML =
+                document.createElement('div');
 
             productoHTML.className =
                 'carrito-producto border-bottom pb-3 mb-3';
@@ -279,7 +311,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 data-index="${index}"
                                 title="Eliminar producto"
                             >
+
                                 <i class="bi bi-trash"></i>
+
                             </button>
 
                         </div>
@@ -291,8 +325,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
                         <p class="text-muted small mb-2">
+
                             <strong>Talla:</strong>
                             ${producto.talla || 'No especificada'}
+
                         </p>
 
 
@@ -305,7 +341,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     class="btn btn-sm btn-outline-secondary disminuir-cantidad"
                                     data-index="${index}"
                                 >
+
                                     <i class="bi bi-dash"></i>
+
                                 </button>
 
 
@@ -319,7 +357,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     class="btn btn-sm btn-outline-secondary aumentar-cantidad"
                                     data-index="${index}"
                                 >
+
                                     <i class="bi bi-plus"></i>
+
                                 </button>
 
                             </div>
@@ -334,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                 </div>
+
             `;
 
 
@@ -346,7 +387,8 @@ document.addEventListener('DOMContentLoaded', () => {
            ACTUALIZAR TOTAL Y CONTADOR
         ===================================================== */
 
-        contadorCarrito.textContent = cantidadTotal;
+        contadorCarrito.textContent =
+            cantidadTotal;
 
         totalCarrito.textContent =
             `$${total.toLocaleString('es-CL')}`;
@@ -356,76 +398,91 @@ document.addEventListener('DOMContentLoaded', () => {
            BOTONES AUMENTAR CANTIDAD
         ===================================================== */
 
-        document.querySelectorAll('.aumentar-cantidad').forEach(button => {
+        document
+            .querySelectorAll('.aumentar-cantidad')
+            .forEach(button => {
 
-            button.addEventListener('click', () => {
+                button.addEventListener('click', () => {
 
-                const index = parseInt(
-                    button.dataset.index
-                );
+                    const index =
+                        parseInt(button.dataset.index);
 
-                carrito[index].cantidad++;
+                    if (!carrito[index]) {
+                        return;
+                    }
 
-                guardarCarrito();
-                actualizarCarrito();
+                    carrito[index].cantidad++;
+
+                    guardarCarrito();
+                    actualizarCarrito();
+
+                });
 
             });
-
-        });
 
 
         /* =====================================================
            BOTONES DISMINUIR CANTIDAD
         ===================================================== */
 
-        document.querySelectorAll('.disminuir-cantidad').forEach(button => {
+        document
+            .querySelectorAll('.disminuir-cantidad')
+            .forEach(button => {
 
-            button.addEventListener('click', () => {
+                button.addEventListener('click', () => {
 
-                const index = parseInt(
-                    button.dataset.index
-                );
+                    const index =
+                        parseInt(button.dataset.index);
 
-
-                if (carrito[index].cantidad > 1) {
-
-                    carrito[index].cantidad--;
-
-                } else {
-
-                    carrito.splice(index, 1);
-
-                }
+                    if (!carrito[index]) {
+                        return;
+                    }
 
 
-                guardarCarrito();
-                actualizarCarrito();
+                    if (carrito[index].cantidad > 1) {
+
+                        carrito[index].cantidad--;
+
+                    } else {
+
+                        carrito.splice(index, 1);
+
+                    }
+
+
+                    guardarCarrito();
+                    actualizarCarrito();
+
+                });
 
             });
-
-        });
 
 
         /* =====================================================
            BOTONES ELIMINAR
         ===================================================== */
 
-        document.querySelectorAll('.eliminar-producto').forEach(button => {
+        document
+            .querySelectorAll('.eliminar-producto')
+            .forEach(button => {
 
-            button.addEventListener('click', () => {
+                button.addEventListener('click', () => {
 
-                const index = parseInt(
-                    button.dataset.index
-                );
+                    const index =
+                        parseInt(button.dataset.index);
 
-                carrito.splice(index, 1);
+                    if (!carrito[index]) {
+                        return;
+                    }
 
-                guardarCarrito();
-                actualizarCarrito();
+                    carrito.splice(index, 1);
+
+                    guardarCarrito();
+                    actualizarCarrito();
+
+                });
 
             });
-
-        });
 
     }
 
@@ -434,13 +491,14 @@ document.addEventListener('DOMContentLoaded', () => {
        AGREGAR PRODUCTO AL CARRITO
     ========================================================= */
 
-    function agregarAlCarrito(producto) {
+    window.agregarAlCarrito = function (producto) {
 
-        const productoExistente = carrito.find(
-            item =>
-                item.id === producto.id &&
-                item.talla === producto.talla
-        );
+        const productoExistente =
+            carrito.find(
+                item =>
+                    String(item.id) === String(producto.id) &&
+                    item.talla === producto.talla
+            );
 
 
         if (productoExistente) {
@@ -450,18 +508,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
 
             carrito.push({
+
                 id: producto.id,
                 nombre: producto.nombre,
                 precio: producto.precio,
                 imagen: producto.imagen,
                 talla: producto.talla,
                 cantidad: producto.cantidad
+
             });
 
         }
 
 
         guardarCarrito();
+
         actualizarCarrito();
 
 
@@ -469,99 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `${producto.nombre} se agregó al carrito.`
         );
 
-    }
-
-
-    /* =========================================================
-       BOTONES "AGREGAR AL CARRITO"
-    ========================================================= */
-
-    document.querySelectorAll('.agregar-carrito').forEach(button => {
-
-        button.addEventListener('click', () => {
-
-            const urlParams =
-                new URLSearchParams(window.location.search);
-
-            const prodId =
-                urlParams.get('id') || '1';
-
-
-            const productoActual =
-                productos[prodId];
-
-
-            if (!productoActual) {
-
-                alert('No se pudo encontrar el producto.');
-
-                return;
-            }
-
-
-            const tallaSelect =
-                document.getElementById('tallaSelect');
-
-            const cantidadInput =
-                document.getElementById('cantidadInput');
-
-
-            const talla =
-                tallaSelect ? tallaSelect.value : '';
-
-
-            const cantidad =
-                cantidadInput
-                    ? parseInt(cantidadInput.value)
-                    : 1;
-
-
-            if (
-                cantidad < 1 ||
-                cantidad > 10 ||
-                isNaN(cantidad)
-            ) {
-
-                alert(
-                    'La cantidad debe estar entre 1 y 10.'
-                );
-
-                return;
-            }
-
-
-            const producto = {
-
-                id:
-                    productoActual.id ||
-                    prodId,
-
-                nombre:
-                    productoActual.nombre,
-
-                precio:
-                    parseInt(
-                        productoActual.precio.replace(/\D/g, '')
-                    ),
-
-                imagen:
-                    productoActual.img,
-
-                talla:
-                    talla,
-
-                cantidad:
-                    cantidad
-
-            };
-
-
-            agregarAlCarrito(producto);
-
-        });
-
-    });
-
+    };
 
     /* =========================================================
        BOTÓN VACIAR CARRITO
@@ -669,7 +638,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     href="productos.html"
                     class="btn btn-primary w-100"
                 >
+
                     Ver productos
+
                 </a>
 
             `;
@@ -762,203 +733,209 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-/* =========================================================
-   CONFIRMAR PEDIDO
-========================================================= */
+    /* =========================================================
+       CONFIRMAR PEDIDO
+    ========================================================= */
 
-const formCheckout =
-    document.getElementById('formCheckout');
-
-if (formCheckout) {
-
-    formCheckout.addEventListener('submit', (e) => {
-
-        e.preventDefault();
+    const formCheckout =
+        document.getElementById('formCheckout');
 
 
-        /* Obtener carrito actual */
+    if (formCheckout) {
 
-        const carritoActual =
-            JSON.parse(
-                localStorage.getItem('carrito')
-            ) || [];
+        formCheckout.addEventListener('submit', (e) => {
+
+            e.preventDefault();
 
 
-        /* Verificar que haya productos */
+            /* Obtener carrito actual */
 
-        if (carritoActual.length === 0) {
+            const carritoActual =
+                JSON.parse(
+                    localStorage.getItem('carrito')
+                ) || [];
+
+
+            /* Verificar que haya productos */
+
+            if (carritoActual.length === 0) {
+
+                alert(
+                    'No puedes realizar una compra con el carrito vacío.'
+                );
+
+                window.location.href =
+                    'productos.html';
+
+                return;
+            }
+
+
+            /* Obtener datos del formulario */
+
+            const nombre =
+                document.getElementById('nombre').value.trim();
+
+            const apellido =
+                document.getElementById('apellido').value.trim();
+
+            const email =
+                document.getElementById('email').value.trim();
+
+            const telefono =
+                document.getElementById('telefono').value.trim();
+
+            const direccion =
+                document.getElementById('direccion').value.trim();
+
+            const comuna =
+                document.getElementById('comuna').value.trim();
+
+            const region =
+                document.getElementById('region').value;
+
+            const metodoPago =
+                document.querySelector(
+                    'input[name="pago"]:checked'
+                );
+
+
+            /* Validar datos */
+
+            if (
+                !nombre ||
+                !apellido ||
+                !email ||
+                !telefono ||
+                !direccion ||
+                !comuna ||
+                !region ||
+                !metodoPago
+            ) {
+
+                alert(
+                    'Por favor completa todos los datos antes de confirmar el pedido.'
+                );
+
+                return;
+            }
+
+
+            /* Calcular total */
+
+            let total = 0;
+
+            carritoActual.forEach(producto => {
+
+                total +=
+                    producto.precio *
+                    producto.cantidad;
+
+            });
+
+
+            /* Generar número de pedido */
+
+            const numeroPedido =
+                'ME-' +
+                Date.now().toString().slice(-8);
+
+
+            /* Crear pedido */
+
+            const pedido = {
+
+                numeroPedido: numeroPedido,
+
+                fecha:
+                    new Date().toLocaleString('es-CL'),
+
+                cliente: {
+
+                    nombre: nombre,
+
+                    apellido: apellido,
+
+                    email: email,
+
+                    telefono: telefono
+
+                },
+
+                envio: {
+
+                    direccion: direccion,
+
+                    comuna: comuna,
+
+                    region: region
+
+                },
+
+                metodoPago:
+                    metodoPago.value,
+
+                productos:
+                    carritoActual,
+
+                total:
+                    total
+
+            };
+
+
+            /* Obtener pedidos anteriores */
+
+            const pedidosGuardados =
+                JSON.parse(
+                    localStorage.getItem('pedidos')
+                ) || [];
+
+
+            /* Agregar nuevo pedido */
+
+            pedidosGuardados.push(pedido);
+
+
+            /* Guardar pedidos */
+
+            localStorage.setItem(
+                'pedidos',
+                JSON.stringify(pedidosGuardados)
+            );
+
+
+            /* Vaciar carrito */
+
+            localStorage.removeItem('carrito');
+
+            carrito = [];
+
+
+            /* Mensaje de confirmación */
 
             alert(
-                'No puedes realizar una compra con el carrito vacío.'
-            );
-
-            window.location.href = 'productos.html';
-
-            return;
-        }
-
-
-        /* Obtener datos del formulario */
-
-        const nombre =
-            document.getElementById('nombre').value.trim();
-
-        const apellido =
-            document.getElementById('apellido').value.trim();
-
-        const email =
-            document.getElementById('email').value.trim();
-
-        const telefono =
-            document.getElementById('telefono').value.trim();
-
-        const direccion =
-            document.getElementById('direccion').value.trim();
-
-        const comuna =
-            document.getElementById('comuna').value.trim();
-
-        const region =
-            document.getElementById('region').value;
-
-        const metodoPago =
-            document.querySelector(
-                'input[name="pago"]:checked'
-            );
-
-
-        /* Validar datos */
-
-        if (
-            !nombre ||
-            !apellido ||
-            !email ||
-            !telefono ||
-            !direccion ||
-            !comuna ||
-            !region ||
-            !metodoPago
-        ) {
-
-            alert(
-                'Por favor completa todos los datos antes de confirmar el pedido.'
-            );
-
-            return;
-        }
-
-
-        /* Calcular total */
-
-        let total = 0;
-
-        carritoActual.forEach(producto => {
-
-            total +=
-                producto.precio *
-                producto.cantidad;
-
-        });
-
-
-        /* Generar número de pedido */
-
-        const numeroPedido =
-            'ME-' +
-            Date.now().toString().slice(-8);
-
-
-        /* Crear pedido */
-
-        const pedido = {
-
-            numeroPedido: numeroPedido,
-
-            fecha:
-                new Date().toLocaleString('es-CL'),
-
-            cliente: {
-
-                nombre: nombre,
-
-                apellido: apellido,
-
-                email: email,
-
-                telefono: telefono
-
-            },
-
-            envio: {
-
-                direccion: direccion,
-
-                comuna: comuna,
-
-                region: region
-
-            },
-
-            metodoPago:
-                metodoPago.value,
-
-            productos:
-                carritoActual,
-
-            total:
-                total
-
-        };
-
-
-        /* Obtener pedidos anteriores */
-
-        const pedidosGuardados =
-            JSON.parse(
-                localStorage.getItem('pedidos')
-            ) || [];
-
-
-        /* Agregar nuevo pedido */
-
-        pedidosGuardados.push(pedido);
-
-
-        /* Guardar pedidos */
-
-        localStorage.setItem(
-            'pedidos',
-            JSON.stringify(pedidosGuardados)
-        );
-
-
-        /* Vaciar carrito */
-
-        localStorage.removeItem('carrito');
-
-
-        /* Mensaje de confirmación */
-
-        alert(
-            `¡Compra realizada correctamente!
+                `¡Compra realizada correctamente!
 
 Número de pedido: ${numeroPedido}
 
 Total: $${total.toLocaleString('es-CL')}`
-        );
+            );
 
 
-        /* Volver al inicio */
+            /* Volver al inicio */
 
-        window.location.href =
-            'index.html';
+            window.location.href =
+                'index.html';
 
-    });
+        });
 
-}
+    }
+
+
     /* =========================================================
-      MOSTRAR PEDIDOS EN ADMINISTRACIÓN
-   ========================================================= */
+       MOSTRAR PEDIDOS EN ADMINISTRACIÓN
+    ========================================================= */
 
     const tablaPedidos =
         document.getElementById('tablaPedidos');
@@ -978,22 +955,22 @@ Total: $${total.toLocaleString('es-CL')}`
 
             tablaPedidos.innerHTML = `
 
-            <tr>
+                <tr>
 
-                <td
-                    colspan="8"
-                    class="text-center text-muted py-4"
-                >
+                    <td
+                        colspan="8"
+                        class="text-center text-muted py-4"
+                    >
 
-                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>
 
-                    No hay pedidos registrados.
+                        No hay pedidos registrados.
 
-                </td>
+                    </td>
 
-            </tr>
+                </tr>
 
-        `;
+            `;
 
         } else {
 
@@ -1020,182 +997,199 @@ Total: $${total.toLocaleString('es-CL')}`
 
                 /* Color del estado */
 
-                let claseEstado = 'bg-warning text-dark';
+                let claseEstado =
+                    'bg-warning text-dark';
 
                 if (pedido.estado === 'Preparando') {
-                    claseEstado = 'bg-info text-dark';
+                    claseEstado =
+                        'bg-info text-dark';
                 }
 
                 if (pedido.estado === 'Enviado') {
-                    claseEstado = 'bg-primary';
+                    claseEstado =
+                        'bg-primary';
                 }
 
                 if (pedido.estado === 'Entregado') {
-                    claseEstado = 'bg-success';
+                    claseEstado =
+                        'bg-success';
                 }
 
 
                 tablaPedidos.innerHTML += `
 
-                <tr>
+                    <tr>
 
-                    <!-- PEDIDO -->
+                        <!-- PEDIDO -->
 
-                    <td>
+                        <td>
 
-                        <strong>
-                            ${pedido.numeroPedido}
-                        </strong>
+                            <strong>
+                                ${pedido.numeroPedido}
+                            </strong>
 
-                    </td>
-
-
-                    <!-- FECHA -->
-
-                    <td>
-
-                        <small>
-                            ${pedido.fecha}
-                        </small>
-
-                    </td>
+                        </td>
 
 
-                    <!-- CLIENTE -->
+                        <!-- FECHA -->
 
-                    <td>
+                        <td>
 
-                        <strong>
+                            <small>
+                                ${pedido.fecha}
+                            </small>
 
-                            ${pedido.cliente.nombre}
-                            ${pedido.cliente.apellido}
-
-                        </strong>
-
-                        <br>
-
-                        <small class="text-muted">
-
-                            ${pedido.cliente.email}
-
-                        </small>
-
-                    </td>
+                        </td>
 
 
-                    <!-- PRODUCTOS -->
+                        <!-- CLIENTE -->
 
-                    <td>
+                        <td>
 
-                        <span class="badge bg-secondary">
+                            <strong>
 
-                            ${cantidadProductos}
+                                ${pedido.cliente.nombre}
+                                ${pedido.cliente.apellido}
 
-                            ${cantidadProductos === 1
+                            </strong>
+
+                            <br>
+
+                            <small class="text-muted">
+
+                                ${pedido.cliente.email}
+
+                            </small>
+
+                        </td>
+
+
+                        <!-- PRODUCTOS -->
+
+                        <td>
+
+                            <span class="badge bg-secondary">
+
+                                ${cantidadProductos}
+
+                                ${cantidadProductos === 1
                         ? 'producto'
-                        : 'productos'}
+                        : 'productos'
+                    }
 
-                        </span>
+                            </span>
 
-                    </td>
-
-
-                    <!-- TOTAL -->
-
-                    <td>
-
-                        <strong>
-
-                            $${pedido.total.toLocaleString('es-CL')}
-
-                        </strong>
-
-                    </td>
+                        </td>
 
 
-                    <!-- PAGO -->
+                        <!-- TOTAL -->
 
-                    <td>
+                        <td>
 
-                        ${pedido.metodoPago}
+                            <strong>
 
-                    </td>
+                                $${pedido.total.toLocaleString('es-CL')}
 
+                            </strong>
 
-                    <!-- ESTADO -->
-
-                    <td>
-
-                        <span class="badge ${claseEstado}">
-
-                            ${pedido.estado}
-
-                        </span>
-
-                    </td>
+                        </td>
 
 
-                    <!-- ACCIONES -->
+                        <!-- PAGO -->
 
-                    <td>
+                        <td>
 
-                        <div class="d-flex gap-1">
+                            ${pedido.metodoPago}
 
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-outline-primary ver-pedido"
-                                data-index="${index}"
-                                title="Ver detalle"
-                            >
-
-                                <i class="bi bi-eye"></i>
-
-                            </button>
+                        </td>
 
 
-                            <select
-                                class="form-select form-select-sm cambiar-estado"
-                                data-index="${index}"
-                                style="width: 125px;"
-                            >
+                        <!-- ESTADO -->
 
-                                <option
-                                    value="Pendiente"
-                                    ${pedido.estado === 'Pendiente' ? 'selected' : ''}
+                        <td>
+
+                            <span class="badge ${claseEstado}">
+
+                                ${pedido.estado}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- ACCIONES -->
+
+                        <td>
+
+                            <div class="d-flex gap-1">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-primary ver-pedido"
+                                    data-index="${index}"
+                                    title="Ver detalle"
                                 >
-                                    Pendiente
-                                </option>
 
-                                <option
-                                    value="Preparando"
-                                    ${pedido.estado === 'Preparando' ? 'selected' : ''}
+                                    <i class="bi bi-eye"></i>
+
+                                </button>
+
+
+                                <select
+                                    class="form-select form-select-sm cambiar-estado"
+                                    data-index="${index}"
+                                    style="width: 125px;"
                                 >
-                                    Preparando
-                                </option>
 
-                                <option
-                                    value="Enviado"
-                                    ${pedido.estado === 'Enviado' ? 'selected' : ''}
-                                >
-                                    Enviado
-                                </option>
+                                    <option
+                                        value="Pendiente"
+                                        ${pedido.estado === 'Pendiente'
+                        ? 'selected'
+                        : ''
+                    }
+                                    >
+                                        Pendiente
+                                    </option>
 
-                                <option
-                                    value="Entregado"
-                                    ${pedido.estado === 'Entregado' ? 'selected' : ''}
-                                >
-                                    Entregado
-                                </option>
+                                    <option
+                                        value="Preparando"
+                                        ${pedido.estado === 'Preparando'
+                        ? 'selected'
+                        : ''
+                    }
+                                    >
+                                        Preparando
+                                    </option>
 
-                            </select>
+                                    <option
+                                        value="Enviado"
+                                        ${pedido.estado === 'Enviado'
+                        ? 'selected'
+                        : ''
+                    }
+                                    >
+                                        Enviado
+                                    </option>
 
-                        </div>
+                                    <option
+                                        value="Entregado"
+                                        ${pedido.estado === 'Entregado'
+                        ? 'selected'
+                        : ''
+                    }
+                                    >
+                                        Entregado
+                                    </option>
 
-                    </td>
+                                </select>
 
-                </tr>
+                            </div>
 
-            `;
+                        </td>
+
+                    </tr>
+
+                `;
 
             });
 
@@ -1223,7 +1217,6 @@ Total: $${total.toLocaleString('es-CL')}`
                         const index =
                             parseInt(select.dataset.index);
 
-
                         const nuevoEstado =
                             select.value;
 
@@ -1237,8 +1230,6 @@ Total: $${total.toLocaleString('es-CL')}`
                             JSON.stringify(pedidos)
                         );
 
-
-                        /* Recargar la tabla */
 
                         location.reload();
 
@@ -1277,35 +1268,122 @@ Total: $${total.toLocaleString('es-CL')}`
 
                             productosHTML += `
 
-                            <div class="border-bottom pb-2 mb-2">
+                                <div class="border-bottom pb-2 mb-2">
+
+                                    <strong>
+                                        ${producto.nombre}
+                                    </strong>
+
+                                    <br>
+
+                                    <small>
+
+                                        Talla:
+                                        ${producto.talla || 'No especificada'}
+
+                                    </small>
+
+                                    <br>
+
+                                    <small>
+
+                                        Cantidad:
+                                        ${producto.cantidad}
+
+                                    </small>
+
+                                    <br>
+
+                                    <strong>
+
+                                        $${subtotal.toLocaleString('es-CL')}
+
+                                    </strong>
+
+                                </div>
+
+                            `;
+
+                        });
+
+
+                        const detalle = `
+
+                            <strong>
+                                Pedido:
+                            </strong>
+
+                            ${pedido.numeroPedido}
+
+                            <br><br>
+
+
+                            <strong>
+                                Cliente:
+                            </strong>
+
+                            ${pedido.cliente.nombre}
+                            ${pedido.cliente.apellido}
+
+                            <br>
+
+                            <strong>
+                                Correo:
+                            </strong>
+
+                            ${pedido.cliente.email}
+
+                            <br>
+
+                            <strong>
+                                Teléfono:
+                            </strong>
+
+                            ${pedido.cliente.telefono}
+
+                            <br><br>
+
+
+                            <strong>
+                                Dirección de envío:
+                            </strong>
+
+                            ${pedido.envio.direccion}
+
+                            <br>
+
+                            <strong>
+                                Comuna:
+                            </strong>
+
+                            ${pedido.envio.comuna}
+
+                            <br>
+
+                            <strong>
+                                Región:
+                            </strong>
+
+                            ${pedido.envio.region}
+
+                            <hr>
+
+
+                            <strong>
+                                Productos:
+                            </strong>
+
+                            <br><br>
+
+                            ${productosHTML}
+
+
+                            <div class="text-end mt-3">
 
                                 <strong>
-                                    ${producto.nombre}
-                                </strong>
 
-                                <br>
-
-                                <small>
-
-                                    Talla:
-                                    ${producto.talla || 'No especificada'}
-
-                                </small>
-
-                                <br>
-
-                                <small>
-
-                                    Cantidad:
-                                    ${producto.cantidad}
-
-                                </small>
-
-                                <br>
-
-                                <strong>
-
-                                    $${subtotal.toLocaleString('es-CL')}
+                                    Total:
+                                    $${pedido.total.toLocaleString('es-CL')}
 
                                 </strong>
 
@@ -1313,145 +1391,63 @@ Total: $${total.toLocaleString('es-CL')}`
 
                         `;
 
-                        });
-
-
-                        const detalle = `
-
-                        <strong>
-                            Pedido:
-                        </strong>
-
-                        ${pedido.numeroPedido}
-
-                        <br><br>
-
-
-                        <strong>
-                            Cliente:
-                        </strong>
-
-                        ${pedido.cliente.nombre}
-                        ${pedido.cliente.apellido}
-
-                        <br>
-
-                        <strong>
-                            Correo:
-                        </strong>
-
-                        ${pedido.cliente.email}
-
-                        <br>
-
-                        <strong>
-                            Teléfono:
-                        </strong>
-
-                        ${pedido.cliente.telefono}
-
-                        <br><br>
-
-
-                        <strong>
-                            Dirección de envío:
-                        </strong>
-
-                        ${pedido.envio.direccion}
-
-                        <br>
-
-                        <strong>
-                            Comuna:
-                        </strong>
-
-                        ${pedido.envio.comuna}
-
-                        <br>
-
-                        <strong>
-                            Región:
-                        </strong>
-
-                        ${pedido.envio.region}
-
-                        <hr>
-
-
-                        <strong>
-                            Productos:
-                        </strong>
-
-                        <br><br>
-
-                        ${productosHTML}
-
-
-                        <div class="text-end mt-3">
-
-                            <strong>
-                                Total:
-                                $${pedido.total.toLocaleString('es-CL')}
-                            </strong>
-
-                        </div>
-
-                    `;
-
 
                         /* Crear ventana modal */
 
                         const modalHTML = `
 
-                        <div
-                            class="modal fade"
-                            id="modalDetallePedido"
-                            tabindex="-1"
-                        >
-
                             <div
-                                class="modal-dialog modal-dialog-centered modal-lg"
+                                class="modal fade"
+                                id="modalDetallePedido"
+                                tabindex="-1"
                             >
 
-                                <div class="modal-content">
+                                <div
+                                    class="modal-dialog modal-dialog-centered modal-lg"
+                                >
 
-                                    <div class="modal-header">
+                                    <div class="modal-content">
 
-                                        <h5 class="modal-title">
+                                        <div class="modal-header">
 
-                                            <i class="bi bi-receipt me-2"></i>
+                                            <h5 class="modal-title">
 
-                                            Detalle del pedido
+                                                <i class="bi bi-receipt me-2"></i>
 
-                                        </h5>
+                                                Detalle del pedido
 
-                                        <button
-                                            type="button"
-                                            class="btn-close"
-                                            data-bs-dismiss="modal"
-                                        ></button>
-
-                                    </div>
+                                            </h5>
 
 
-                                    <div class="modal-body">
+                                            <button
+                                                type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal"
+                                            ></button>
 
-                                        ${detalle}
-
-                                    </div>
+                                        </div>
 
 
-                                    <div class="modal-footer">
+                                        <div class="modal-body">
 
-                                        <button
-                                            type="button"
-                                            class="btn btn-secondary"
-                                            data-bs-dismiss="modal"
-                                        >
+                                            ${detalle}
 
-                                            Cerrar
+                                        </div>
 
-                                        </button>
+
+                                        <div class="modal-footer">
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-secondary"
+                                                data-bs-dismiss="modal"
+                                            >
+
+                                                Cerrar
+
+                                            </button>
+
+                                        </div>
 
                                     </div>
 
@@ -1459,9 +1455,7 @@ Total: $${total.toLocaleString('es-CL')}`
 
                             </div>
 
-                        </div>
-
-                    `;
+                        `;
 
 
                         /* Eliminar modal anterior */
@@ -1505,10 +1499,11 @@ Total: $${total.toLocaleString('es-CL')}`
 
     }
 
-/* =========================================================
-   ACTUALIZAR CARRITO AL CARGAR LA PÁGINA
-========================================================= */
 
-actualizarCarrito();
+    /* =========================================================
+       ACTUALIZAR CARRITO AL CARGAR LA PÁGINA
+    ========================================================= */
+
+    actualizarCarrito();
 
 });

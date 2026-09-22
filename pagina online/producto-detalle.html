@@ -4,196 +4,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title id="pageTitle">Detalle del Producto - Moda & Estilo</title>
-    
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CSS propio -->
     <link rel="stylesheet" href="css/estilos.css">
+
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body class="bg-light d-flex flex-column min-vh-100">
 
-    
-<nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
-    <div class="container">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+        <div class="container">
 
-        <a class="navbar-brand fw-bold" href="index.html">
-            Moda & Estilo
-        </a>
+            <a class="navbar-brand fw-bold" href="index.html">
+                Moda & Estilo
+            </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 
-        <div class="collapse navbar-collapse" id="navbarNav">
+                <span class="navbar-toggler-icon"></span>
 
-            <ul class="navbar-nav ms-auto align-items-lg-center">
+            </button>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="index.html">
-                        Inicio
-                    </a>
-                </li>
+            <div class="collapse navbar-collapse" id="navbarNav">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="nosotros.html">
-                        Nosotros
-                    </a>
-                </li>
+                <ul class="navbar-nav ms-auto align-items-lg-center">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="productos.html">
-                        Productos
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            Inicio
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="login.html">
-                        Iniciar Sesión
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="nosotros.html">
+                            Nosotros
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="registro.html">
-                        Registrarse
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="productos.html">
+                            Productos
+                        </a>
+                    </li>
 
-                <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">
+                            Iniciar Sesión
+                        </a>
+                    </li>
 
-                    <button type="button" class="btn btn-warning position-relative" data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvasCarrito" aria-controls="offcanvasCarrito">
-                        <i class="bi bi-cart3 fs-5"></i>
+                    <li class="nav-item">
+                        <a class="nav-link" href="registro.html">
+                            Registrarse
+                        </a>
+                    </li>
 
-                        <span id="contadorCarrito"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            0
-                        </span>
-                    </button>
+                    <!-- CARRITO -->
+                    <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
 
-                </li>
+                        <button type="button" class="btn btn-warning position-relative" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasCarrito" aria-controls="offcanvasCarrito">
 
-            </ul>
+                            <i class="bi bi-cart3 fs-5"></i>
+
+                            <span id="contadorCarrito"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                0
+                            </span>
+
+                        </button>
+
+                    </li>
+
+                </ul>
+
+            </div>
 
         </div>
+    </nav>
 
-    </div>
-</nav>
 
-    
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="container my-5 flex-grow-1">
-        
+
+        <!-- BREADCRUMB -->
         <nav aria-label="breadcrumb">
+
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
-                <li class="breadcrumb-item"><a href="productos.html">Productos</a></li>
-                <li class="breadcrumb-item active" id="breadcrumbNombre" aria-current="page">Cargando...</li>
+
+                <li class="breadcrumb-item">
+                    <a href="index.html">Inicio</a>
+                </li>
+
+                <li class="breadcrumb-item">
+                    <a href="productos.html">Productos</a>
+                </li>
+
+                <li class="breadcrumb-item active" id="breadcrumbNombre" aria-current="page">
+
+                    Cargando...
+
+                </li>
+
             </ol>
+
         </nav>
 
+
+        <!-- DETALLE DEL PRODUCTO -->
         <section class="card border-0 shadow-sm p-4">
+
             <div class="row g-4 align-items-center">
-                
+
+                <!-- IMAGEN -->
                 <div class="col-md-6">
-                    <img id="prodImg" src="" class="img-fluid rounded shadow-sm w-100" style="max-height: 450px; object-fit: cover;" alt="Producto">
+
+                    <img id="prodImg" src="" class="img-fluid rounded shadow-sm w-100"
+                        style="max-height: 450px; object-fit: cover;" alt="Producto">
+
                 </div>
 
+
+                <!-- INFORMACIÓN -->
                 <div class="col-md-6">
-                    <span id="prodCategoria" class="badge bg-warning text-dark mb-2">Colección</span>
-                    <h1 id="prodNombre" class="fw-bold display-6">Nombre del Producto</h1>
-                    <p id="prodRef" class="text-muted fs-5">Ref: #000</p>
-                    
-                    <h2 id="prodPrecio" class="text-primary fw-bold display-6 my-3">$0</h2>
-                    
-                    <p id="prodDesc" class="card-text">
-                        Descripción del producto.
+
+                    <span id="prodCategoria" class="badge bg-warning text-dark mb-2">
+
+                        Colección
+
+                    </span>
+
+                    <h1 id="prodNombre" class="fw-bold display-6">
+
+                        Nombre del Producto
+
+                    </h1>
+
+                    <p id="prodRef" class="text-muted fs-5">
+
+                        Ref: #000
+
                     </p>
 
+                    <h2 id="prodPrecio" class="text-primary fw-bold display-6 my-3">
+
+                        $0
+
+                    </h2>
+
+                    <p id="prodDesc" class="card-text">
+
+                        Descripción del producto.
+
+                    </p>
+
+
+                    <!-- FORMULARIO -->
                     <form class="mt-4">
+
+                        <!-- TALLA -->
                         <div class="mb-3">
-                            <label for="tallaSelect" class="form-label fw-bold">Seleccionar Talla:</label>
+
+                            <label for="tallaSelect" class="form-label fw-bold">
+
+                                Seleccionar Talla:
+
+                            </label>
+
                             <select class="form-select w-50" id="tallaSelect">
+
                             </select>
+
                         </div>
 
+
+                        <!-- CANTIDAD -->
                         <div class="mb-4">
-                            <label for="cantidadInput" class="form-label fw-bold">Cantidad:</label>
-                            <input type="number" class="form-control w-25" id="cantidadInput" value="1" min="1" max="10">
+
+                            <label for="cantidadInput" class="form-label fw-bold">
+
+                                Cantidad:
+
+                            </label>
+
+                            <input type="number" class="form-control w-25" id="cantidadInput" value="1" min="1"
+                                max="10">
+
                         </div>
 
+
+                        <!-- BOTONES -->
                         <div class="d-grid gap-2 d-md-block">
-                            <button type="button" class="btn btn-primary btn-lg px-4 me-md-2 fw-bold">
-                                <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
+
+                            <!-- IMPORTANTE:
+                                 Este ID debe coincidir
+                                 con el JavaScript -->
+
+                            <button type="button" id="btnAgregarCarrito"
+                                class="btn btn-primary btn-lg px-4 me-md-2 fw-bold">
+
+                                <i class="bi bi-cart-plus me-2"></i>
+
+                                Añadir al Carrito
+
                             </button>
 
 
-                            <a href="productos.html" class="btn btn-outline-secondary btn-lg">Volver al Catálogo</a>
+                            <a href="productos.html" class="btn btn-outline-secondary btn-lg">
+
+                                Volver al Catálogo
+
+                            </a>
+
                         </div>
+
                     </form>
+
                 </div>
+
             </div>
+
         </section>
+
     </main>
-    <!-- Carrito -->
+
+
+    <!-- =========================================
+         CARRITO
+    ========================================== -->
+
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
+
         <div class="offcanvas-header">
-    
+
             <h5 class="offcanvas-title fw-bold" id="offcanvasCarritoLabel">
+
                 <i class="bi bi-cart3 me-2"></i>
+
                 Mi carrito
+
             </h5>
-    
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
-    
+
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar">
+
+            </button>
+
         </div>
-    
+
+
         <div class="offcanvas-body">
-    
+
             <div id="listaCarrito">
+
                 <!-- Los productos se cargan mediante JavaScript -->
+
             </div>
-    
+
+
             <hr>
-    
+
+
+            <!-- TOTAL -->
             <div class="d-flex justify-content-between align-items-center mb-3">
+
                 <strong>Total:</strong>
-    
+
                 <strong id="totalCarrito">
                     $0
                 </strong>
+
             </div>
-    
+
+
+            <!-- BOTONES CARRITO -->
             <div class="d-grid gap-2">
-    
+
                 <button type="button" class="btn btn-success" id="btnComprar">
+
                     <i class="bi bi-credit-card me-2"></i>
+
                     Comprar
+
                 </button>
-    
+
+
                 <button type="button" class="btn btn-outline-danger" id="btnVaciar">
+
                     <i class="bi bi-trash me-2"></i>
+
                     Vaciar carrito
+
                 </button>
-    
+
             </div>
-    
+
         </div>
+
     </div>
 
+
+    <!-- FOOTER -->
     <footer class="bg-dark text-light pt-4 pb-3 mt-auto">
+
         <div class="container text-center">
-            <p class="mb-0 text-white-50">&copy; 2026 Moda & Estilo. Todos los derechos reservados.</p>
+
+            <p class="mb-0 text-white-50">
+
+                &copy; 2026 Moda & Estilo. Todos los derechos reservados.
+
+            </p>
+
         </div>
+
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script src="js/main.js"></script>
 
-    
+    <!-- =========================================
+         BOOTSTRAP JS
+    ========================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- =========================================
+         DATOS Y LÓGICA DEL PRODUCTO
+    ========================================== -->
+
     <script>
+
         const productos = {
+
             "1": {
                 nombre: "Polera Oversize Negra",
                 ref: "Ref: #001",
@@ -201,9 +350,16 @@
                 categoria: "Colección Urbana",
                 img: "img/urbana.jpg",
                 desc: "Polera de algodón 100% con estilo urbano holgado, ideal para un look cómodo y moderno.",
-                tallas: ["S - Small", "M - Medium", "L - Large", "XL - Extra Large"],
+                tallas: [
+                    "S - Small",
+                    "M - Medium",
+                    "L - Large",
+                    "XL - Extra Large"
+                ],
                 stock: 15
             },
+
+
             "2": {
                 nombre: "Pantalón Jean Classic",
                 ref: "Ref: #002",
@@ -211,9 +367,16 @@
                 categoria: "Colección Casual",
                 img: "img/casual.jpg",
                 desc: "Jeans de corte recto con material resistente y flexible, perfecto para combinar a diario.",
-                tallas: ["38 - S", "40 - M", "42 - L", "44 - XL"],
+                tallas: [
+                    "38 - S",
+                    "40 - M",
+                    "42 - L",
+                    "44 - XL"
+                ],
                 stock: 8
             },
+
+
             "3": {
                 nombre: "Chaqueta Formal Fit",
                 ref: "Ref: #003",
@@ -221,9 +384,15 @@
                 categoria: "Colección Formal",
                 img: "img/formal.jpg",
                 desc: "Chaqueta de diseño elegante para eventos especiales, confeccionada con terminaciones finas.",
-                tallas: ["S - Small", "M - Medium", "L - Large"],
+                tallas: [
+                    "S - Small",
+                    "M - Medium",
+                    "L - Large"
+                ],
                 stock: 0
             },
+
+
             "4": {
                 nombre: "Gorro Beanie Urbano",
                 ref: "Ref: #004",
@@ -231,90 +400,233 @@
                 categoria: "Accesorios",
                 img: "img/accesorios.jpg",
                 desc: "Gorro tejido de lana acrílica, el accesorio perfecto para complementar tu vestimenta.",
-                tallas: ["Talla Única (Estandard)"],
+                tallas: [
+                    "Talla Única (Estandard)"
+                ],
                 stock: 20
             }
+
         };
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const prodId = urlParams.get('id') || "1"; 
+
+        /* =========================================
+           OBTENER PRODUCTO DESDE LA URL
+        ========================================== */
+
+        const urlParams = new URLSearchParams(
+            window.location.search
+        );
+
+        const prodId = urlParams.get("id") || "1";
 
         const p = productos[prodId] || productos["1"];
 
-        document.getElementById("pageTitle").innerText = `${p.nombre} - Moda & Estilo`;
-        document.getElementById("breadcrumbNombre").innerText = p.nombre;
-        document.getElementById("prodNombre").innerText = p.nombre;
-        document.getElementById("prodRef").innerText = p.ref;
-        document.getElementById("prodPrecio").innerText = p.precio;
-        document.getElementById("prodCategoria").innerText = p.categoria;
-        document.getElementById("prodDesc").innerText = p.desc;
-        document.getElementById("prodImg").src = p.img;
-        document.getElementById("prodImg").alt = p.nombre;
 
-        const selectTalla = document.getElementById("tallaSelect");
+        /* =========================================
+           MOSTRAR INFORMACIÓN DEL PRODUCTO
+        ========================================== */
+
+        document.getElementById("pageTitle").innerText =
+            `${p.nombre} - Moda & Estilo`;
+
+        document.getElementById("breadcrumbNombre").innerText =
+            p.nombre;
+
+        document.getElementById("prodNombre").innerText =
+            p.nombre;
+
+        document.getElementById("prodRef").innerText =
+            p.ref;
+
+        document.getElementById("prodPrecio").innerText =
+            p.precio;
+
+        document.getElementById("prodCategoria").innerText =
+            p.categoria;
+
+        document.getElementById("prodDesc").innerText =
+            p.desc;
+
+        document.getElementById("prodImg").src =
+            p.img;
+
+        document.getElementById("prodImg").alt =
+            p.nombre;
+
+
+        /* =========================================
+           CARGAR TALLAS
+        ========================================== */
+
+        const selectTalla =
+            document.getElementById("tallaSelect");
+
         selectTalla.innerHTML = "";
+
+
         p.tallas.forEach((talla, index) => {
+
             const opt = document.createElement("option");
+
             opt.value = talla;
+
             opt.innerText = talla;
-            if (p.tallas.length > 1 && index === 1) opt.selected = true;
+
+
+            if (
+                p.tallas.length > 1 &&
+                index === 1
+            ) {
+                opt.selected = true;
+            }
+
+
             selectTalla.appendChild(opt);
+
         });
 
-        const cantidadInput = document.getElementById("cantidadInput");
+
+        /* =========================================
+           CONFIGURAR STOCK
+        ========================================== */
+
+        const cantidadInput =
+            document.getElementById("cantidadInput");
+
         cantidadInput.max = p.stock;
 
-        const btnAgregar = document.getElementById("btnAgregarCarrito");
-        const infoStock = document.createElement("p");
-        infoStock.className = "text-muted small mb-3";
+
+        const btnAgregar =
+            document.getElementById("btnAgregarCarrito");
+
+
+        const infoStock =
+            document.createElement("p");
+
+        infoStock.className =
+            "text-muted small mb-3";
+
 
         if (p.stock > 0) {
-            infoStock.textContent = `Quedan ${p.stock} unidades disponibles.`;
+
+            infoStock.textContent =
+                `Quedan ${p.stock} unidades disponibles.`;
+
         } else {
-            infoStock.textContent = "Producto sin stock disponible.";
-            infoStock.classList.add("text-danger", "fw-bold");
+
+            infoStock.textContent =
+                "Producto sin stock disponible.";
+
+            infoStock.classList.add(
+                "text-danger",
+                "fw-bold"
+            );
+
             btnAgregar.disabled = true;
+
         }
 
-        cantidadInput.closest(".mb-4").after(infoStock);
 
-        const precioNumero = parseInt(p.precio.replace(/\D/g, ""), 10);
+        cantidadInput
+            .closest(".mb-4")
+            .after(infoStock);
 
-        document.getElementById("btnAgregarCarrito").addEventListener("click", () => {
-            const talla = document.getElementById("tallaSelect").value;
-            const cantidad = parseInt(document.getElementById("cantidadInput").value, 10) || 1;
 
-            if (!talla) {
-                alert("Por favor selecciona una talla.");
-                return;
-            }
+        /* =========================================
+           PRECIO NUMÉRICO
+        ========================================== */
 
-            if (cantidad > p.stock) {
-                alert(`Solo quedan ${p.stock} unidades disponibles.`);
-                return;
-            }
+        const precioNumero =
+            parseInt(
+                p.precio.replace(/\D/g, ""),
+                10
+            );
 
-            const carritoActual = obtenerCarrito();
-            const yaEnCarrito = carritoActual.find(item => item.id === prodId && item.talla === talla);
-            const cantidadTotal = (yaEnCarrito ? yaEnCarrito.cantidad : 0) + cantidad;
 
-            if (cantidadTotal > p.stock) {
-                alert(`No puedes agregar más, ya tienes ${yaEnCarrito ? yaEnCarrito.cantidad : 0} en el carrito y solo hay ${p.stock} disponibles.`);
-                return;
-            }
+        /* =========================================
+           AGREGAR PRODUCTO AL CARRITO
+        ========================================== */
 
-            agregarAlCarrito({
-                id: prodId,
-                nombre: p.nombre,
-                precio: precioNumero,
-                imagen: p.img,
-                talla: talla,
-                cantidad: cantidad
+        document
+            .getElementById("btnAgregarCarrito")
+            .addEventListener("click", () => {
+
+                const talla =
+                    document.getElementById("tallaSelect").value;
+
+
+                const cantidad =
+                    parseInt(
+                        document.getElementById("cantidadInput").value,
+                        10
+                    ) || 1;
+
+
+                /* VALIDAR TALLA */
+
+                if (!talla) {
+
+                    alert("Por favor selecciona una talla.");
+
+                    return;
+
+                }
+
+
+                /* VALIDAR CANTIDAD */
+
+                if (cantidad < 1) {
+
+                    alert("La cantidad debe ser mayor a 0.");
+
+                    return;
+
+                }
+
+
+                /* VALIDAR STOCK */
+
+                if (cantidad > p.stock) {
+
+                    alert(
+                        `Solo quedan ${p.stock} unidades disponibles.`
+                    );
+
+                    return;
+
+                }
+
+
+                /* AGREGAR DIRECTAMENTE AL CARRITO */
+
+                window.agregarAlCarrito({
+
+                    id: prodId,
+
+                    nombre: p.nombre,
+
+                    precio: precioNumero,
+
+                    imagen: p.img,
+
+                    talla: talla,
+
+                    cantidad: cantidad
+
+                });
+
             });
-        });
+
     </script>
 
+
+    <!-- =========================================
+         JAVASCRIPT PRINCIPAL
+         SOLO UNA VEZ
+    ========================================== -->
+
     <script src="js/main.js"></script>
+
 </body>
 
 </html>
