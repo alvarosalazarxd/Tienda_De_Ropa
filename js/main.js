@@ -2,9 +2,6 @@
 // FUNCIONES DE UTILIDAD
 // ==========================================
 
-/**
- * Escapa caracteres especiales de HTML para prevenir ataques XSS.
- */
 function escaparHTML(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -15,9 +12,6 @@ function escaparHTML(str) {
         .replace(/'/g, "&#039;");
 }
 
-/**
- * Normaliza y convierte textos de precio (ej: "$19.990" o "19990") a Number entero.
- */
 function parsearPrecio(precioRaw) {
     if (typeof precioRaw === 'number') return Math.max(0, Math.floor(precioRaw));
     if (!precioRaw) return 0;
@@ -25,31 +19,28 @@ function parsearPrecio(precioRaw) {
     return parseInt(digitos, 10) || 0;
 }
 
-
 // ==========================================
-// INICIALIZACIÓN DE LA APLICACIÓN
+// INICIALIZACIÓN GENERAL (DOM CONTENT LOADED)
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. Navbar y Estado de Sesión
+    // Navbar y Carrito
     actualizarNavbarUsuario();
-
-    // 2. Carrito de Compras
     vincularBotonesAgregarCarrito();
     renderizarCarrito();
     actualizarContadorCarrito();
     vincularBotonVaciar();
     vincularBotonPagar();
 
-    // 3. Panel Administrador (Productos) — ahora persistido en localStorage
+    // Vistas Dinámicas
+    renderizarCatalogoProductos();
     inicializarPanelAdminProductos();
-
-    // 4. Panel Administrador (Usuarios)
     cargarTablaUsuarios();
     configurarEventosTablaUsuarios();
+    inicializarCheckout();
 
-    // 5. Toggle de Visibilidad de Contraseñas
+    // Mostrar/Ocultar Contraseñas
     document.querySelectorAll('.btn-toggle-password').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -69,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 6. Formulario de Registro
+    // Formulario de Registro
     const formRegistro = document.getElementById('formRegistro');
     if (formRegistro) {
         formRegistro.addEventListener('submit', (e) => {
@@ -130,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 7. Formulario de Login
+    // Formulario de Login
     const formLogin = document.getElementById('formLogin');
     if (formLogin) {
         formLogin.addEventListener('submit', (e) => {
@@ -172,9 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 // ==========================================
-// GESTIÓN DEL CARRITO DE COMPRAS
+// MÓDULO DEL CARRITO DE COMPRAS
 // ==========================================
 
 const CARRITO_KEY = 'carrito_moda_estilo';
@@ -211,7 +201,7 @@ function vincularBotonesAgregarCarrito() {
         if (!btn) return;
 
         const textoBoton = btn.textContent.trim().toLowerCase();
-        if (textoBoton.includes('ver') || textoBoton.includes('detalle') || textoBoton.includes('comprando') || textoBoton.includes('pagar') || textoBoton.includes('vaciar')) {
+        if (textoBoton.includes('ver') || textoBoton.includes('detalle') || textoBoton.includes('comprando') || textoBoton.includes('pagar') || textoBoton.includes('vaciar') || textoBoton.includes('confirmar')) {
             return;
         }
 
@@ -370,7 +360,6 @@ function renderizarCarrito() {
         elem.textContent = totalFormateado;
     });
 
-    // Eventos para cambiar cantidad desde el input numérico
     contenedor.querySelectorAll('.cantidad-item').forEach(input => {
         input.addEventListener('change', (e) => {
             const idx = parseInt(e.target.getAttribute('data-index'), 10);
@@ -385,7 +374,6 @@ function renderizarCarrito() {
         });
     });
 
-    // Eventos para eliminar ítem del carrito
     contenedor.querySelectorAll('.btn-eliminar').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const idx = parseInt(e.currentTarget.getAttribute('data-index'), 10);
@@ -417,22 +405,97 @@ function vincularBotonPagar() {
         btnPagar.onclick = () => {
             const carrito = obtenerCarrito();
             if (carrito.length === 0) {
-                alert('Tu carrito está vacío. Agrega productos antes de realizar el pago.');
+                alert('Tu carrito está vacío. Agrega productos antes de proceder al pago.');
                 return;
             }
-
-            const total = document.getElementById('totalCarrito')?.textContent || '$0';
-            if (confirm(`¿Confirmar compra por un total de ${total}?`)) {
-                alert('¡Gracias por tu compra! Tu pedido ha sido procesado exitosamente.');
-                localStorage.removeItem(CARRITO_KEY);
-                localStorage.removeItem('carritoCompras');
-                renderizarCarrito();
-                actualizarContadorCarrito();
-            }
+            window.location.href = 'checkout.html';
         };
     }
 }
 
+// ==========================================
+// MÓDULO DE CHECKOUT (PASARELA DE PAGO)
+// ==========================================
+
+function inicializarCheckout() {
+    const itemsContainer = document.getElementById('itemsCheckout');
+    const totalPagoElem = document.getElementById('totalPago');
+    const formCheckout = document.getElementById('formCheckout');
+    const radioTarjeta = document.getElementById('tarjeta');
+    const radioTransferencia = document.getElementById('transferencia');
+    const camposTarjeta = document.getElementById('camposTarjeta');
+
+    if (!itemsContainer && !formCheckout) return;
+
+    // Conmutar campos de tarjeta de crédito
+    if (radioTarjeta && radioTransferencia && camposTarjeta) {
+        const inputsTarjeta = camposTarjeta.querySelectorAll('input');
+        
+        function toggleTarjeta() {
+            if (radioTarjeta.checked) {
+                camposTarjeta.style.display = 'block';
+                inputsTarjeta.forEach(i => i.required = true);
+            } else {
+                camposTarjeta.style.display = 'none';
+                inputsTarjeta.forEach(i => i.required = false);
+            }
+        }
+
+        radioTarjeta.addEventListener('change', toggleTarjeta);
+        radioTransferencia.addEventListener('change', toggleTarjeta);
+    }
+
+    // Cargar Resumen de productos en Checkout
+    const carrito = obtenerCarrito();
+    const formatoCLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
+
+    if (carrito.length === 0) {
+        if (itemsContainer) itemsContainer.innerHTML = '<p class="text-muted small">No hay productos en el pedido.</p>';
+        if (totalPagoElem) totalPagoElem.textContent = '$0';
+    } else {
+        let totalCalculado = 0;
+        let htmlItems = '';
+
+        carrito.forEach(item => {
+            const precioNum = parsearPrecio(item.precio);
+            const cantidad = parseInt(item.cantidad, 10) || 1;
+            const subtotal = precioNum * cantidad;
+            totalCalculado += subtotal;
+
+            htmlItems += `
+                <div class="d-flex justify-content-between align-items-center mb-2 small">
+                    <div>
+                        <span class="fw-bold">${escaparHTML(item.nombre)}</span>
+                        <span class="text-muted"> x${cantidad}</span>
+                    </div>
+                    <span class="fw-semibold">${formatoCLP.format(subtotal)}</span>
+                </div>
+            `;
+        });
+
+        if (itemsContainer) itemsContainer.innerHTML = htmlItems;
+        if (totalPagoElem) totalPagoElem.textContent = formatoCLP.format(totalCalculado);
+    }
+
+    // Confirmar pago y vaciar carrito
+    if (formCheckout) {
+        formCheckout.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            if (carrito.length === 0) {
+                alert('No hay productos en el pedido.');
+                return;
+            }
+
+            alert('¡Pago procesado con éxito! Gracias por tu compra en Moda & Estilo.');
+
+            localStorage.removeItem(CARRITO_KEY);
+            localStorage.removeItem('carritoCompras');
+
+            window.location.href = 'index.html';
+        });
+    }
+}
 
 // ==========================================
 // CONTROL DE SESIÓN Y NAVBAR
@@ -488,13 +551,8 @@ function cerrarSesion(e) {
     window.location.href = 'index.html';
 }
 
-
 // ==========================================
-// FUNCIONES ADMIN (PRODUCTOS Y USUARIOS)
-// ==========================================
-
-// ==========================================
-// PRODUCTOS (base de datos simulada en localStorage)
+// BASE DE DATOS Y CATÁLOGO DE PRODUCTOS
 // ==========================================
 
 const PRODUCTOS_KEY = 'productos_moda_estilo';
@@ -503,7 +561,7 @@ const productosPorDefecto = [
     {
         id: 1,
         nombre: "Polera Oversize Negra",
-        categoria: "Colección Urbana",
+        categoria: "Ropa Urbana",
         categoriaSlug: "urbano",
         precio: 19990,
         img: "img/urbana.jpg",
@@ -514,7 +572,7 @@ const productosPorDefecto = [
     {
         id: 2,
         nombre: "Pantalón Jean Classic",
-        categoria: "Colección Casual",
+        categoria: "Ropa Casual",
         categoriaSlug: "casual",
         precio: 29990,
         img: "img/casual.jpg",
@@ -525,7 +583,7 @@ const productosPorDefecto = [
     {
         id: 3,
         nombre: "Chaqueta Formal Fit",
-        categoria: "Colección Formal",
+        categoria: "Ropa Formal",
         categoriaSlug: "formal",
         precio: 45990,
         img: "img/formal.jpg",
@@ -595,13 +653,52 @@ function calcularEstadoStock(stock) {
     return { texto: 'Disponible', clase: 'bg-success' };
 }
 
+// Renderiza los productos dinámicamente en productos.html (si existe el contenedor)
+function renderizarCatalogoProductos() {
+    const catalogo = document.getElementById('contenedorProductos');
+    if (!catalogo) return;
+
+    const productos = obtenerProductos();
+    const formatoCLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
+
+    catalogo.innerHTML = '';
+
+    productos.forEach(p => {
+        const opcionesTallas = (p.tallas || ['Única']).map(t => `<option value="${escaparHTML(t)}">${escaparHTML(t)}</option>`).join('');
+
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-3 mb-4';
+        col.innerHTML = `
+            <div class="card h-100 border-0 shadow-sm tarjeta-producto">
+                <img src="${escaparHTML(p.img)}" class="card-img-top" alt="${escaparHTML(p.nombre)}" style="height: 250px; object-fit: cover;">
+                <div class="card-body d-flex flex-column">
+                    <span class="badge bg-secondary mb-2 align-self-start">${escaparHTML(p.categoria)}</span>
+                    <h5 class="card-title fw-bold">${escaparHTML(p.nombre)}</h5>
+                    <p class="card-text text-muted small flex-grow-1">${escaparHTML(p.desc || '')}</p>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Talla:</label>
+                        <select class="form-select form-select-sm">${opcionesTallas}</select>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <span class="fs-5 fw-bold text-dark">${formatoCLP.format(p.precio)}</span>
+                        <button class="btn btn-dark btn-sm btn-agregar-carrito" data-id="${p.id}" data-nombre="${escaparHTML(p.nombre)}" data-precio="${p.precio}" data-imagen="${escaparHTML(p.img)}">
+                            <i class="bi bi-cart-plus me-1"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        catalogo.appendChild(col);
+    });
+}
+
 // ==========================================
-// PANEL ADMIN — GESTIÓN DE PRODUCTOS (conectado al modal real)
+// PANEL ADMIN — GESTIÓN DE PRODUCTOS
 // ==========================================
 
 function inicializarPanelAdminProductos() {
     const tbody = document.getElementById('tablaAdminProductos');
-    if (!tbody) return; // Esta lógica solo corre en admin.html
+    if (!tbody) return;
 
     const modalEl = document.getElementById('modalProducto');
     const modalProducto = modalEl ? new bootstrap.Modal(modalEl) : null;
@@ -731,6 +828,10 @@ function inicializarPanelAdminProductos() {
 
     renderTablaAdmin();
 }
+
+// ==========================================
+// PANEL ADMIN — GESTIÓN DE USUARIOS
+// ==========================================
 
 function cargarTablaUsuarios() {
     const tablaUsuarios = document.getElementById('tablaAdminUsuarios');
