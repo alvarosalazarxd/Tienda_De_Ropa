@@ -13,27 +13,63 @@
 
 <body class="d-flex flex-column min-vh-100">
 
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">Moda & Estilo</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="collapsibleNavbar">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="nosotros.html">Nosotros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="productos.html">Productos</a>
-                    </li>
-                </ul>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top">
 
-                <ul class="navbar-nav ms-auto">
+    <div class="container-fluid">
+
+        <!-- LOGO -->
+
+        <a class="navbar-brand fw-bold" href="index.html">
+            <i class="bi bi-bag-heart-fill me-2 text-warning"></i>
+            Moda & Estilo
+        </a>
+
+
+        <!-- BOTÓN RESPONSIVE -->
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+            <!-- MENÚ -->
+
+            <ul class="navbar-nav">
+
+                <li class="nav-item">
+
+                    <a class="nav-link" href="index.html">
+                        Inicio
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+
+                    <a class="nav-link" href="nosotros.html">
+                        Nosotros
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+
+                    <a class="nav-link active" href="productos.html">
+                        Productos
+                    </a>
+
+                </li>
+
+            </ul>
+
+
+            <!-- PARTE DERECHA -->
+
+            <ul class="navbar-nav ms-auto align-items-sm-center">
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="carrito.html">
                             <i class="bi bi-cart3 fs-5"></i>
@@ -41,17 +77,51 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="login.html">Iniciar Sesión</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="registro.html">Registrarse</a>
-                    </li>
-                </ul>
-            </div>
+
+                <li class="nav-item me-sm-2">
+
+                    <a class="nav-link" href="login.html">
+                        <i class="bi bi-person me-1"></i>
+                        Iniciar Sesión
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item me-sm-3">
+
+                    <a class="nav-link" href="registro.html">
+                        Registrarse
+                    </a>
+
+                </li>
+
+
+                <!-- CARRITO -->
+
+                <li class="nav-item">
+
+                    <button type="button" class="btn btn-warning position-relative" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasCarrito" aria-controls="offcanvasCarrito">
+
+                        <i class="bi bi-cart3 fs-5"></i>
+
+                        <span id="contadorCarrito"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            0
+                        </span>
+
+                    </button>
+
+                </li>
+
+            </ul>
+
         </div>
-    </nav>
-    
+
+    </div>
+
+</nav>
     <header class="p-5 bg-dark text-white text-center">
         <h1>Catálogo de Temporada</h1>
         <p>Explora nuestras prendas exclusivas al mejor precio y renueva tu closet hoy mismo.</p>
@@ -61,83 +131,242 @@
         <div class="row mb-3">
             
             
-            <div class="col-md-3 mt-2">
-                <div class="card h-100">
-                    <a href="producto-detalle.html?id=1">
-                        <img class="card-img-top" src="img/urbana.jpg" alt="Polera Oversize Negra">
-                    </a>
-                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
-                        <div>
-                            <h4 class="card-title">Polera Oversize Negra</h4>
-                            <p class="card-text">Polera de algodón 100% con estilo urbano holgado, ideal para un look cómodo y moderno.</p>
-                        </div>
-                        <div>
-                            <h5 class="text-warning">$19.990</h5>
-                            <a href="producto-detalle.html?id=1" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <div class="container my-5">
             
-            <div class="col-md-3 mt-2">
-                <div class="card h-100">
-                    <a href="producto-detalle.html?id=2">
-                        <img class="card-img-top" src="img/casual.jpg" alt="Pantalón Jean Classic">
-                    </a>
-                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
-                        <div>
-                            <h4 class="card-title">Pantalón Jean Classic</h4>
-                            <p class="card-text">Jeans de corte recto con material resistente y flexible, perfecto para combinar a diario.</p>
-                        </div>
-                        <div>
-                            <h5 class="text-warning">$29.990</h5>
-                            <a href="producto-detalle.html?id=2" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+                <div class="row g-4 justify-content-center">
             
-            <div class="col-md-3 mt-2">
-                <div class="card h-100">
-                    <a href="producto-detalle.html?id=3">
-                        <img class="card-img-top" src="img/formal.jpg" alt="Chaqueta Formal Fit">
-                    </a>
-                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
-                        <div>
-                            <h4 class="card-title">Chaqueta Formal Fit</h4>
-                            <p class="card-text">Chaqueta de diseño elegante para eventos especiales, confeccionada con terminaciones finas.</p>
-                        </div>
-                        <div>
-                            <h5 class="text-warning">$45.990</h5>
-                            <a href="producto-detalle.html?id=3" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+                    <!-- Producto 1 -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card producto-card h-100 shadow-sm">
             
-            <div class="col-md-3 mt-2">
-                <div class="card h-100">
-                    <a href="producto-detalle.html?id=4">
-                        <img class="card-img-top" src="img/accesorios.jpg" alt="Gorro Beanie Urbano">
-                    </a>
-                    <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
-                        <div>
-                            <h4 class="card-title">Gorro Beanie Urbano</h4>
-                            <p class="card-text">Gorro tejido de lana acrílica, el accesorio perfecto para complementar tu vestimenta.</p>
-                        </div>
-                        <div>
-                            <h5 class="text-warning">$8.990</h5>
-                            <a href="producto-detalle.html?id=4" class="btn btn-primary w-100 mt-2">Ver Detalle</a>
+                            <a href="producto-detalle.html?id=1" class="producto-imagen-link">
+                                <img class="imagen-producto" src="img/urbana.jpg" alt="Polera Oversize Negra">
+                            </a>
+            
+                            <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+            
+                                <div>
+                                    <h5 class="card-title">
+                                        Polera Oversize Negra
+                                    </h5>
+            
+                                    <p class="card-text">
+                                        Polera de algodón 100% con estilo urbano holgado,
+                                        ideal para un look cómodo y moderno.
+                                    </p>
+                                </div>
+            
+                                <div>
+                                    <h5 class="text-warning producto-precio">
+                                        $19.990
+                                    </h5>
+            
+                                    <a href="producto-detalle.html?id=1" class="btn btn-primary w-100 producto-btn">
+                                        Ver Detalle
+                                    </a>
+                                </div>
+            
+                            </div>
                         </div>
                     </div>
+            
+            
+                    <!-- Producto 2 -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card producto-card h-100 shadow-sm">
+            
+                            <a href="producto-detalle.html?id=2" class="producto-imagen-link">
+                                <img class="imagen-producto" src="img/casual.jpg" alt="Pantalón Jean Classic">
+                            </a>
+            
+                            <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+            
+                                <div>
+                                    <h5 class="card-title">
+                                        Pantalón Jean Classic
+                                    </h5>
+            
+                                    <p class="card-text">
+                                        Jeans de corte recto con material resistente
+                                        y flexible, perfecto para combinar a diario.
+                                    </p>
+                                </div>
+            
+                                <div>
+                                    <h5 class="text-warning producto-precio">
+                                        $29.990
+                                    </h5>
+            
+                                    <a href="producto-detalle.html?id=2" class="btn btn-primary w-100 producto-btn">
+                                        Ver Detalle
+                                    </a>
+                                </div>
+            
+                            </div>
+                        </div>
+                    </div>
+            
+            
+                    <!-- Producto 3 -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card producto-card h-100 shadow-sm">
+            
+                            <a href="producto-detalle.html?id=3" class="producto-imagen-link">
+                                <img class="imagen-producto" src="img/formal.jpg" alt="Chaqueta Formal Fit">
+                            </a>
+            
+                            <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+            
+                                <div>
+                                    <h5 class="card-title">
+                                        Chaqueta Formal Fit
+                                    </h5>
+            
+                                    <p class="card-text">
+                                        Chaqueta de diseño elegante para eventos especiales,
+                                        confeccionada con terminaciones finas.
+                                    </p>
+                                </div>
+            
+                                <div>
+                                    <h5 class="text-warning producto-precio">
+                                        $45.990
+                                    </h5>
+            
+                                    <a href="producto-detalle.html?id=3" class="btn btn-primary w-100 producto-btn">
+                                        Ver Detalle
+                                    </a>
+                                </div>
+            
+                            </div>
+                        </div>
+                    </div>
+            
+            
+                    <!-- Producto 4 -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card producto-card h-100 shadow-sm">
+            
+                            <a href="producto-detalle.html?id=4" class="producto-imagen-link">
+                                <img class="imagen-producto" src="img/accesorios.jpg" alt="Gorro Beanie Urbano">
+                            </a>
+            
+                            <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+            
+                                <div>
+                                    <h5 class="card-title">
+                                        Gorro Beanie Urbano
+                                    </h5>
+            
+                                    <p class="card-text">
+                                        Gorro tejido de lana acrílica,
+                                        el accesorio perfecto para complementar tu vestimenta.
+                                    </p>
+                                </div>
+            
+                                <div>
+                                    <h5 class="text-warning producto-precio">
+                                        $8.990
+                                    </h5>
+            
+                                    <a href="producto-detalle.html?id=4" class="btn btn-primary w-100 producto-btn">
+                                        Ver Detalle
+                                    </a>
+                                </div>
+            
+                            </div>
+                        </div>
+                    </div>
+            
                 </div>
+            
             </div>
 
         </div>
     </main>
+    <!-- =====================================================
+         CARRITO DE COMPRAS
+    ===================================================== -->
+    
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
+    
+        <!-- CABECERA -->
+    
+        <div class="offcanvas-header bg-dark text-white">
+    
+            <h5 class="offcanvas-title" id="offcanvasCarritoLabel">
+    
+                <i class="bi bi-cart3 me-2"></i>
+    
+                Mi carrito
+    
+            </h5>
+    
+    
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                aria-label="Cerrar"></button>
+    
+        </div>
+    
+    
+        <!-- CONTENIDO -->
+    
+        <div class="offcanvas-body d-flex flex-column">
+    
+            <!-- PRODUCTOS -->
+    
+            <div id="listaCarrito" class="flex-grow-1">
+    
+                <!-- Los productos aparecerán mediante main.js -->
+    
+            </div>
+    
+    
+            <!-- TOTAL -->
+    
+            <div class="border-top pt-3">
+    
+                <div class="d-flex justify-content-between mb-3">
+    
+                    <strong>
+                        Total:
+                    </strong>
+    
+                    <strong id="totalCarrito" class="text-warning">
+                        $0
+                    </strong>
+    
+                </div>
+    
+    
+                <!-- BOTONES -->
+    
+                <div class="d-grid gap-2">
+    
+                    <button type="button" id="btnComprar" class="btn btn-primary">
+    
+                        <i class="bi bi-credit-card me-1"></i>
+    
+                        Comprar
+    
+                    </button>
+    
+    
+                    <button type="button" id="btnVaciar" class="btn btn-outline-danger">
+    
+                        <i class="bi bi-trash me-1"></i>
+    
+                        Vaciar carrito
+    
+                    </button>
+    
+                </div>
+    
+            </div>
+    
+        </div>
+    
+    </div>
     
     <footer class="bg-dark text-light pt-5 pb-4 mt-auto">
         <div class="container">

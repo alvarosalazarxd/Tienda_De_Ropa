@@ -55,80 +55,126 @@
 </nav>
 
     
-    <div class="container my-5 flex-grow-1">
-        <div class="row justify-content-center">
-            <div class="col-md-7 col-lg-6">
-                <div class="card shadow-lg border-0 rounded-3">
-                    <div class="card-body p-4 p-sm-5 bg-dark text-white rounded-3">
-                        
-                        <h2 class="text-center fw-bold mb-4">Crear Cuenta</h2>
-                        
-                        <form id="formRegistro" novalidate>
+  <div class="container my-5 flex-grow-1">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body p-4 p-sm-5 bg-dark text-white rounded-3">
+
+                    <h2 class="text-center fw-bold mb-4">Crear Cuenta</h2>
+
+                    <form id="formRegistro" novalidate>
+
+                        <!-- Nombres y Apellidos -->
+                        <div class="row">
                             
-                            <div class="mb-3">
-                                <label for="nombreCompleto" class="form-label">Nombre Completo</label>
+                            <div class="col-md-6 mb-3">
+                                <label for="Nombres" class="form-label">Nombres</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-                                    <input type="text" class="form-control" id="nombreCompleto" placeholder="Juan Pérez" required>
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person-fill"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="Nombres"
+                                        placeholder="Juan Antonio" required>
                                 </div>
                                 <div class="invalid-feedback">
-                                    Ingresa tu nombre completo.
+                                    Ingresa tus nombres.
                                 </div>
                             </div>
 
-                            
-                            <div class="mb-3">
-                                <label for="regEmail" class="form-label">Correo Electrónico</label>
+                            <div class="col-md-6 mb-3">
+                                <label for="Apellidos" class="form-label">Apellidos</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
-                                    <input type="email" class="form-control" id="regEmail" placeholder="nombre@ejemplo.com" required>
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person-fill"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="Apellidos"
+                                        placeholder="García Marquez" required>
                                 </div>
                                 <div class="invalid-feedback">
-                                    Ingresa un correo electrónico válido.
+                                    Ingresa tus apellidos.
                                 </div>
                             </div>
 
-                            
-                            <div class="mb-3">
-                                <label for="regPassword" class="form-label">Contraseña</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                                    <input type="password" class="form-control" id="regPassword" placeholder="••••••••" required>
-                                </div>
-                                <small class="text-white-50">Debe tener al menos 8 caracteres, una mayúscula y un número.</small>
-                                <div class="invalid-feedback">
-                                    La contraseña no cumple con los requisitos de seguridad.
-                                </div>
-                            </div>
-
-                            
-                            <div class="mb-4">
-                                <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-shield-lock-fill"></i></span>
-                                    <input type="password" class="form-control" id="confirmPassword" placeholder="••••••••" required>
-                                </div>
-                                <div class="invalid-feedback">
-                                    Las contraseñas no coinciden.
-                                </div>
-                            </div>
-
-                            
-                            <button type="submit" class="btn btn-warning w-100 py-2 fw-bold">Registrarse</button>
-                        </form>
-
-                        
-                        <div class="text-center mt-4">
-                            <p class="mb-0 text-white-50">¿Ya tienes una cuenta? 
-                                <a href="login.html" class="text-warning text-decoration-none fw-bold">Inicia sesión aquí</a>
-                            </p>
                         </div>
 
+                        <!-- Correo Electrónico -->
+                        <div class="mb-3">
+                            <label for="regEmail" class="form-label">Correo Electrónico</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </span>
+                                <input type="email" class="form-control" id="regEmail"
+                                    placeholder="nombre@ejemplo.com" required>
+                            </div>
+                            <div class="invalid-feedback">
+                                Ingresa un correo electrónico válido.
+                            </div>
+                        </div>
+
+                        <!-- Contraseña -->
+                        <div class="mb-3">
+                            <label for="regPassword" class="form-label">Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock-fill"></i>
+                                </span>
+                                <input type="password" class="form-control" id="regPassword"
+                                    placeholder="••••••••" required>
+                            </div>
+
+                            <small class="text-white-50">
+                                Debe tener al menos 8 caracteres, una mayúscula y un número.
+                            </small>
+
+                            <div class="invalid-feedback">
+                                La contraseña no cumple con los requisitos de seguridad.
+                            </div>
+                        </div>
+
+                        <!-- Confirmar Contraseña -->
+                        <div class="mb-4">
+                            <label for="confirmPassword" class="form-label">
+                                Confirmar Contraseña
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-shield-lock-fill"></i>
+                                </span>
+                                <input type="password" class="form-control" id="confirmPassword"
+                                    placeholder="••••••••" required>
+                            </div>
+
+                            <div class="invalid-feedback">
+                                Las contraseñas no coinciden.
+                            </div>
+                        </div>
+
+                        <!-- Botón -->
+                        <button type="submit" class="btn btn-warning w-100 py-2 fw-bold">
+                            Registrarse
+                        </button>
+
+                    </form>
+
+                    <!-- Inicio de sesión -->
+                    <div class="text-center mt-4">
+                        <p class="mb-0 text-white-50">
+                            ¿Ya tienes una cuenta?
+                            <a href="login.html"
+                                class="text-warning text-decoration-none fw-bold">
+                                Inicia sesión aquí
+                            </a>
+                        </p>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     
     <footer class="bg-dark text-light pt-4 pb-3 mt-auto">
