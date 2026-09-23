@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarTablaUsuarios();
     configurarEventosTablaUsuarios();
     inicializarCheckout();
+    inicializarGraficoVentas();
 
     document.querySelectorAll('.btn-toggle-password').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('regPassword')?.value || '';
             const confirmPassword = document.getElementById('confirmPassword')?.value || '';
             const alerta = document.getElementById('alertaRegistro');
+
             const mostrarAlerta = (msg, tipo = 'danger') => {
                 if (alerta) {
                     alerta.className = `alert alert-${tipo} mb-4`;
@@ -64,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert(msg);
                 }
             };
+
             if (!nombres || !apellidos || !email || !password || !confirmPassword) {
                 mostrarAlerta('Por favor completa todos los campos.');
                 return;
@@ -72,16 +75,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 mostrarAlerta('Las contraseñas no coinciden.');
                 return;
             }
+
             let usuarios = [];
             try {
                 usuarios = JSON.parse(localStorage.getItem('usuarios_registrados')) || [];
             } catch (err) {
                 usuarios = [];
             }
+
             if (usuarios.some(u => u.email === email)) {
                 mostrarAlerta('El correo electrónico ya se encuentra registrado.');
                 return;
             }
+
             usuarios.push({ 
                 id: Date.now(),
                 nombres, 
@@ -90,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 password,
                 rol: 'Cliente'
             });
+
             localStorage.setItem('usuarios_registrados', JSON.stringify(usuarios));
             mostrarAlerta('¡Cuenta creada con éxito! Redirigiendo...', 'success');
             setTimeout(() => window.location.href = 'login.html', 1500);
@@ -102,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const email = document.getElementById('email')?.value.trim().toLowerCase() || '';
             const password = document.getElementById('password')?.value || '';
+
             if (email === 'admin@modaestilo.cl' && password === 'admin123') {
                 const adminUser = {
                     nombres: 'Administrador',
@@ -114,12 +122,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = 'admin.html';
                 return;
             }
+
             let usuarios = [];
             try {
                 usuarios = JSON.parse(localStorage.getItem('usuarios_registrados')) || [];
             } catch (err) {
                 usuarios = [];
             }
+
             const user = usuarios.find(u => u.email === email && u.password === password);
             if (user) {
                 localStorage.setItem('usuario_activo', JSON.stringify(user));
@@ -133,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const CARRITO_KEY = 'carrito_moda_estilo';
+const VENTAS_KEY = 'ventas_moda_estilo';
 
 function obtenerCarrito() {
     try {
@@ -162,16 +173,19 @@ function vincularBotonesAgregarCarrito() {
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.btn-agregar-carrito, [data-agregar-carrito], .card-body .btn-dark, .card-body .btn-primary, .tarjeta-producto .btn');
         if (!btn) return;
+
         const textoBoton = btn.textContent.trim().toLowerCase();
         if (textoBoton.includes('ver') || textoBoton.includes('detalle') || textoBoton.includes('comprando') || textoBoton.includes('pagar') || textoBoton.includes('vaciar') || textoBoton.includes('confirmar')) {
             return;
         }
+
         e.preventDefault();
         let id = btn.getAttribute('data-id') || btn.dataset.id;
         let nombre = btn.dataset.nombre || btn.getAttribute('data-nombre');
         let precio = btn.dataset.precio || btn.getAttribute('data-precio');
         let imagen = btn.dataset.imagen || btn.getAttribute('data-imagen');
         let talla = btn.dataset.talla || btn.getAttribute('data-talla') || '';
+
         const tarjeta = btn.closest('.card') || btn.closest('.tarjeta-producto') || btn.closest('.col') || btn.closest('.producto-item');
         if (tarjeta) {
             if (!nombre) {
@@ -193,8 +207,10 @@ function vincularBotonesAgregarCarrito() {
                 talla = selectTalla ? selectTalla.value : '';
             }
         }
+
         const precioNumero = parsearPrecio(precio);
         agregarAlCarrito(nombre, precioNumero, imagen, talla, id);
+
         const textoOriginal = btn.innerHTML;
         btn.innerHTML = '<i class="bi bi-check-circle me-1"></i> ¡Agregado!';
         btn.classList.add('btn-success');
@@ -210,10 +226,12 @@ function agregarAlCarrito(nombre, precio, imagen = '', talla = '', id = null) {
     const precioLimpio = parsearPrecio(precio);
     const imagenLimpia = (typeof imagen === 'string' && !imagen.includes('[object')) ? imagen : 'img/urbana.jpg';
     const tallaLimpia = typeof talla === 'string' ? talla.trim() : '';
+
     let carrito = obtenerCarrito();
     const indice = carrito.findIndex(item => 
         (id && item.id == id) || (item.nombre === nombreLimpio && item.talla === tallaLimpia)
     );
+
     if (indice !== -1) {
         carrito[indice].cantidad = (parseInt(carrito[indice].cantidad, 10) || 0) + 1;
         if (precioLimpio > 0) carrito[indice].precio = precioLimpio;
@@ -227,6 +245,7 @@ function agregarAlCarrito(nombre, precio, imagen = '', talla = '', id = null) {
             cantidad: 1
         });
     }
+
     guardarCarrito(carrito);
     renderizarCarrito();
 }
@@ -246,13 +265,16 @@ function renderizarCarrito() {
     const contenidoCarrito = document.getElementById('contenidoCarrito');
     
     if (!contenedor) return;
+
     const carrito = obtenerCarrito();
     const formatoCLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
+
     const resetTotales = () => {
         document.querySelectorAll('#subtotalCarrito, #totalCarrito, .subtotal-carrito, .total-carrito').forEach(el => {
             if (el) el.textContent = '$0';
         });
     };
+
     if (carrito.length === 0) {
         contenedor.innerHTML = '';
         if (carritoVacioMsg) carritoVacioMsg.classList.remove('d-none');
@@ -260,15 +282,19 @@ function renderizarCarrito() {
         resetTotales();
         return;
     }
+
     if (carritoVacioMsg) carritoVacioMsg.classList.add('d-none');
     if (contenidoCarrito) contenidoCarrito.classList.remove('d-none');
+
     let total = 0;
     contenedor.innerHTML = '';
+
     carrito.forEach((item, index) => {
         const cantidad = parseInt(item.cantidad, 10) || 1;
         const precio = parsearPrecio(item.precio);
         const subtotal = precio * cantidad;
         total += subtotal;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>
@@ -293,10 +319,12 @@ function renderizarCarrito() {
         `;
         contenedor.appendChild(tr);
     });
+
     const totalFormateado = formatoCLP.format(total);
     document.querySelectorAll('#subtotalCarrito, #totalCarrito, .subtotal-carrito, .total-carrito').forEach(elem => {
         elem.textContent = totalFormateado;
     });
+
     contenedor.querySelectorAll('.cantidad-item').forEach(input => {
         input.addEventListener('change', (e) => {
             const idx = parseInt(e.target.getAttribute('data-index'), 10);
@@ -309,6 +337,7 @@ function renderizarCarrito() {
             }
         });
     });
+
     contenedor.querySelectorAll('.btn-eliminar').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const idx = parseInt(e.currentTarget.getAttribute('data-index'), 10);
@@ -357,7 +386,6 @@ function inicializarCheckout() {
 
     if (!itemsContainer && !formCheckout) return;
 
-    // --- FORMATEO DINÁMICO DE TARJETA ---
     const inputNumero = document.getElementById('numeroTarjeta');
     const inputExp = document.getElementById('expiracionTarjeta');
     const inputCvv = document.getElementById('cvvTarjeta');
@@ -387,7 +415,6 @@ function inicializarCheckout() {
         });
     }
 
-    // --- VISIBILIDAD DE CAMPOS TARJETA / TRANSFERENCIA ---
     if (radioTarjeta && radioTransferencia && camposTarjeta) {
         const inputsTarjeta = camposTarjeta.querySelectorAll('input');
         
@@ -413,11 +440,13 @@ function inicializarCheckout() {
     } else {
         let totalCalculado = 0;
         let htmlItems = '';
+
         carrito.forEach(item => {
             const precioNum = parsearPrecio(item.precio);
             const cantidad = parseInt(item.cantidad, 10) || 1;
             const subtotal = precioNum * cantidad;
             totalCalculado += subtotal;
+
             htmlItems += `
                 <div class="d-flex justify-content-between align-items-center mb-2 small">
                     <div>
@@ -428,12 +457,14 @@ function inicializarCheckout() {
                 </div>
             `;
         });
+
         if (itemsContainer) itemsContainer.innerHTML = htmlItems;
         if (totalPagoElem) totalPagoElem.textContent = formatoCLP.format(totalCalculado);
     }
 
     if (formCheckout) {
         let procesando = false;
+
         formCheckout.addEventListener('submit', (e) => {
             e.preventDefault();
             if (procesando) return;
@@ -444,7 +475,6 @@ function inicializarCheckout() {
                 return;
             }
 
-            // Validar expiración de tarjeta si el método seleccionado es tarjeta
             if (radioTarjeta && radioTarjeta.checked && inputExp) {
                 const expVal = inputExp.value.trim();
                 if (expVal.length < 5 || !expVal.includes('/')) {
@@ -454,17 +484,26 @@ function inicializarCheckout() {
             }
 
             procesando = true;
+
             let productosDB = obtenerProductos();
+            let montoTotalVenta = 0;
+
             carritoActual.forEach(itemCarrito => {
                 const prodIndex = productosDB.findIndex(p => 
                     Number(p.id) === Number(itemCarrito.id) || p.nombre.trim() === itemCarrito.nombre.trim()
                 );
+                const cantidadComprada = parseInt(itemCarrito.cantidad, 10) || 1;
+                const precioUnidad = parsearPrecio(itemCarrito.precio);
+                
+                montoTotalVenta += precioUnidad * cantidadComprada;
+
                 if (prodIndex !== -1) {
-                    const cantidadComprada = parseInt(itemCarrito.cantidad, 10) || 1;
                     productosDB[prodIndex].stock = Math.max(0, productosDB[prodIndex].stock - cantidadComprada);
                 }
             });
+
             guardarProductos(productosDB);
+            registrarVentaHistorial(montoTotalVenta);
 
             localStorage.removeItem(CARRITO_KEY);
             localStorage.removeItem('carritoCompras');
@@ -475,6 +514,95 @@ function inicializarCheckout() {
     }
 }
 
+function registrarVentaHistorial(monto) {
+    try {
+        let ventas = JSON.parse(localStorage.getItem(VENTAS_KEY)) || [];
+        ventas.push({
+            monto: monto,
+            fecha: new Date().toISOString()
+        });
+        localStorage.setItem(VENTAS_KEY, JSON.stringify(ventas));
+    } catch (e) {
+        console.error('Error guardando la venta:', e);
+    }
+}
+
+function obtenerVentasHistorial() {
+    try {
+        return JSON.parse(localStorage.getItem(VENTAS_KEY)) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function inicializarGraficoVentas() {
+    const canvas = document.getElementById('graficoVentas');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    const ctx = canvas.getContext('2d');
+    const ventas = obtenerVentasHistorial();
+
+    const totalVentasRegistradas = ventas.reduce((acc, v) => acc + (v.monto || 0), 0);
+    const montoBaseMes = 1450000;
+    const totalMesActual = montoBaseMes + totalVentasRegistradas;
+
+    const dashVentasMes = document.getElementById('dashVentasMes');
+    if (dashVentasMes) {
+        dashVentasMes.textContent = `$${totalMesActual.toLocaleString('es-CL')}`;
+    }
+
+    const ventasBaseSemanal = [150000, 220000, 180000, 290000, 240000, 310000, 260000];
+
+    if (ventas.length > 0) {
+        ventasBaseSemanal[6] += totalVentasRegistradas;
+    }
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            datasets: [{
+                label: 'Ventas ($)',
+                data: ventasBaseSemanal,
+                borderColor: '#c5a059',
+                backgroundColor: 'rgba(197, 160, 89, 0.15)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.35,
+                pointBackgroundColor: '#c5a059',
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return '$' + context.parsed.y.toLocaleString('es-CL');
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return '$' + (value / 1000) + 'k';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 function actualizarNavbarUsuario() {
     let usuarioActivo = null;
     try {
@@ -482,8 +610,10 @@ function actualizarNavbarUsuario() {
     } catch (e) {
         usuarioActivo = null;
     }
+
     const navDerecho = document.querySelector('.navbar-nav.ms-auto');
     if (!navDerecho) return;
+
     if (usuarioActivo) {
         navDerecho.querySelectorAll('li').forEach(li => {
             const a = li.querySelector('a');
@@ -491,6 +621,7 @@ function actualizarNavbarUsuario() {
                 li.remove();
             }
         });
+
         const liUsuario = document.createElement('li');
         liUsuario.className = 'nav-item dropdown';
         liUsuario.innerHTML = `
@@ -507,6 +638,7 @@ function actualizarNavbarUsuario() {
             </ul>
         `;
         navDerecho.appendChild(liUsuario);
+
         const btnLogout = liUsuario.querySelector('#btnCerrarSesion');
         if (btnLogout) {
             btnLogout.addEventListener('click', cerrarSesion);
@@ -621,11 +753,14 @@ function calcularEstadoStock(stock) {
 function renderizarCatalogoProductos() {
     const catalogo = document.getElementById('contenedorProductos');
     if (!catalogo) return;
+
     const productos = obtenerProductos();
     const formatoCLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
+
     catalogo.innerHTML = '';
     productos.forEach(p => {
         const opcionesTallas = (p.tallas || ['Única']).map(t => `<option value="${escaparHTML(t)}">${escaparHTML(t)}</option>`).join('');
+        
         const col = document.createElement('div');
         col.className = 'col-md-6 col-lg-3 mb-4';
         col.innerHTML = `
@@ -655,26 +790,31 @@ function renderizarCatalogoProductos() {
 function inicializarPanelAdminProductos() {
     const tbody = document.getElementById('tablaAdminProductos');
     if (!tbody) return;
+
     const modalEl = document.getElementById('modalProducto');
     const modalProducto = modalEl ? new bootstrap.Modal(modalEl) : null;
     const form = document.getElementById('formProductoAdmin');
     const tituloModal = document.getElementById('modalProductoTitulo');
     const inputIdEditar = document.getElementById('filaIndexEditar');
+
     const mapaCategoriaSlug = {
         'Ropa Urbana': 'urbano',
         'Ropa Casual': 'casual',
         'Ropa Formal': 'formal',
         'Accesorios': 'accesorios'
     };
+
     function renderTablaAdmin() {
         const productos = obtenerProductos();
         tbody.innerHTML = '';
         let totalStock = 0;
         let alertas = 0;
+
         productos.forEach(p => {
             totalStock += p.stock;
             const estado = calcularEstadoStock(p.stock);
             if (p.stock <= 5) alertas++;
+
             const fila = document.createElement('tr');
             fila.innerHTML = `
                 <td>#${String(p.id).padStart(3, '0')}</td>
@@ -690,20 +830,24 @@ function inicializarPanelAdminProductos() {
             `;
             tbody.appendChild(fila);
         });
+
         const dashStock = document.getElementById('dashTotalStock');
         const dashAlertas = document.getElementById('dashAlertas');
         if (dashStock) dashStock.textContent = `${totalStock} prendas`;
         if (dashAlertas) dashAlertas.textContent = `${alertas} ítems bajos`;
     }
+
     function abrirModalAgregar() {
         form.reset();
         inputIdEditar.value = '';
         tituloModal.textContent = 'Agregar Producto';
         if (modalProducto) modalProducto.show();
     }
+
     function abrirModalEditar(id) {
         const p = obtenerProductoPorId(id);
         if (!p) return;
+
         inputIdEditar.value = p.id;
         document.getElementById('prodNombre').value = p.nombre;
         document.getElementById('prodCategoria').value = p.categoria;
@@ -712,17 +856,22 @@ function inicializarPanelAdminProductos() {
         document.getElementById('prodImagen').value = p.img;
         document.getElementById('prodDescripcion').value = p.desc || '';
         document.getElementById('prodTallas').value = (p.tallas || []).join(', ');
+
         tituloModal.textContent = 'Editar Producto';
         if (modalProducto) modalProducto.show();
     }
+
     const btnAbrir = document.getElementById('btnAbrirModalAgregar');
     if (btnAbrir) btnAbrir.addEventListener('click', abrirModalAgregar);
+
     tbody.addEventListener('click', (e) => {
         const btnEditar = e.target.closest('.btn-editar-producto');
         const btnEliminar = e.target.closest('.btn-eliminar-producto');
+
         if (btnEditar) {
             abrirModalEditar(btnEditar.dataset.id);
         }
+
         if (btnEliminar) {
             const p = obtenerProductoPorId(btnEliminar.dataset.id);
             const nombre = p ? p.nombre : 'este producto';
@@ -732,15 +881,18 @@ function inicializarPanelAdminProductos() {
             }
         }
     });
+
     if (form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
+
             const idEditando = inputIdEditar.value;
             const categoria = document.getElementById('prodCategoria').value;
             const tallas = document.getElementById('prodTallas').value
                 .split(',')
                 .map(t => t.trim())
                 .filter(t => t !== '');
+
             const producto = {
                 id: idEditando ? Number(idEditando) : Date.now(),
                 nombre: document.getElementById('prodNombre').value.trim(),
@@ -752,15 +904,18 @@ function inicializarPanelAdminProductos() {
                 desc: document.getElementById('prodDescripcion').value.trim(),
                 tallas: tallas.length ? tallas : ['Talla Única']
             };
+
             if (idEditando) {
                 actualizarProducto(producto);
             } else {
                 agregarProducto(producto);
             }
+
             if (modalProducto) modalProducto.hide();
             renderTablaAdmin();
         });
     }
+
     renderTablaAdmin();
 }
 
@@ -768,31 +923,38 @@ function cargarTablaUsuarios() {
     const tablaUsuarios = document.getElementById('tablaAdminUsuarios');
     const badgeTotal = document.getElementById('totalUsuariosBadge');
     if (!tablaUsuarios) return;
+
     const usuariosPorDefecto = [
         { id: 101, nombres: "Juan", apellidos: "Pérez", email: "admin@modaestilo.cl", rol: "Administrador" },
         { id: 102, nombres: "María", apellidos: "González", email: "maria.g@email.com", rol: "Cliente" },
         { id: 103, nombres: "Carlos", apellidos: "Silva", email: "carlos.silva@email.com", rol: "Cliente" }
     ];
+
     let usuarios = [];
     try {
         usuarios = JSON.parse(localStorage.getItem('usuarios_registrados'));
     } catch (e) {
         usuarios = null;
     }
+
     if (!usuarios || usuarios.length === 0) {
         usuarios = usuariosPorDefecto;
         localStorage.setItem('usuarios_registrados', JSON.stringify(usuarios));
     }
+
     if (badgeTotal) {
         badgeTotal.textContent = `${usuarios.length} registrados`;
     }
+
     tablaUsuarios.innerHTML = '';
     usuarios.forEach((u, index) => {
         const esAdmin = u.rol === 'Administrador' || u.email === 'admin@modaestilo.cl';
         const badgeRol = esAdmin 
             ? '<span class="badge bg-dark">Administrador</span>' 
             : '<span class="badge bg-secondary">Cliente</span>';
+
         const nombreCompleto = `${u.nombres || ''} ${u.apellidos || ''}`.trim() || 'Usuario Desconocido';
+
         const fila = document.createElement('tr');
         fila.innerHTML = `
             <td>#${String(u.id || index + 1).slice(-3)}</td>
@@ -812,6 +974,7 @@ function cargarTablaUsuarios() {
 function configurarEventosTablaUsuarios() {
     const tablaUsuarios = document.getElementById('tablaAdminUsuarios');
     if (!tablaUsuarios) return;
+
     tablaUsuarios.onclick = (e) => {
         const btnEliminar = e.target.closest('.btn-eliminar-usuario');
         if (btnEliminar) {
@@ -828,8 +991,10 @@ function eliminarUsuario(index) {
     } catch (e) {
         usuarios = [];
     }
+
     const user = usuarios[index];
     const nombre = user ? `${user.nombres} ${user.apellidos}`.trim() : 'este usuario';
+
     if (confirm(`¿Estás seguro de que deseas eliminar a ${nombre}?`)) {
         usuarios.splice(index, 1);
         localStorage.setItem('usuarios_registrados', JSON.stringify(usuarios));

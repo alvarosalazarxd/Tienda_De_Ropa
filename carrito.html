@@ -13,7 +13,6 @@
 
 <body class="d-flex flex-column min-vh-100">
 
-    <!-- Navegación Principal -->
     <nav class="navbar navbar-expand-sm navbar-dark navbar-custom sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold text-uppercase fs-4" href="index.html">Moda & Estilo</a>
@@ -52,7 +51,6 @@
         </div>
     </nav>
 
-    <!-- Encabezado de la Sección -->
     <header class="bg-dark text-white py-4 border-bottom border-gold mb-4">
         <div class="container">
             <h1 class="h3 fw-bold text-uppercase mb-0" style="letter-spacing: 1px;">
@@ -63,7 +61,6 @@
 
     <main class="container my-4 flex-grow-1">
         
-        <!-- Mensaje cuando el carrito está vacío -->
         <div id="carritoVacioMsg" class="text-center py-5 d-none">
             <i class="bi bi-cart-x text-muted display-1"></i>
             <h3 class="mt-3 fw-bold text-dark">Tu carrito está vacío</h3>
@@ -73,10 +70,8 @@
             </a>
         </div>
 
-        <!-- Contenido principal del Carrito -->
         <div id="contenidoCarrito" class="row g-4 d-none">
             
-            <!-- Lista de Productos -->
             <div class="col-12 col-lg-8">
                 <div class="card card-custom shadow-sm border-0 rounded-3 overflow-hidden">
                     <div class="card-body p-0">
@@ -92,7 +87,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="listaCarrito">
-                                    <!-- Se genera dinámicamente mediante js/main.js -->
                                 </tbody>
                             </table>
                         </div>
@@ -109,7 +103,6 @@
                 </div>
             </div>
 
-            <!-- Resumen del Pedido -->
             <div class="col-12 col-lg-4">
                 <div class="card card-custom shadow-sm border-0 rounded-3 p-3">
                     <h5 class="fw-bold border-bottom pb-2 text-uppercase fs-6">Resumen del Pedido</h5>
@@ -130,7 +123,6 @@
                         <span id="totalCarrito" class="fs-4 fw-bold text-gold">$0</span>
                     </div>
 
-                    <!-- Botón vinculado al proceso de Checkout -->
                     <button type="button" id="btnPagar" class="btn btn-fashion w-100 py-2 rounded-pill fw-bold text-uppercase" style="letter-spacing: 0.5px;">
                         <i class="bi bi-credit-card me-2"></i>Proceder al Pago
                     </button>
@@ -144,7 +136,6 @@
         </div>
     </main>
 
-    <!-- Footer Completo -->
     <footer class="footer-custom pt-5 pb-3 mt-auto">
         <div class="container">
             <div class="row g-4 align-items-start mb-4">

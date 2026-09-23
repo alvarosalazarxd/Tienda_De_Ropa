@@ -1,17 +1,13 @@
-/* ==========================================
-   VARIABLES DE COLOR (Tienda de Ropa / Moda)
-   ========================================== */
 :root {
     --fashion-dark: #111111;
     --fashion-gold: #c5a880;
     --fashion-gold-hover: #e0c8a6;
     --fashion-bg: #f7f5f0;
     --fashion-card-bg: #ffffff;
+    --sidebar-width: 250px;
+    --sidebar-hover: #1f1f1f;
 }
 
-/* ==========================================
-   ESTILOS GENERALES
-   ========================================== */
 body {
     background-color: var(--fashion-bg);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,9 +18,6 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
-/* ==========================================
-   NAVBAR & BANNER
-   ========================================== */
 .navbar-custom {
     background-color: var(--fashion-dark) !important;
     border-bottom: 1px solid rgba(197, 168, 128, 0.3);
@@ -56,9 +49,6 @@ body {
     letter-spacing: 2px;
 }
 
-/* ==========================================
-   TARJETAS (CARDS)
-   ========================================== */
 .card, .card-custom {
     border: none;
     border-radius: 12px;
@@ -80,9 +70,6 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ==========================================
-   BOTONES
-   ========================================== */
 .btn-fashion {
     background-color: var(--fashion-dark);
     color: #ffffff;
@@ -97,9 +84,6 @@ body {
     font-weight: 600;
 }
 
-/* ==========================================
-   FORMULARIO Y TABLAS
-   ========================================== */
 .form-control:focus {
     border-color: var(--fashion-gold); 
     box-shadow: 0 0 0 0.25rem rgba(197, 168, 128, 0.25);
@@ -109,9 +93,6 @@ body {
     background-color: rgba(0, 0, 0, 0.03);
 }
 
-/* ==========================================
-   CLASES UTILITARIAS & FOOTER
-   ========================================== */
 .text-gold {
     color: var(--fashion-gold) !important;
 }
@@ -138,11 +119,7 @@ body {
 .hover-link:hover {
     color: var(--fashion-gold) !important;
 }
-/* ==========================================
-   ESTILOS ESPECÍFICOS PARA EL PANEL ADMIN
-   ========================================== */
 
-/* Botón principal dorado personalizado */
 .btn-gold {
     background-color: var(--fashion-gold) !important;
     color: #111111 !important;
@@ -156,7 +133,6 @@ body {
     color: #111111 !important;
 }
 
-/* Tarjetas de Métricas en el Admin */
 .card-metric-admin {
     background-color: var(--fashion-dark) !important;
     color: #ffffff !important;
@@ -164,7 +140,6 @@ body {
     border-radius: 12px;
 }
 
-/* Tabla del Admin adaptada a la paleta */
 .card-admin-table {
     border-radius: 12px;
     overflow: hidden;
@@ -181,4 +156,60 @@ body {
     color: #ffffff !important;
     font-weight: 600;
     padding: 1rem;
+}
+
+#sidebar {
+    width: var(--sidebar-width);
+    min-height: 100vh;
+    background-color: var(--fashion-dark);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    border-right: 1px solid rgba(197, 168, 128, 0.2);
+    transition: all 0.3s;
+}
+
+#sidebar .nav-link {
+    color: #a0a0a0;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin: 4px 12px;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+#sidebar .nav-link:hover, 
+#sidebar .nav-link.active {
+    color: var(--fashion-gold);
+    background-color: var(--sidebar-hover);
+}
+
+#sidebar .nav-link i {
+    font-size: 1.1rem;
+    margin-right: 12px;
+}
+
+#main-wrapper {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-header {
+    background-color: #ffffff;
+    height: 70px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding: 0 30px;
+}
+
+.seccion-admin {
+    display: none;
+}
+
+.seccion-admin.activa {
+    display: block;
 }
