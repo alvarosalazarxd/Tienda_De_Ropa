@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     inicializarCheckout();
     inicializarGraficoVentas();
     prepararAyudasFormulario();
+    renderizarHistorialUsuario();
 
     document.querySelectorAll('.btn-toggle-password').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -75,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mostrarAlerta('Por favor completa todos los campos.');
                 return;
             }
+
             if (password !== confirmPassword) {
                 mostrarAlerta('Las contraseñas no coinciden.');
                 return;
@@ -153,7 +155,6 @@ const VENTAS_KEY = 'ventas_moda_estilo';
 const PEDIDOS_KEY = 'pedidos_moda_estilo';
 const PRODUCTOS_KEY = 'productos_moda_estilo';
 
-
 function obtenerCarrito() {
     try {
         const data = localStorage.getItem(CARRITO_KEY) || localStorage.getItem('carritoCompras');
@@ -226,6 +227,7 @@ function vincularBotonesAgregarCarrito() {
 
         const precioNumero = parsearPrecio(precio);
         agregarAlCarrito(nombre, precioNumero, imagen, talla, id);
+
         mostrarAviso('Producto agregado', nombre + ' se agregó al carrito.');
 
         const textoOriginal = btn.innerHTML;
@@ -242,12 +244,13 @@ function agregarAlCarrito(nombre, precio, imagen = '', talla = '', id = null) {
     const nombreLimpio = typeof nombre === 'string' && !nombre.includes('[object') ? nombre.trim() : 'Producto';
     const precioLimpio = parsearPrecio(precio);
     const imagenLimpia = typeof imagen === 'string' && !imagen.includes('[object') ? imagen : 'img/urbana.jpg';
-    const tallaLimpia = typeof talla === 'string' ? talla.trim() : '';
+    const tallaLimpia = typeof talla === 'string' ? talla.trim() : 'Única';
 
     let carrito = obtenerCarrito();
+
     const indice = carrito.findIndex(item =>
-        (id && item.id == id) ||
-        (item.nombre === nombreLimpio && item.talla === tallaLimpia)
+        (id ? String(item.id) === String(id) : item.nombre === nombreLimpio) && 
+        String(item.talla || 'Única') === String(tallaLimpia || 'Única')
     );
 
     if (indice !== -1) {
@@ -259,10 +262,11 @@ function agregarAlCarrito(nombre, precio, imagen = '', talla = '', id = null) {
             nombre: nombreLimpio,
             precio: precioLimpio,
             imagen: imagenLimpia,
-            talla: tallaLimpia,
+            talla: tallaLimpia || 'Única',
             cantidad: 1
         });
     }
+
     guardarCarrito(carrito);
     renderizarCarrito();
 }
@@ -280,6 +284,7 @@ function renderizarCarrito() {
     const contenedor = document.getElementById('listaCarrito');
     const carritoVacioMsg = document.getElementById('carritoVacioMsg');
     const contenidoCarrito = document.getElementById('contenidoCarrito');
+
     if (!contenedor) return;
 
     const carrito = obtenerCarrito();
@@ -304,6 +309,7 @@ function renderizarCarrito() {
 
     let total = 0;
     contenedor.innerHTML = '';
+
     carrito.forEach((item, index) => {
         const cantidad = parseInt(item.cantidad, 10) || 1;
         const precio = parsearPrecio(item.precio);
@@ -367,6 +373,7 @@ function vincularBotonVaciar() {
         btnVaciar.onclick = async () => {
             const carrito = obtenerCarrito();
             if (carrito.length === 0) return;
+
             const confirmado = await pedirConfirmacion('Vaciar carrito', '¿Quieres quitar todos los productos del carrito?');
             if (confirmado) {
                 localStorage.removeItem(CARRITO_KEY);
@@ -391,7 +398,6 @@ function vincularBotonPagar() {
         };
     }
 }
-
 
 function inicializarCheckout() {
     const itemsContainer = document.getElementById('itemsCheckout');
@@ -463,6 +469,7 @@ function inicializarCheckout() {
                 <div class="d-flex justify-content-between align-items-center mb-2 small">
                     <div>
                         <span class="fw-bold">${escaparHTML(item.nombre)}</span>
+                        <span class="text-muted"> (${escaparHTML(item.talla || 'Única')})</span>
                         <span class="text-muted"> x${cantidad}</span>
                     </div>
                     <span class="fw-semibold">${formatoCLP.format(subtotal)}</span>
@@ -478,14 +485,16 @@ function inicializarCheckout() {
         formCheckout.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (procesando) return;
+
             const boton = formCheckout.querySelector('button[type="submit"]');
             procesando = true;
             boton.disabled = true;
 
             try {
+                // Validación estricta para números telefónicos de Chile (+569XXXXXXXX)
                 const telefono = document.getElementById('telefonoCheckout');
-                if (telefono && !/^\+?\d{8,15}$/.test(telefono.value)) {
-                    await mostrarAviso('Revisa el teléfono', 'Escribe de 8 a 15 números, con un + opcional al inicio.');
+                if (telefono && !/^\+569\d{8}$/.test(telefono.value)) {
+                    await mostrarAviso('Teléfono inválido', 'Debes ingresar un número chileno de 9 dígitos válido (+569XXXXXXXX).');
                     return;
                 }
 
@@ -498,14 +507,17 @@ function inicializarCheckout() {
                 if (radioTarjeta && radioTarjeta.checked) {
                     const numero = inputNumero.value.replace(/\s/g, '');
                     const exp = inputExp.value.trim();
+
                     if (numero !== '4242424242424242') {
                         await mostrarAviso('Tarjeta de demostración', 'Usa solamente el número de prueba 4242 4242 4242 4242.');
                         return;
                     }
+
                     if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(exp)) {
                         await mostrarAviso('Vencimiento inválido', 'Usa el formato MM/AA.');
                         return;
                     }
+
                     if (inputCvv.value !== '123') {
                         await mostrarAviso('CVV de demostración', 'El CVV de prueba es 123.');
                         return;
@@ -542,26 +554,42 @@ function inicializarCheckout() {
                 cantidades.forEach((cantidad, id) => {
                     productosDB.find(p => String(p.id) === id).stock -= cantidad;
                 });
+
                 guardarProductos(productosDB);
 
                 let usuarioActivo = null;
                 try { usuarioActivo = JSON.parse(localStorage.getItem('usuario_activo')); } catch(err){}
 
+                const nombre = document.getElementById('nombreCheckout')?.value || '';
+                const apellido = document.getElementById('apellidoCheckout')?.value || '';
+                const calle = document.getElementById('calleCheckout')?.value || '';
+                const numeroDom = document.getElementById('numeroCheckout')?.value || '';
+                const depto = document.getElementById('deptoCheckout')?.value || '';
+                const comuna = document.getElementById('comunaCheckout')?.value || '';
+                const ciudad = document.getElementById('ciudadCheckout')?.value || '';
+                const region = document.getElementById('regionCheckout')?.value || '';
+                const postal = document.getElementById('postalCheckout')?.value || '';
+                const ref = document.getElementById('referenciaCheckout')?.value || '';
+
+                const dirFormateada = `${calle} #${numeroDom}${depto ? ', Depto/Casa: ' + depto : ''}${ref ? ' (Ref: ' + ref + ')' : ''}`;
+                const ubicaFormateada = `${comuna}, ${ciudad}, ${region} (CP: ${postal})`;
+
                 const nuevoPedido = {
                     id: 'PED-' + Math.floor(100000 + Math.random() * 900000),
                     fecha: new Date().toLocaleDateString('es-CL'),
-                    clienteNombre: (document.getElementById('nombresCheckout')?.value || 'Cliente') + ' ' + (document.getElementById('apellidosCheckout')?.value || ''),
-                    clienteEmail: document.getElementById('emailCheckout')?.value || (usuarioActivo ? usuarioActivo.email : 'invitado@tienda.cl'),
+                    clienteNombre: `${nombre} ${apellido}`.trim() || 'Cliente Sin Nombre',
+                    clienteEmail: document.getElementById('correoCheckout')?.value || (usuarioActivo ? usuarioActivo.email : 'invitado@tienda.cl'),
                     clienteTelefono: document.getElementById('telefonoCheckout')?.value || 'No informado',
                     tipoUsuario: usuarioActivo ? (usuarioActivo.rol || 'Cliente Registrado') : 'Invitado',
-                    direccion: document.getElementById('direccionCheckout')?.value || 'Dirección no especificada',
-                    comunaRegion: (document.getElementById('comunaCheckout')?.value || '') + ', ' + (document.getElementById('regionCheckout')?.value || ''),
+                    direccion: dirFormateada,
+                    comunaRegion: ubicaFormateada,
                     metodoPago: radioTarjeta && radioTarjeta.checked ? 'Tarjeta de Crédito/Débito' : 'Transferencia Bancaria',
                     estado: radioTarjeta && radioTarjeta.checked ? 'Recibido' : 'Pendiente de Pago',
                     total: montoTotalVenta,
                     items: carritoActual.map(i => ({
+                        id: i.id,
                         nombre: i.nombre,
-                        talla: i.talla || 'S/T',
+                        talla: i.talla || 'Única',
                         precioHistorico: i.precio,
                         cantidad: i.cantidad,
                         subtotal: i.precio * i.cantidad
@@ -587,14 +615,13 @@ function inicializarCheckout() {
     }
 }
 
-
 const pedidosPorDefecto = [
     {
         id: "PED-102938",
         fecha: "20/09/2026",
         clienteNombre: "María González",
         clienteEmail: "maria.g@email.com",
-        clienteTelefono: "+56 9 8765 4321",
+        clienteTelefono: "+56987654321",
         tipoUsuario: "Cliente Registrado",
         direccion: "Av. Providencia 1234, Apto 502",
         comunaRegion: "Providencia, Región Metropolitana",
@@ -602,8 +629,8 @@ const pedidosPorDefecto = [
         estado: "Entregado",
         total: 49980,
         items: [
-            { nombre: "Polera Oversize Negra", talla: "M - Medium", precioHistorico: 19990, cantidad: 1, subtotal: 19990 },
-            { nombre: "Pantalón Jean Classic", talla: "40 - M", precioHistorico: 29990, cantidad: 1, subtotal: 29990 }
+            { id: 1, nombre: "Polera Oversize Negra", talla: "M - Medium", precioHistorico: 19990, cantidad: 1, subtotal: 19990 },
+            { id: 2, nombre: "Pantalón Jean Classic", talla: "40 - M", precioHistorico: 29990, cantidad: 1, subtotal: 29990 }
         ]
     },
     {
@@ -611,7 +638,7 @@ const pedidosPorDefecto = [
         fecha: "22/09/2026",
         clienteNombre: "Carlos Silva",
         clienteEmail: "carlos.silva@email.com",
-        clienteTelefono: "+56 9 1122 3344",
+        clienteTelefono: "+56911223344",
         tipoUsuario: "Cliente Registrado",
         direccion: "Calle Las Heras 456",
         comunaRegion: "Concepción, Región del Bío Bío",
@@ -619,7 +646,7 @@ const pedidosPorDefecto = [
         estado: "Pendiente de Pago",
         total: 45990,
         items: [
-            { nombre: "Chaqueta Formal Fit", talla: "L - Large", precioHistorico: 45990, cantidad: 1, subtotal: 45990 }
+            { id: 3, nombre: "Chaqueta Formal Fit", talla: "L - Large", precioHistorico: 45990, cantidad: 1, subtotal: 45990 }
         ]
     }
 ];
@@ -672,7 +699,6 @@ function inicializarPanelAdminPedidos() {
     const filtroEstado = document.getElementById('filtroEstadoPedido');
     const modalEl = document.getElementById('modalDetallePedido');
     const modalDetalle = modalEl ? new bootstrap.Modal(modalEl) : null;
-
     let pedidoSeleccionadoActual = null;
 
     function renderTablaPedidos() {
@@ -681,7 +707,6 @@ function inicializarPanelAdminPedidos() {
         const estadoFiltro = filtroEstado ? filtroEstado.value : 'TODOS';
 
         tablaPedidos.innerHTML = '';
-
         const filtrados = pedidos.filter(p => {
             const coincideTexto = p.id.toLowerCase().includes(textoBusqueda) || p.clienteNombre.toLowerCase().includes(textoBusqueda);
             const coincideEstado = estadoFiltro === 'TODOS' || p.estado === estadoFiltro;
@@ -756,7 +781,6 @@ function inicializarPanelAdminPedidos() {
         });
 
         document.getElementById('detPedidoTotal').textContent = `$${p.total.toLocaleString('es-CL')}`;
-
         if (modalDetalle) modalDetalle.show();
     }
 
@@ -765,16 +789,31 @@ function inicializarPanelAdminPedidos() {
         btnGuardarEstado.onclick = async () => {
             if (!pedidoSeleccionadoActual) return;
             const nuevoEst = document.getElementById('selectEstadoPedidoModal').value;
+            const estadoAnterior = pedidoSeleccionadoActual.estado;
+
+            if (nuevoEst === 'Cancelado' && estadoAnterior !== 'Cancelado') {
+                const productosDB = obtenerProductos();
+                pedidoSeleccionadoActual.items.forEach(item => {
+                    const prod = productosDB.find(p => String(p.id) === String(item.id) || p.nombre === item.nombre);
+                    if (prod) {
+                        prod.stock = Number(prod.stock || 0) + Number(item.cantidad || 0);
+                    }
+                });
+                guardarProductos(productosDB);
+            }
+
             actualizarEstadoPedidoEnStorage(pedidoSeleccionadoActual.id, nuevoEst);
             if (modalDetalle) modalDetalle.hide();
             await mostrarAviso('Pedido Actualizado', `El pedido ${pedidoSeleccionadoActual.id} ahora está en estado "${nuevoEst}".`);
             renderTablaPedidos();
+            if (typeof inicializarPanelAdminProductos === 'function') {
+                inicializarPanelAdminProductos();
+            }
         };
     }
 
     renderTablaPedidos();
 }
-
 
 function registrarVentaHistorial(monto) {
     try {
@@ -797,30 +836,28 @@ function obtenerVentasHistorial() {
 function inicializarGraficoVentas() {
     const canvas = document.getElementById('graficoVentas');
     if (!canvas || typeof Chart === 'undefined') return;
+
     const ctx = canvas.getContext('2d');
     const ventas = obtenerVentasHistorial();
-
     const totalVentasRegistradas = ventas.reduce((acc, v) => acc + (v.monto || 0), 0);
-    const montoBaseMes = 1450000;
-    const totalMesActual = montoBaseMes + totalVentasRegistradas;
 
     const dashVentasMes = document.getElementById('dashVentasMes');
     if (dashVentasMes) {
-        dashVentasMes.textContent = `$${totalMesActual.toLocaleString('es-CL')}`;
+        dashVentasMes.textContent = `$${totalVentasRegistradas.toLocaleString('es-CL')}`;
     }
 
-    const ventasBaseSemanal = [150000, 220000, 180000, 290000, 240000, 310000, 260000];
-    if (ventas.length > 0) {
-        ventasBaseSemanal[6] += totalVentasRegistradas;
+    const datosGrafico = [0, 0, 0, 0, 0, 0, totalVentasRegistradas];
+    if (window.miGraficoVentasInstance) {
+        window.miGraficoVentasInstance.destroy();
     }
 
-    new Chart(ctx, {
+    window.miGraficoVentasInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
             datasets: [{
                 label: 'Ventas ($)',
-                data: ventasBaseSemanal,
+                data: datosGrafico,
                 borderColor: '#c5a059',
                 backgroundColor: 'rgba(197, 160, 89, 0.15)',
                 borderWidth: 2,
@@ -856,7 +893,6 @@ function inicializarGraficoVentas() {
     });
 }
 
-
 function actualizarNavbarUsuario() {
     let usuarioActivo = null;
     try {
@@ -885,6 +921,8 @@ function actualizarNavbarUsuario() {
             </a>
             <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary" aria-labelledby="userDropdown">
                 ${usuarioActivo.rol === 'Administrador' ? '<li><a class="dropdown-item text-light" href="admin.html"><i class="bi bi-speedometer2 me-2"></i>Panel Admin</a></li><li><hr class="dropdown-divider border-secondary"></li>' : ''}
+                <li><a class="dropdown-item text-light" href="mis-compras.html"><i class="bi bi-bag-check me-2"></i>Mis Compras</a></li>
+                <li><hr class="dropdown-divider border-secondary"></li>
                 <li>
                     <a class="dropdown-item text-danger fw-semibold" href="#" id="btnCerrarSesion">
                         <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
@@ -905,7 +943,6 @@ async function cerrarSesion(e) {
     await mostrarAviso('Sesión cerrada', 'Has cerrado sesión correctamente.');
     window.location.href = 'index.html';
 }
-
 
 const productosPorDefecto = [
     { id: 1, nombre: "Polera Oversize Negra", categoria: "Ropa Urbana", categoriaSlug: "urbano", precio: 19990, img: "img/urbana.jpg", desc: "Polera de algodón 100% con estilo urbano holgado.", tallas: ["S - Small", "M - Medium", "L - Large", "XL - Extra Large"], stock: 15 },
@@ -972,7 +1009,7 @@ function renderizarCatalogoProductos() {
 
     catalogo.innerHTML = '';
     productos.forEach(p => {
-        const opcionesTallas = (p.tallas || ['Única'])
+        const opcionesTallas = (p.tallas || ['Talla Única'])
             .map(t => `<option value="${escaparHTML(t)}">${escaparHTML(t)}</option>`)
             .join('');
 
@@ -1074,7 +1111,6 @@ function inicializarPanelAdminProductos() {
             document.getElementById('prodImagen').value = p.img || '';
             document.getElementById('prodDescripcion').value = p.desc || '';
             document.getElementById('prodTallas').value = Array.isArray(p.tallas) ? p.tallas.join(', ') : (p.tallas || '');
-
             tituloModal.textContent = 'Editar Producto';
             if (modalProducto) modalProducto.show();
         }
@@ -1121,7 +1157,6 @@ function inicializarPanelAdminProductos() {
 
     renderTablaAdmin();
 }
-
 
 function cargarTablaUsuarios() {
     const tablaUsuarios = document.getElementById('tablaAdminUsuarios');
@@ -1173,6 +1208,7 @@ function cargarTablaUsuarios() {
 function configurarEventosTablaUsuarios() {
     const tablaUsuarios = document.getElementById('tablaAdminUsuarios');
     if (!tablaUsuarios) return;
+
     tablaUsuarios.onclick = (e) => {
         const btnEliminar = e.target.closest('.btn-eliminar-usuario');
         if (btnEliminar) {
@@ -1195,7 +1231,6 @@ async function eliminarUsuario(index) {
     }
 }
 
-
 let modalEnUso = false;
 function abrirDialogo(opciones) {
     if (modalEnUso) return Promise.resolve(false);
@@ -1209,6 +1244,7 @@ function abrirDialogo(opciones) {
         padding: 24px; color: #222; background: white; box-shadow: 0 12px 60px #0005;
         font: 16px Arial, sans-serif; max-height: 85vh; overflow: auto;
     `;
+
     dialogo.innerHTML = `
         <h2 id="tituloAccion" style="font-size:22px; margin:0 0 16px;"></h2>
         <div id="contenidoAccion" style="line-height:1.5;"></div>
@@ -1259,12 +1295,85 @@ function pedirConfirmacion(titulo, texto) {
     return abrirDialogo({ titulo, html: '<p>' + escaparHTML(texto) + '</p>', aceptar: 'Confirmar' });
 }
 
+// Función de control en tiempo real para el campo de teléfono chileno (+569XXXXXXXX)
 function prepararAyudasFormulario() {
     const telefono = document.getElementById('telefonoCheckout');
     if (telefono) {
+        telefono.addEventListener('focus', function() {
+            if (!telefono.value.trim()) {
+                telefono.value = '+569';
+            }
+        });
+
         telefono.addEventListener('input', function() {
-            const valor = telefono.value;
-            telefono.value = (valor.startsWith('+') ? '+' : '') + valor.replace(/\D/g, '').slice(0, 15);
+            let valor = telefono.value;
+
+            if (!valor.startsWith('+569')) {
+                valor = '+569' + valor.replace(/^\+?5?6?9?/, '');
+            }
+
+            const numerosAdicionales = valor.slice(4).replace(/\D/g, '').slice(0, 8);
+            telefono.value = '+569' + numerosAdicionales;
         });
     }
+}
+
+function renderizarHistorialUsuario() {
+    const contenedor = document.getElementById('contenedorHistorialUsuario');
+    if (!contenedor) return;
+
+    let usuarioActivo = null;
+    try { usuarioActivo = JSON.parse(localStorage.getItem('usuario_activo')); } catch(e){}
+
+    if (!usuarioActivo) {
+        contenedor.innerHTML = '<div class="alert alert-warning text-center">Debes iniciar sesión para ver tu historial de compras.</div>';
+        return;
+    }
+
+    const pedidos = obtenerPedidos();
+    const misPedidos = pedidos.filter(p => p.clienteEmail && p.clienteEmail.toLowerCase() === usuarioActivo.email.toLowerCase());
+
+    if (misPedidos.length === 0) {
+        contenedor.innerHTML = '<div class="alert alert-light text-center border">Aún no has realizado ninguna compra.</div>';
+        return;
+    }
+
+    contenedor.innerHTML = misPedidos.map(p => `
+        <div class="card mb-3 border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <span class="fw-bold text-dark me-2">Pedido ${p.id}</span>
+                    <small class="text-muted">(${p.fecha})</small>
+                </div>
+                <span class="badge ${obtenerBadgeEstadoPedido(p.estado)}">${p.estado}</span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3 small text-muted">
+                    <div class="col-md-6">
+                        <strong>Envío a:</strong> ${escaparHTML(p.direccion)}, ${escaparHTML(p.comunaRegion)}
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <strong>Método de pago:</strong> ${escaparHTML(p.metodoPago)}
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <tbody>
+                            ${p.items.map(item => `
+                                <tr>
+                                    <td>${escaparHTML(item.nombre)} <span class="badge bg-light text-dark border ms-1">${escaparHTML(item.talla)}</span></td>
+                                    <td class="text-center">x${item.cantidad}</td>                                     <td class="text-end fw-semibold">$${item.subtotal.toLocaleString('es-CL')}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <hr class="my-2">
+                <div class="d-flex justify-content-between align-items-center pt-2">
+                    <span class="fw-bold">Total Pagado</span>
+                    <span class="fs-5 fw-bold text-dark">$${p.total.toLocaleString('es-CL')}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
 }
