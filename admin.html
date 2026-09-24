@@ -21,10 +21,13 @@
             </a>
         </div>
 
-        <div class="px-3 my-2 text-uppercase text-gold small fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Navegación Admin</div>
+        <div class="px-3 my-2 text-uppercase text-gold small fw-bold sidebar-section-title">Navegación Admin</div>
         <nav class="nav flex-column">
             <a href="#" class="nav-link active" data-seccion="sec-dashboard">
                 <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
+            <a href="#" class="nav-link" data-seccion="sec-pedidos">
+                <i class="bi bi-receipt"></i> Gestión Pedidos
             </a>
             <a href="#" class="nav-link" data-seccion="sec-productos">
                 <i class="bi bi-box-seam-fill"></i> Gestión Productos
@@ -34,7 +37,7 @@
             </a>
         </nav>
 
-        <div class="px-3 mt-4 my-2 text-uppercase text-gold small fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Sitio Público</div>
+        <div class="px-3 mt-4 my-2 text-uppercase text-gold small fw-bold sidebar-section-title">Sitio Público</div>
         <nav class="nav flex-column">
             <a href="index.html" class="nav-link">
                 <i class="bi bi-shop"></i> Ir al sitio público
@@ -42,9 +45,8 @@
             <a href="productos.html" class="nav-link">
                 <i class="bi bi-bag"></i> Ver Productos
             </a>
-            <a href="index.html" class="nav-link text-danger mt-3" onclick="cerrarSesion(event)">                   
-                <i class="bi bi-box-arrow-right"></i>
-                        Cerrar Sesión
+            <a href="#" class="nav-link text-danger mt-3" id="btnAdminCerrarSesion">
+                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
             </a>
         </nav>
     </aside>
@@ -53,7 +55,7 @@
 
         <header class="top-header d-flex align-items-center justify-content-between shadow-sm">
             <div class="d-flex align-items-center">
-                <div class="input-group d-none d-md-flex" style="width: 280px;">
+                <div class="input-group d-none d-md-flex header-search-input">
                     <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
                     <input type="text" class="form-control bg-light border-0" placeholder="Buscar en el panel...">
                 </div>
@@ -63,10 +65,10 @@
                 <span class="badge btn-gold"><i class="bi bi-star-fill me-1"></i> Modo Admin</span>
                 <div class="vr"></div>
                 <div class="d-flex align-items-center gap-2">
-                    <div class="navbar-custom text-gold rounded-circle d-flex align-items-center justify-content-center fw-bold border border-gold" style="width: 38px; height: 38px;">JP</div>
+                    <div class="navbar-custom text-gold rounded-circle d-flex align-items-center justify-content-center fw-bold border border-gold user-avatar">JP</div>
                     <div class="d-none d-sm-block">
                         <div class="fw-bold small lh-1">Juan Pérez</div>
-                        <small class="text-muted" style="font-size: 0.75rem;">Administrador</small>
+                        <small class="text-muted text-xs">Administrador</small>
                     </div>
                 </div>
             </div>
@@ -85,7 +87,7 @@
                         <div class="p-3 card-metric-admin d-flex justify-content-between align-items-center shadow-sm">
                             <div>
                                 <div class="text-uppercase text-gold small fw-bold">TOTAL STOCK</div>
-                                <h3 class="mb-0 fw-bold mt-1" id="dashTotalStock">142 prendas</h3>
+                                <h3 class="mb-0 fw-bold mt-1" id="dashTotalStock">0 prendas</h3>
                             </div>
                             <i class="bi bi-box-seam fs-1 text-gold"></i>
                         </div>
@@ -93,8 +95,8 @@
                     <div class="col-md-4">
                         <div class="p-3 card-metric-admin d-flex justify-content-between align-items-center shadow-sm">
                             <div>
-                                <div class="text-uppercase text-gold small fw-bold">VENTAS DEL MES</div>
-                                <h3 class="mb-0 fw-bold mt-1" id="dashVentasMes">$1.450.000</h3>
+                                <div class="text-uppercase text-gold small fw-bold">VENTAS REALES MES</div>
+                                <h3 class="mb-0 fw-bold mt-1" id="dashVentasMes">$0</h3>
                             </div>
                             <i class="bi bi-currency-dollar fs-1 text-gold"></i>
                         </div>
@@ -102,8 +104,8 @@
                     <div class="col-md-4">
                         <div class="p-3 card-metric-admin d-flex justify-content-between align-items-center shadow-sm">
                             <div>
-                                <div class="text-uppercase text-gold small fw-bold">ALERTAS DE REPOSICIÓN</div>
-                                <h3 class="mb-0 fw-bold mt-1" id="dashAlertas">2 ítems bajos</h3>
+                                <div class="text-uppercase text-gold small fw-bold">ALERTAS REPOSICIÓN</div>
+                                <h3 class="mb-0 fw-bold mt-1" id="dashAlertas">0 ítems bajos</h3>
                             </div>
                             <i class="bi bi-exclamation-triangle-fill fs-1 text-warning"></i>
                         </div>
@@ -111,42 +113,53 @@
                 </div>
 
                 <div class="row g-3">
-                    <div class="col-lg-8">
-                        <div class="card border-0 shadow-sm p-4 h-100">
+                    <div class="col-lg-12">
+                        <div class="card border-0 shadow-sm p-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="fw-bold m-0">Análisis de Ventas Semanales</h6>
-                                <span class="badge bg-light text-dark">Últimos 7 días</span>
+                                <h6 class="fw-bold m-0">Análisis de Ventas por Pedidos Reales</h6>
+                                <span class="badge bg-light text-dark">Dinámico</span>
                             </div>
-                            <div style="position: relative; height: 220px; width: 100%;">
+                            <div class="dashboard-chart-wrapper">
                                 <canvas id="graficoVentas"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="card border-0 shadow-sm p-4 h-100">
-                            <h6 class="fw-bold mb-3">Canales de Tráfico</h6>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between small mb-1">
-                                    <span>Escritorio</span>
-                                    <span class="fw-bold">60%</span>
-                                </div>
-                                <div class="progress" style="height: 8px;"><div class="progress-bar bg-dark" style="width: 60%"></div></div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between small mb-1">
-                                    <span>Celular</span>
-                                    <span class="fw-bold">30%</span>
-                                </div>
-                                <div class="progress" style="height: 8px;"><div class="progress-bar style-gold" style="width: 30%; background-color: var(--fashion-gold);"></div></div>
-                            </div>
-                            <div>
-                                <div class="d-flex justify-content-between small mb-1">
-                                    <span>Otros</span>
-                                    <span class="fw-bold">10%</span>
-                                </div>
-                                <div class="progress" style="height: 8px;"><div class="progress-bar bg-secondary" style="width: 10%"></div></div>
-                            </div>
+                </div>
+            </section>
+
+            <section id="sec-pedidos" class="seccion-admin">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header navbar-custom text-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold text-white"><i class="bi bi-receipt text-gold me-2"></i>Gestión de Pedidos</h5>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="filtroBuscarPedido" class="form-control form-control-sm" placeholder="Buscar N° u Orden / Cliente...">
+                            <select id="filtroEstadoPedido" class="form-select form-select-sm select-filtro-estado">
+                                <option value="TODOS">Todos los estados</option>
+                                <option value="Pendiente de Pago">Pendiente de Pago</option>
+                                <option value="Recibido">Recibido</option>
+                                <option value="Preparando">Preparando</option>
+                                <option value="Enviado">Enviado</option>
+                                <option value="Entregado">Entregado</option>
+                                <option value="Cancelado">Cancelado</option>
+                            </select>
                         </div>
+                    </div>
+                    <div class="card-body p-0 table-responsive bg-white">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr class="border-bottom">
+                                    <th class="py-3">N° Pedido</th>
+                                    <th class="py-3">Fecha</th>
+                                    <th class="py-3">Cliente</th>
+                                    <th class="py-3">Método Pago</th>
+                                    <th class="py-3">Total</th>
+                                    <th class="py-3">Estado</th>
+                                    <th class="py-3 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaAdminPedidos">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -208,77 +221,89 @@
         </main>
     </div>
 
-    <div
-        class="modal fade"
-        id="modalProducto"
-        tabindex="-1"
-        aria-labelledby="modalProductoTitulo"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal fade" id="modalDetallePedido" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-
-                <form id="formProductoAdmin" novalidate>
-
-                    <div class="modal-header navbar-custom text-white">
-                        <h5
-                            class="modal-title fw-bold"
-                            id="modalProductoTitulo"
-                        >
-                            Agregar Producto
-                        </h5>
-
-                        <button
-                            type="button"
-                            class="btn-close btn-close-white"
-                            data-bs-dismiss="modal"
-                            aria-label="Cerrar"
-                        ></button>
+                <div class="modal-header navbar-custom text-white">
+                    <h5 class="modal-title fw-bold" id="modalPedidoTitulo">Detalle del Pedido</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold border-bottom pb-1 text-gold">Información del Cliente</h6>
+                            <p class="mb-1" id="detPedidoCliente"></p>
+                            <p class="mb-1" id="detPedidoEmail"></p>
+                            <p class="mb-1" id="detPedidoTelefono"></p>
+                            <p class="mb-1" id="detPedidoTipoUsuario"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold border-bottom pb-1 text-gold">Dirección de Despacho</h6>
+                            <p class="mb-1" id="detPedidoDireccion"></p>
+                            <p class="mb-1" id="detPedidoComunaRegion"></p>
+                        </div>
                     </div>
 
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-gold">Cambiar Estado del Pedido:</label>
+                            <select id="selectEstadoPedidoModal" class="form-select">
+                                <option value="Pendiente de Pago">Pendiente de Pago</option>
+                                <option value="Recibido">Recibido</option>
+                                <option value="Preparando">Preparando</option>
+                                <option value="Enviado">Enviado</option>
+                                <option value="Entregado">Entregado</option>
+                                <option value="Cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 align-self-end">
+                            <button type="button" class="btn btn-gold fw-bold w-100" id="btnGuardarEstadoPedido">Actualizar Estado</button>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold border-bottom pb-1 text-gold">Ítems Comprados (Congelados)</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Talla</th>
+                                    <th>Precio Histórico</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaDetalleProductosPedido">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end fw-bold fs-5 mt-2">
+                        Total: <span id="detPedidoTotal" class="text-gold"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="formProductoAdmin">
+                    <div class="modal-header navbar-custom text-white">
+                        <h5 class="modal-title fw-bold" id="modalProductoTitulo">Agregar Producto</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
                     <div class="modal-body">
-
-                        <p
-                            id="errorProducto"
-                            class="alert alert-danger"
-                            role="alert"
-                            hidden
-                        ></p>
-
-                        <input
-                            type="hidden"
-                            id="filaIndexEditar"
-                            value=""
-                        >
+                        <input type="hidden" id="filaIndexEditar" value="-1">
 
                         <div class="mb-3">
-                            <label
-                                for="prodNombre"
-                                class="form-label fw-semibold"
-                            >
-                                Nombre del Producto
-                            </label>
-
-                            <input
-                                type="text"
-                                id="prodNombre"
-                                class="form-control"
-                                required
-                            >
+                            <label class="form-label fw-semibold">Nombre del Producto</label>
+                            <input type="text" id="prodNombre" class="form-control" required>
                         </div>
 
                         <div class="mb-3">
-                            <label
-                                for="prodCategoria"
-                                class="form-label fw-semibold"
-                            >
-                                Categoría
-                            </label>
-
-                            <select
-                                id="prodCategoria"
-                                class="form-select"
-                                required
-                            >
+                            <label class="form-label fw-semibold">Categoría</label>
+                            <select id="prodCategoria" class="form-select" required>
                                 <option value="Ropa Urbana">Ropa Urbana</option>
                                 <option value="Ropa Casual">Ropa Casual</option>
                                 <option value="Ropa Formal">Ropa Formal</option>
@@ -288,126 +313,36 @@
 
                         <div class="row g-3 mb-3">
                             <div class="col-6">
-                                <label
-                                    for="prodPrecio"
-                                    class="form-label fw-semibold"
-                                >
-                                    Precio ($)
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="prodPrecio"
-                                    class="form-control"
-                                    min="1"
-                                    step="1"
-                                    required
-                                >
+                                <label class="form-label fw-semibold">Precio ($)</label>
+                                <input type="number" id="prodPrecio" class="form-control" min="0" required>
                             </div>
-
                             <div class="col-6">
-                                <label
-                                    for="prodStock"
-                                    class="form-label fw-semibold"
-                                >
-                                    Stock Unidades
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="prodStock"
-                                    class="form-control"
-                                    min="0"
-                                    step="1"
-                                    required
-                                >
+                                <label class="form-label fw-semibold">Stock Unidades</label>
+                                <input type="number" id="prodStock" class="form-control" min="0" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label
-                                for="prodImagen"
-                                class="form-label fw-semibold"
-                            >
-                                Ruta Imagen (URL / Local)
-                            </label>
-
-                            <input
-                                type="text"
-                                id="prodImagen"
-                                class="form-control"
-                                placeholder="img/ejemplo.jpg"
-                            >
+                            <label class="form-label fw-semibold">Ruta Imagen (URL / Local)</label>
+                            <input type="text" id="prodImagen" class="form-control" placeholder="img/ejemplo.jpg">
                         </div>
 
                         <div class="mb-3">
-                            <label
-                                for="prodDescripcion"
-                                class="form-label fw-semibold"
-                            >
-                                Descripción
-                            </label>
-
-                            <textarea
-                                id="prodDescripcion"
-                                class="form-control"
-                                rows="2"
-                                placeholder="Descripción breve de la prenda"
-                            ></textarea>
+                            <label class="form-label fw-semibold">Descripción</label>
+                            <textarea id="prodDescripcion" class="form-control" rows="2" placeholder="Descripción breve de la prenda"></textarea>
                         </div>
 
-                        <fieldset class="mb-3">
-                            <legend class="fs-6 fw-semibold">
-                                Tallas disponibles
-                            </legend>
-
-                            <div
-                                id="opcionesTallas"
-                                class="d-flex flex-wrap gap-3"
-                            ></div>
-
-                            <p class="small text-muted mt-2">
-                                Selecciona al menos una talla.
-                            </p>
-                        </fieldset>
-
-                        <fieldset class="mb-3">
-                            <legend class="fs-6 fw-semibold">
-                                Colores (opcional)
-                            </legend>
-
-                            <div
-                                id="opcionesColores"
-                                class="d-flex flex-wrap gap-3"
-                            ></div>
-
-                            <p class="small text-muted mt-2">
-                                Se conserva el stock total del producto;
-                                no se reparte por color.
-                            </p>
-                        </fieldset>
-
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tallas disponibles</label>
+                            <input type="text" id="prodTallas" class="form-control" placeholder="S - Small, M - Medium, L - Large">
+                            <small class="text-muted">Sepáralas con coma.</small>
+                        </div>
                     </div>
-
                     <div class="modal-footer">
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal"
-                        >
-                            Cancelar
-                        </button>
-
-                        <button
-                            type="submit"
-                            class="btn btn-gold fw-bold"
-                        >
-                            Guardar Cambios
-                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-gold fw-bold">Guardar Cambios</button>
                     </div>
-
                 </form>
-
             </div>
         </div>
     </div>
@@ -437,6 +372,16 @@
                     });
                 });
             });
+
+            const btnAdminLogout = document.getElementById('btnAdminCerrarSesion');
+            if(btnAdminLogout){
+                btnAdminLogout.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if(typeof cerrarSesion === 'function') {
+                        cerrarSesion();
+                    }
+                });
+            }
         });
     </script>
 </body>
