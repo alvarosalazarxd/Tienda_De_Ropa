@@ -186,16 +186,13 @@
             const itemsCheckout = document.getElementById("itemsCheckout");
             const totalPago = document.getElementById("totalPago");
             
-            let carrito = JSON.parse(localStorage.getItem("carrito"));
-            if (!carrito || carrito.length === 0) {
-                carrito = [
-                    { id: 1, nombre: "Polera Algodón Premium", precio: 15990, cantidad: 2 },
-                    { id: 2, nombre: "Jeans Slim Fit", precio: 29990, cantidad: 1 }
-                ];
-            }
+            // Obtener el carrito desde el localStorage sincrónicamente con las distintas claves posibles
+            let carrito = JSON.parse(localStorage.getItem("carrito_moda_estilo")) || 
+                          JSON.parse(localStorage.getItem("carrito")) || 
+                          JSON.parse(localStorage.getItem("carritoCompras")) || [];
 
             function renderizarResumen() {
-                if (carrito.length === 0) {
+                if (!carrito || carrito.length === 0) {
                     itemsCheckout.innerHTML = `<p class="text-muted small">No hay productos en el carrito.</p>`;
                     totalPago.textContent = "$0";
                     return;
@@ -212,7 +209,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div>
                                 <div class="fw-semibold">${producto.nombre}</div>
-                                <div class="text-muted small">Cant: ${producto.cantidad} x $${producto.precio.toLocaleString("es-CL")}</div>
+                                <div class="text-muted small">Cant: ${producto.cantidad} x $${Number(producto.precio).toLocaleString("es-CL")}</div>
                             </div>
                             <span class="fw-semibold">$${subtotal.toLocaleString("es-CL")}</span>
                         </div>
@@ -290,7 +287,10 @@
             const modalAvisoTexto = document.getElementById("modalAvisoTexto");
             const btnCerrarModalAviso = document.getElementById("btnCerrarModalAviso");
 
+            let esCompraExitosa = false;
+
             function mostrarModal(titulo, mensaje, esExito = true) {
+                esCompraExitosa = esExito;
                 modalAvisoTitulo.textContent = titulo;
                 modalAvisoTexto.textContent = mensaje;
                 modalAvisoTitulo.className = esExito ? "h5 fw-bold mb-3 text-success" : "h5 fw-bold mb-3 text-danger";
@@ -299,6 +299,10 @@
 
             btnCerrarModalAviso.addEventListener("click", () => {
                 modalAviso.close();
+                // Si la compra fue exitosa, redirige automáticamente al inicio
+                if (esCompraExitosa) {
+                    window.location.href = "index.html";
+                }
             });
 
             const formCheckout = document.getElementById("formCheckout");
@@ -306,7 +310,7 @@
             formCheckout.addEventListener("submit", (e) => {
                 e.preventDefault();
 
-                if (carrito.length === 0) {
+                if (!carrito || carrito.length === 0) {
                     mostrarModal("Error", "Tu carrito está vacío. Agrega productos antes de continuar.", false);
                     return;
                 }
@@ -326,13 +330,18 @@
                     }
                 }
 
-                mostrarModal("¡Compra Realizada!", "Tu compra simulada se ha procesado con éxito.", true);
-
+                // Limpiar completamente el almacenamiento local
                 localStorage.removeItem("carrito");
+                localStorage.removeItem("carrito_moda_estilo");
+                localStorage.removeItem("carritoCompras");
+
                 carrito = [];
                 formCheckout.reset();
                 alternarMetodoPago();
                 renderizarResumen();
+
+                // Mostrar mensaje de éxito y activar la redirección
+                mostrarModal("¡Compra Realizada!", "Tu compra simulada se ha procesado con éxito.", true);
             });
         });
     </script>
