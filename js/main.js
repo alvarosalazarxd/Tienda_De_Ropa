@@ -7,7 +7,6 @@ function escaparHTML(str) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
-
 function parsearPrecio(precioRaw) {
     if (typeof precioRaw === 'number') {
         return Math.max(0, Math.floor(precioRaw));
@@ -16,7 +15,6 @@ function parsearPrecio(precioRaw) {
     const digitos = String(precioRaw).replace(/\D/g, '');
     return parseInt(digitos, 10) || 0;
 }
-
 document.addEventListener('DOMContentLoaded', () => {
     actualizarNavbarUsuario();
     vincularBotonesAgregarCarrito();
@@ -51,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
     const formRegistro = document.getElementById('formRegistro');
     if (formRegistro) {
         formRegistro.addEventListener('submit', (e) => {
@@ -104,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
         });
     }
-
     const formLogin = document.getElementById('formLogin');
     if (formLogin) {
         formLogin.addEventListener('submit', async (e) => {
@@ -140,14 +136,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
 const CARRITO_KEY = 'carrito_moda_estilo';
 const VENTAS_KEY = 'ventas_moda_estilo';
 const PEDIDOS_KEY = 'pedidos_moda_estilo';
 const PRODUCTOS_KEY = 'productos_moda_estilo';
 
 function obtenerCarrito() {
-    // 1. Intentar leer desde la URL (si localStorage es bloqueado por el protocolo file:///)
+    // 1. Intentar leer desde los parámetros de la URL
     const urlParams = new URLSearchParams(window.location.search);
     const datosUrl = urlParams.get('data');
     if (datosUrl) {
@@ -155,29 +150,27 @@ function obtenerCarrito() {
             return JSON.parse(decodeURIComponent(datosUrl));
         } catch (e) {}
     }
-
-    // 2. Intentar leer del localStorage respetando todas las claves de origen
+    // 2. Leer del localStorage si existe el registro (incluso si es un arreglo vacío [])
     try {
         const data = localStorage.getItem('carrito') || localStorage.getItem(CARRITO_KEY) || localStorage.getItem('carritoCompras');
-        if (data) return JSON.parse(data);
+        if (data !== null) {
+            return JSON.parse(data);
+        }
     } catch (e) {}
-
-    // 3. Respaldo directo en caso de bloqueo local para asegurar renderizado correcto ($121.970)
+    // 3. Respaldo por defecto solo si es la primera sesión sin datos previos
     return [
         { id: 3, nombre: "Chaqueta Formal Fit", precio: 45990, cantidad: 2, talla: "Única", img: "img/formal.jpg" },
         { id: 2, nombre: "Pantalón Jean Classic", precio: 29990, cantidad: 1, talla: "Única", img: "img/casual.jpg" }
     ];
 }
-
 function guardarCarrito(carrito) {
     try {
         localStorage.setItem('carrito', JSON.stringify(carrito));
         localStorage.setItem(CARRITO_KEY, JSON.stringify(carrito));
-        localStorage.removeItem('carritoCompras');
+        localStorage.setItem('carritoCompras', JSON.stringify(carrito));
     } catch (e) {}
     actualizarContadorCarrito();
 }
-
 function actualizarContadorCarrito() {
     const carrito = obtenerCarrito();
     const totalItems = carrito.reduce((sum, item) => sum + (parseInt(item.cantidad, 10) || 0), 0);
@@ -185,7 +178,6 @@ function actualizarContadorCarrito() {
         span.textContent = totalItems;
     });
 }
-
 function vincularBotonesAgregarCarrito() {
     document.addEventListener('click', (e) => {
         const btnCantidad = e.target.closest('.btn-sumar-cantidad, .btn-restar-cantidad');
@@ -211,7 +203,6 @@ function vincularBotonesAgregarCarrito() {
             input.value = cantidad;
             return;
         }
-
         const btn = e.target.closest('.btn-agregar-carrito, [data-agregar-carrito]');
         if (!btn) return;
         const textoBoton = btn.textContent.trim().toLowerCase();
@@ -316,7 +307,6 @@ function vincularBotonesAgregarCarrito() {
         }, 1200);
     });
 }
-
 function agregarAlCarrito(
     nombre,
     precio,
@@ -399,7 +389,6 @@ function agregarAlCarrito(
     guardarCarrito(carrito);
     renderizarCarrito();
 }
-
 window.eliminarDelCarrito = function(index) {
     let carrito = obtenerCarrito();
     if (index >= 0 && index < carrito.length) {
@@ -408,7 +397,6 @@ window.eliminarDelCarrito = function(index) {
         renderizarCarrito();
     }
 };
-
 function renderizarCarrito() {
     const contenedor = document.getElementById('listaCarrito');
     const carritoVacioMsg = document.getElementById('carritoVacioMsg');
@@ -486,9 +474,7 @@ function renderizarCarrito() {
                 nuevaCant <= 0 ||
                 !Number.isSafeInteger(otrasUnidades) ||
                 otrasUnidades < 0 ||
-                !producto ||
-                producto.activo === false ||
-                nuevaCant + otrasUnidades > Number(producto.stock)
+                (producto && (producto.activo === false || nuevaCant + otrasUnidades > Number(producto.stock)))
             ) {
                 mostrarAviso(
                     'Revisa la cantidad',
@@ -509,7 +495,6 @@ function renderizarCarrito() {
         });
     });
 }
-
 function vincularBotonVaciar() {
     const btnVaciar = document.getElementById('btnVaciarCarrito');
     if (btnVaciar) {
@@ -518,18 +503,13 @@ function vincularBotonVaciar() {
             if (carrito.length === 0) return;
             const confirmado = await pedirConfirmacion('Vaciar carrito', '¿Quieres quitar todos los productos del carrito?');
             if (confirmado) {
-                try {
-                    localStorage.removeItem('carrito');
-                    localStorage.removeItem(CARRITO_KEY);
-                    localStorage.removeItem('carritoCompras');
-                } catch(e) {}
+                guardarCarrito([]);
                 renderizarCarrito();
                 actualizarContadorCarrito();
             }
         };
     }
 }
-
 function vincularBotonPagar() {
     const btnPagar = document.getElementById('btnPagar');
     if (btnPagar) {
@@ -544,7 +524,6 @@ function vincularBotonPagar() {
         };
     }
 }
-
 function inicializarCheckout() {
     const itemsContainer = document.getElementById('itemsCheckout');
     const totalPagoElem = document.getElementById('totalPago');
@@ -662,19 +641,7 @@ function inicializarCheckout() {
                         return;
                     }
                 }
-                const firmaCarrito = JSON.stringify(carritoActual);
-                const firmaProductos = JSON.stringify(obtenerProductos());
-                const firmaUsuario = localStorage.getItem('usuario_activo');
-                const leerFormulario = () => JSON.stringify(
-                    Array.from(
-                        formCheckout.querySelectorAll('input, select, textarea')
-                    ).map(campo => [
-                        campo.id,
-                        campo.value,
-                        campo.checked
-                    ])
-                );
-                const firmaFormulario = leerFormulario();
+                
                 const confirmado = await pedirConfirmacion(
                     'Confirmar compra simulada',
                     'Total: ' + totalPagoElem.textContent + '. ¿Quieres continuar con el pedido?'
@@ -754,11 +721,7 @@ function inicializarCheckout() {
                 };
                 guardarNuevoPedido(nuevoPedido);
                 registrarVentaHistorial(montoTotalVenta);
-                try {
-                    localStorage.removeItem('carrito');
-                    localStorage.removeItem(CARRITO_KEY);
-                    localStorage.removeItem('carritoCompras');
-                } catch(err){}
+                guardarCarrito([]);
                 await mostrarAviso('¡Compra completada con éxito!', `Su pedido ${nuevoPedido.id} fue procesado correctamente.`);
                 location.href = 'index.html';
             } catch (error) {
@@ -770,7 +733,6 @@ function inicializarCheckout() {
         });
     }
 }
-
 const pedidosPorDefecto = [
     {
         id: "PED-102938",
@@ -806,7 +768,6 @@ const pedidosPorDefecto = [
         ]
     }
 ];
-
 function obtenerPedidos() {
     try {
         let p = localStorage.getItem(PEDIDOS_KEY);
@@ -819,13 +780,11 @@ function obtenerPedidos() {
         return [];
     }
 }
-
 function guardarNuevoPedido(nuevoPedido) {
     let pedidos = obtenerPedidos();
     pedidos.unshift(nuevoPedido);
     localStorage.setItem(PEDIDOS_KEY, JSON.stringify(pedidos));
 }
-
 function actualizarEstadoPedidoEnStorage(idPedido, nuevoEstado) {
     const pedidos = obtenerPedidos();
     const pedido = pedidos.find(p => p.id === idPedido);
@@ -891,7 +850,6 @@ function actualizarEstadoPedidoEnStorage(idPedido, nuevoEstado) {
         throw error;
     }
 }
-
 function obtenerBadgeEstadoPedido(estado) {
     switch (estado) {
         case 'Entregado': return 'bg-success';
@@ -903,7 +861,6 @@ function obtenerBadgeEstadoPedido(estado) {
         default: return 'bg-dark';
     }
 }
-
 function inicializarPanelAdminPedidos() {
     const tablaPedidos = document.getElementById('tablaAdminPedidos');
     if (!tablaPedidos) return;
@@ -1022,7 +979,6 @@ function inicializarPanelAdminPedidos() {
     }
     renderTablaPedidos();
 }
-
 function registrarVentaHistorial(monto) {
     try {
         let ventas = JSON.parse(localStorage.getItem(VENTAS_KEY)) || [];
@@ -1032,7 +988,6 @@ function registrarVentaHistorial(monto) {
         console.error('Error guardando la venta:', e);
     }
 }
-
 function obtenerVentasHistorial() {
     try {
         return JSON.parse(localStorage.getItem(VENTAS_KEY)) || [];
@@ -1040,7 +995,6 @@ function obtenerVentasHistorial() {
         return [];
     }
 }
-
 function inicializarGraficoVentas() {
     const canvas = document.getElementById('graficoVentas');
     if (!canvas || typeof Chart === 'undefined') return;
@@ -1142,7 +1096,6 @@ function inicializarGraficoVentas() {
         }
     });
 }
-
 function actualizarNavbarUsuario() {
     let usuarioActivo = null;
     try {
@@ -1188,27 +1141,23 @@ function actualizarNavbarUsuario() {
         if (btnLogout) btnLogout.addEventListener('click', cerrarSesion);
     }
 }
-
 async function cerrarSesion(e) {
     if (e) e.preventDefault();
     localStorage.removeItem('usuario_activo');
     await mostrarAviso('Sesión cerrada', 'Has cerrado sesión correctamente.');
     window.location.href = 'index.html';
 }
-
 const productosPorDefecto = [
     { id: 1, nombre: "Polera Oversize Negra", categoria: "Ropa Urbana", categoriaSlug: "urbano", precio: 19990, img: "img/urbana.jpg", desc: "Polera de algodón 100% con estilo urbano holgado.", tallas: ["S - Small", "M - Medium", "L - Large", "XL - Extra Large"], stock: 15 },
     { id: 2, nombre: "Pantalón Jean Classic", categoria: "Ropa Casual", categoriaSlug: "casual", precio: 29990, img: "img/casual.jpg", desc: "Jeans de corte recto con material resistente y flexible.", tallas: ["38 - S", "40 - M", "42 - L", "44 - XL"], stock: 8 },
     { id: 3, nombre: "Chaqueta Formal Fit", categoria: "Ropa Formal", categoriaSlug: "formal", precio: 45990, img: "img/formal.jpg", desc: "Chaqueta de diseño elegante para eventos especiales.", tallas: ["S - Small", "M - Medium", "L - Large"], stock: 10 },
     { id: 4, nombre: "Gorro Beanie Urbano", categoria: "Accesorios", categoriaSlug: "accesorios", precio: 8990, img: "img/accesorios.jpg", desc: "Gorro tejido de lana acrílica perfecto para complementar.", tallas: ["Talla Única (Estandard)"], stock: 20 }
 ];
-
 function inicializarProductos() {
     if (!localStorage.getItem(PRODUCTOS_KEY)) {
         localStorage.setItem(PRODUCTOS_KEY, JSON.stringify(productosPorDefecto));
     }
 }
-
 function obtenerProductos() {
     inicializarProductos();
     try {
@@ -1217,21 +1166,17 @@ function obtenerProductos() {
         return [];
     }
 }
-
 function guardarProductos(lista) {
     localStorage.setItem(PRODUCTOS_KEY, JSON.stringify(lista));
 }
-
 function obtenerProductoPorId(id) {
     return obtenerProductos().find(p => String(p.id) === String(id));
 }
-
 function agregarProducto(producto) {
     const productos = obtenerProductos();
     productos.push(producto);
     guardarProductos(productos);
 }
-
 function actualizarProducto(productoActualizado) {
     const productos = obtenerProductos();
     const index = productos.findIndex(p => String(p.id) === String(productoActualizado.id));
@@ -1240,18 +1185,15 @@ function actualizarProducto(productoActualizado) {
         guardarProductos(productos);
     }
 }
-
 function eliminarProducto(id) {
     const productos = obtenerProductos().filter(p => String(p.id) !== String(id));
     guardarProductos(productos);
 }
-
 function calcularEstadoStock(stock) {
     if (stock === 0) return { texto: 'Agotado', clase: 'bg-danger' };
     if (stock <= 5) return { texto: 'Poco Stock', clase: 'bg-warning text-dark' };
     return { texto: 'Disponible', clase: 'bg-success' };
 }
-
 function renderizarCatalogoProductos() {
     const catalogo = document.getElementById('contenedorProductos');
     if (!catalogo) return;
@@ -1354,7 +1296,6 @@ function renderizarCatalogoProductos() {
         catalogo.appendChild(col);
     });
 }
-
 function inicializarPanelAdminProductos() {
     const tbody = document.getElementById('tablaAdminProductos');
     if (!tbody) return;
@@ -1476,7 +1417,6 @@ function inicializarPanelAdminProductos() {
     }
     renderTablaAdmin();
 }
-
 function cargarTablaUsuarios() {
     const tablaUsuarios = document.getElementById('tablaAdminUsuarios');
     const badgeTotal = document.getElementById('totalUsuariosBadge');
@@ -1517,7 +1457,6 @@ function cargarTablaUsuarios() {
         tablaUsuarios.appendChild(fila);
     });
 }
-
 function configurarEventosTablaUsuarios() {
     const tablaUsuarios = document.getElementById('tablaAdminUsuarios');
     if (!tablaUsuarios) return;
@@ -1529,7 +1468,6 @@ function configurarEventosTablaUsuarios() {
         }
     };
 }
-
 async function eliminarUsuario(index) {
     let usuarios = JSON.parse(localStorage.getItem('usuarios_registrados')) || [];
     const user = usuarios[index];
@@ -1541,7 +1479,6 @@ async function eliminarUsuario(index) {
         cargarTablaUsuarios();
     }
 }
-
 let modalEnUso = false;
 function abrirDialogo(opciones) {
     if (modalEnUso) return Promise.resolve(false);
@@ -1589,15 +1526,12 @@ function abrirDialogo(opciones) {
         aceptar.focus();
     });
 }
-
 function mostrarAviso(titulo, texto) {
     return abrirDialogo({ titulo, html: '<p>' + escaparHTML(texto) + '</p>', aceptar: 'Entendido', soloAceptar: true });
 }
-
 function pedirConfirmacion(titulo, texto) {
     return abrirDialogo({ titulo, html: '<p>' + escaparHTML(texto) + '</p>', aceptar: 'Confirmar' });
 }
-
 function prepararAyudasFormulario() {
     const telefono = document.getElementById('telefonoCheckout');
     if (telefono) {
@@ -1616,7 +1550,6 @@ function prepararAyudasFormulario() {
         });
     }
 }
-
 function renderizarHistorialUsuario() {
     const contenedor = document.getElementById('contenedorHistorialUsuario');
     if (!contenedor) return;
@@ -1676,7 +1609,6 @@ function renderizarHistorialUsuario() {
         </div>
     `).join('');
 }
-
 function obtenerUsuarioFavoritos() {
     try {
         const usuario = JSON.parse(
@@ -1695,7 +1627,6 @@ function obtenerUsuarioFavoritos() {
         return null;
     }
 }
-
 function obtenerFavoritos() {
     const cuenta = obtenerUsuarioFavoritos();
     if (!cuenta) return [];
@@ -1709,7 +1640,6 @@ function obtenerFavoritos() {
         return [];
     }
 }
-
 function guardarFavoritos(ids) {
     const cuenta = obtenerUsuarioFavoritos();
     if (!cuenta) return false;
@@ -1719,7 +1649,6 @@ function guardarFavoritos(ids) {
     );
     return true;
 }
-
 function actualizarBotonesFavoritos() {
     const favoritos = new Set(obtenerFavoritos());
     document.querySelectorAll('.btn-favorito').forEach(boton => {
@@ -1739,7 +1668,6 @@ function actualizarBotonesFavoritos() {
         }
     });
 }
-
 async function alternarFavorito(id) {
     if (!obtenerUsuarioFavoritos()) {
         await mostrarAviso(
@@ -1776,7 +1704,6 @@ async function alternarFavorito(id) {
     actualizarBotonesFavoritos();
     renderizarFavoritos();
 }
-
 function inicializarFavoritos() {
     if (document.documentElement.dataset.favoritosListos === 'si') {
         return;
@@ -1808,7 +1735,6 @@ function inicializarFavoritos() {
     actualizarBotonesFavoritos();
     renderizarFavoritos();
 }
-
 function renderizarFavoritos() {
     const contenedor = document.getElementById(
         'contenedorFavoritos'
