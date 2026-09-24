@@ -495,20 +495,29 @@ function renderizarCarrito() {
         });
     });
 }
+function vaciarCarrito() {
+    // 1. Guardar un arreglo completamente vacío en localStorage
+    localStorage.setItem('carrito_moda_estilo', JSON.stringify([]));
+    
+    // Si usabas otra clave antigua, asegúrate de limpiarla también
+    localStorage.setItem('carritoCompras', JSON.stringify([]));
+
+    // 2. Actualizar la vista del carrito y el contador del navbar
+    renderizarCarrito();
+    actualizarContadorCarrito();
+}
+
+// Vincular la acción al botón de vaciar
 function vincularBotonVaciar() {
     const btnVaciar = document.getElementById('btnVaciarCarrito');
-    if (btnVaciar) {
-        btnVaciar.onclick = async () => {
-            const carrito = obtenerCarrito();
-            if (carrito.length === 0) return;
-            const confirmado = await pedirConfirmacion('Vaciar carrito', '¿Quieres quitar todos los productos del carrito?');
-            if (confirmado) {
-                guardarCarrito([]);
-                renderizarCarrito();
-                actualizarContadorCarrito();
-            }
-        };
-    }
+    if (!btnVaciar) return;
+
+    btnVaciar.addEventListener('click', () => {
+        // Opción con confirmación básica
+        if (confirm('¿Estás seguro de que deseas vaciar tu carrito?')) {
+            vaciarCarrito();
+        }
+    });
 }
 function vincularBotonPagar() {
     const btnPagar = document.getElementById('btnPagar');
@@ -607,10 +616,19 @@ function inicializarCheckout() {
             try {
                 // Validación estricta para números telefónicos de Chile (+569XXXXXXXX)
                 const telefono = document.getElementById('telefonoCheckout');
-                if (telefono && !/^\+569\d{8}$/.test(telefono.value)) {
-                    await mostrarAviso('Teléfono inválido', 'Debes ingresar un número chileno de 9 dígitos válido (+569XXXXXXXX).');
-                    return;
-                }
+
+if (telefono) {
+    // Eliminar espacios en blanco para la validación
+    const telLimpio = telefono.value.trim().replace(/\s+/g, '');
+
+    // Acepta: +56912345678, 56912345678 o 912345678
+    const esValido = /^(\+?56)?9\d{8}$/.test(telLimpio);
+
+    if (!esValido) {
+        await mostrarAviso('Teléfono inválido', 'Ingresa un número chileno válido de 9 dígitos (ej: 912345678 o +56912345678).');
+        return;
+    }
+}
                 const carritoActual = obtenerCarrito();
                 if (!carritoActual.length) {
                     await mostrarAviso('Carrito vacío', 'No hay productos en el pedido.');
