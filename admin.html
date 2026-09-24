@@ -42,8 +42,9 @@
             <a href="productos.html" class="nav-link">
                 <i class="bi bi-bag"></i> Ver Productos
             </a>
-            <a href="login.html" class="nav-link text-danger mt-3">
-                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            <a href="index.html" class="nav-link text-danger mt-3" onclick="cerrarSesion(event)">                   
+                <i class="bi bi-box-arrow-right"></i>
+                        Cerrar Sesión
             </a>
         </nav>
     </aside>
@@ -207,25 +208,77 @@
         </main>
     </div>
 
-    <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
+    <div
+        class="modal fade"
+        id="modalProducto"
+        tabindex="-1"
+        aria-labelledby="modalProductoTitulo"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
-                <form id="formProductoAdmin">
+
+                <form id="formProductoAdmin" novalidate>
+
                     <div class="modal-header navbar-custom text-white">
-                        <h5 class="modal-title fw-bold" id="modalProductoTitulo">Agregar Producto</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        <h5
+                            class="modal-title fw-bold"
+                            id="modalProductoTitulo"
+                        >
+                            Agregar Producto
+                        </h5>
+
+                        <button
+                            type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar"
+                        ></button>
                     </div>
+
                     <div class="modal-body">
-                        <input type="hidden" id="filaIndexEditar" value="-1">
+
+                        <p
+                            id="errorProducto"
+                            class="alert alert-danger"
+                            role="alert"
+                            hidden
+                        ></p>
+
+                        <input
+                            type="hidden"
+                            id="filaIndexEditar"
+                            value=""
+                        >
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Nombre del Producto</label>
-                            <input type="text" id="prodNombre" class="form-control" required>
+                            <label
+                                for="prodNombre"
+                                class="form-label fw-semibold"
+                            >
+                                Nombre del Producto
+                            </label>
+
+                            <input
+                                type="text"
+                                id="prodNombre"
+                                class="form-control"
+                                required
+                            >
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Categoría</label>
-                            <select id="prodCategoria" class="form-select" required>
+                            <label
+                                for="prodCategoria"
+                                class="form-label fw-semibold"
+                            >
+                                Categoría
+                            </label>
+
+                            <select
+                                id="prodCategoria"
+                                class="form-select"
+                                required
+                            >
                                 <option value="Ropa Urbana">Ropa Urbana</option>
                                 <option value="Ropa Casual">Ropa Casual</option>
                                 <option value="Ropa Formal">Ropa Formal</option>
@@ -235,36 +288,126 @@
 
                         <div class="row g-3 mb-3">
                             <div class="col-6">
-                                <label class="form-label fw-semibold">Precio ($)</label>
-                                <input type="number" id="prodPrecio" class="form-control" min="0" required>
+                                <label
+                                    for="prodPrecio"
+                                    class="form-label fw-semibold"
+                                >
+                                    Precio ($)
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="prodPrecio"
+                                    class="form-control"
+                                    min="1"
+                                    step="1"
+                                    required
+                                >
                             </div>
+
                             <div class="col-6">
-                                <label class="form-label fw-semibold">Stock Unidades</label>
-                                <input type="number" id="prodStock" class="form-control" min="0" required>
+                                <label
+                                    for="prodStock"
+                                    class="form-label fw-semibold"
+                                >
+                                    Stock Unidades
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="prodStock"
+                                    class="form-control"
+                                    min="0"
+                                    step="1"
+                                    required
+                                >
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Ruta Imagen (URL / Local)</label>
-                            <input type="text" id="prodImagen" class="form-control" placeholder="img/ejemplo.jpg">
+                            <label
+                                for="prodImagen"
+                                class="form-label fw-semibold"
+                            >
+                                Ruta Imagen (URL / Local)
+                            </label>
+
+                            <input
+                                type="text"
+                                id="prodImagen"
+                                class="form-control"
+                                placeholder="img/ejemplo.jpg"
+                            >
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Descripción</label>
-                            <textarea id="prodDescripcion" class="form-control" rows="2" placeholder="Descripción breve de la prenda"></textarea>
+                            <label
+                                for="prodDescripcion"
+                                class="form-label fw-semibold"
+                            >
+                                Descripción
+                            </label>
+
+                            <textarea
+                                id="prodDescripcion"
+                                class="form-control"
+                                rows="2"
+                                placeholder="Descripción breve de la prenda"
+                            ></textarea>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Tallas disponibles</label>
-                            <input type="text" id="prodTallas" class="form-control" placeholder="S - Small, M - Medium, L - Large">
-                            <small class="text-muted">Sepáralas con coma.</small>
-                        </div>
+                        <fieldset class="mb-3">
+                            <legend class="fs-6 fw-semibold">
+                                Tallas disponibles
+                            </legend>
+
+                            <div
+                                id="opcionesTallas"
+                                class="d-flex flex-wrap gap-3"
+                            ></div>
+
+                            <p class="small text-muted mt-2">
+                                Selecciona al menos una talla.
+                            </p>
+                        </fieldset>
+
+                        <fieldset class="mb-3">
+                            <legend class="fs-6 fw-semibold">
+                                Colores (opcional)
+                            </legend>
+
+                            <div
+                                id="opcionesColores"
+                                class="d-flex flex-wrap gap-3"
+                            ></div>
+
+                            <p class="small text-muted mt-2">
+                                Se conserva el stock total del producto;
+                                no se reparte por color.
+                            </p>
+                        </fieldset>
+
                     </div>
+
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-gold fw-bold">Guardar Cambios</button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn btn-gold fw-bold"
+                        >
+                            Guardar Cambios
+                        </button>
                     </div>
+
                 </form>
+
             </div>
         </div>
     </div>

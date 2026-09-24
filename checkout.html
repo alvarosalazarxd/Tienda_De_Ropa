@@ -1,163 +1,491 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pasarela de Pago - Moda & Estilo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <title>Finalizar compra - Moda & Estilo</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f5f5;
+            color: #222;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 32px auto;
+            padding: 0 20px;
+        }
+
+        a {
+            color: #59451f;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panel {
+            background: white;
+            padding: 24px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+        }
+
+        h2 {
+            font-size: 21px;
+            margin-top: 0;
+        }
+
+        .campos {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .ancho {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input:not([type="radio"]),
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #999;
+            border-radius: 6px;
+            font: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: 3px solid #c5a059;
+            outline-offset: 2px;
+        }
+
+        .metodo {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 16px 0;
+        }
+
+        .metodo label {
+            margin: 0;
+        }
+
+        .ayuda {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .aviso {
+            background: #fff2ce;
+            padding: 16px;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 16px;
+            background: #222;
+            color: white;
+            border: 0;
+            border-radius: 8px;
+            font: bold 17px Arial;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .d-flex,
+        .total {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .mb-2 {
+            margin-bottom: 12px;
+        }
+
+        .fw-bold,
+        .fw-semibold {
+            font-weight: bold;
+        }
+
+        .text-muted {
+            color: #555;
+        }
+
+        .small {
+            font-size: 14px;
+        }
+
+        .total {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        dialog::backdrop {
+            background: #0008;
+        }
+
+        @media (max-width: 760px) {
+            .layout,
+            .campos {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                padding: 18px;
+            }
+        }
+    </style>
 </head>
-<body class="bg-light">
 
-    <div class="container my-5">
-        <div class="row g-4">
-            
-            <div class="col-lg-7">
-                <form id="formCheckout">
-                    
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt me-2 text-primary"></i>1. Datos de Despacho</h5>
-                            <div class="row g-3">
-                                <div class="col-sm-6">
-                                    <label class="form-label small text-muted">Nombre</label>
-                                    <input type="text" class="form-control" required>
-                                </div>
-                                <div class="col-sm-6">
-                                    <label class="form-label small text-muted">Apellido</label>
-                                    <input type="text" class="form-control" required>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label small text-muted">Correo Electrónico</label>
-                                    <input type="email" class="form-control" required>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label small text-muted">Dirección de Entrega</label>
-                                    <input type="text" class="form-control" placeholder="Av. Principal 123, Depto 45" required>
-                                </div>
-                            </div>
+<body>
+    <main>
+        <a href="carrito.html">← Volver al carrito</a>
+
+        <h1>Finalizar compra</h1>
+
+        <p class="aviso">
+            Compra de demostración, sin cobros reales.
+            Para probar tarjeta:
+            <strong>4242 4242 4242 4242</strong>,
+            vencimiento <strong>12/99</strong>
+            y CVV <strong>123</strong>.
+        </p>
+
+        <div class="layout">
+
+            <form id="formCheckout">
+
+                <section class="panel">
+                    <h2>1. Datos de despacho</h2>
+
+                    <p class="ayuda">
+                        Todos los campos son obligatorios salvo los
+                        indicados como opcionales.
+                    </p>
+
+                    <div class="campos">
+
+                        <div>
+                            <label for="nombreCheckout">Nombre</label>
+                            <input
+                                id="nombreCheckout"
+                                name="nombre"
+                                autocomplete="given-name"
+                                maxlength="80"
+                                pattern=".*\S.*"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label for="apellidoCheckout">Apellido</label>
+                            <input
+                                id="apellidoCheckout"
+                                name="apellido"
+                                autocomplete="family-name"
+                                maxlength="80"
+                                pattern=".*\S.*"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label for="correoCheckout">
+                                Correo electrónico
+                            </label>
+                            <input
+                                id="correoCheckout"
+                                name="correo"
+                                type="email"
+                                autocomplete="email"
+                                maxlength="150"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label for="telefonoCheckout">Teléfono</label>
+                            <input
+                                id="telefonoCheckout"
+                                name="telefono"
+                                type="tel"
+                                autocomplete="tel"
+                                inputmode="tel"
+                                pattern="[+]?[0-9]{8,15}"
+                                placeholder="+56912345678"
+                                title="De 8 a 15 números, con + opcional al inicio"
+                                required
+                            >
+                        </div>
+
+                        <div class="ancho">
+                            <label for="regionCheckout">Región</label>
+                            <select
+                                id="regionCheckout"
+                                name="region"
+                                autocomplete="address-level1"
+                                required
+                            >
+                                <option value="">Selecciona una región</option>
+                                <option>Arica y Parinacota</option>
+                                <option>Tarapacá</option>
+                                <option>Antofagasta</option>
+                                <option>Atacama</option>
+                                <option>Coquimbo</option>
+                                <option>Valparaíso</option>
+                                <option>Metropolitana de Santiago</option>
+                                <option>Libertador General Bernardo O'Higgins</option>
+                                <option>Maule</option>
+                                <option>Ñuble</option>
+                                <option>Biobío</option>
+                                <option>La Araucanía</option>
+                                <option>Los Ríos</option>
+                                <option>Los Lagos</option>
+                                <option>Aysén del General Carlos Ibáñez del Campo</option>
+                                <option>Magallanes y de la Antártica Chilena</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="ciudadCheckout">
+                                Ciudad o localidad
+                            </label>
+                            <input
+                                id="ciudadCheckout"
+                                name="ciudad"
+                                placeholder="Ej.: Concepción"
+                                maxlength="100"
+                                pattern=".*\S.*"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label for="comunaCheckout">Comuna</label>
+                            <input
+                                id="comunaCheckout"
+                                name="comuna"
+                                autocomplete="address-level2"
+                                placeholder="Escribe tu comuna"
+                                maxlength="100"
+                                pattern=".*\S.*"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label for="calleCheckout">
+                                Calle, avenida o camino
+                            </label>
+                            <input
+                                id="calleCheckout"
+                                name="calle"
+                                placeholder="Ej.: Avenida O'Higgins"
+                                maxlength="150"
+                                pattern=".*\S.*"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label for="numeroCheckout">
+                                Número de domicilio
+                            </label>
+                            <input
+                                id="numeroCheckout"
+                                name="numero"
+                                placeholder="Ej.: 123, 123B o S/N"
+                                maxlength="20"
+                                pattern=".*\S.*"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label for="deptoCheckout">
+                                Departamento / casa (opcional)
+                            </label>
+                            <input
+                                id="deptoCheckout"
+                                name="departamento"
+                                placeholder="Ej.: Depto. 402, torre B"
+                                maxlength="80"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="postalCheckout">
+                                Código postal
+                            </label>
+                            <input
+                                id="postalCheckout"
+                                name="codigoPostal"
+                                autocomplete="postal-code"
+                                inputmode="numeric"
+                                pattern="[0-9]{7}"
+                                maxlength="7"
+                                title="Escribe los 7 dígitos del código postal"
+                                required
+                            >
+
+                            <a
+                                class="ayuda"
+                                href="https://www.correos.cl/codigo-postal"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Consultar en CorreosChile
+                            </a>
+                        </div>
+
+                        <div class="ancho">
+                            <label for="referenciaCheckout">
+                                Referencia de entrega (opcional)
+                            </label>
+                            <textarea
+                                id="referenciaCheckout"
+                                name="referencia"
+                                rows="2"
+                                maxlength="250"
+                                placeholder="Ej.: Entrada por el pasaje lateral"
+                            ></textarea>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>2. Método de pago</h2>
+
+                    <div class="metodo">
+                        <input
+                            type="radio"
+                            name="metodoPago"
+                            id="tarjeta"
+                            value="tarjeta"
+                            checked
+                        >
+                        <label for="tarjeta">Tarjeta de prueba</label>
+                    </div>
+
+                    <div id="camposTarjeta" class="campos">
+                        <div class="ancho">
+                            <label for="numeroTarjeta">
+                                Número de tarjeta de prueba
+                            </label>
+                            <input
+                                id="numeroTarjeta"
+                                inputmode="numeric"
+                                maxlength="19"
+                                placeholder="4242 4242 4242 4242"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label for="expiracionTarjeta">
+                                Vencimiento
+                            </label>
+                            <input
+                                id="expiracionTarjeta"
+                                inputmode="numeric"
+                                maxlength="5"
+                                placeholder="MM/AA"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label for="cvvTarjeta">CVV de prueba</label>
+                            <input
+                                id="cvvTarjeta"
+                                type="password"
+                                inputmode="numeric"
+                                maxlength="3"
+                                placeholder="123"
+                                required
+                            >
                         </div>
                     </div>
 
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-3"><i class="bi bi-credit-card me-2 text-primary"></i>2. Método de Pago</h5>
-                            
-                            <div class="form-check p-3 border rounded mb-2">
-                                <input class="form-check-input" type="radio" name="metodoPago" id="tarjeta" value="tarjeta" checked>
-                                <label class="form-check-label w-100 fw-bold ms-2" for="tarjeta">
-                                    Tarjeta de Débito / Crédito (Webpay)
-                                </label>
-                            </div>
-
-                            <div id="camposTarjeta" class="mt-3 p-3 bg-light rounded border">
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <label for="numeroTarjeta" class="form-label small text-muted">Número de Tarjeta</label>
-                                        <input type="text" id="numeroTarjeta" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" required>
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="expiracionTarjeta" class="form-label small text-muted">Expiración</label>
-                                        <input type="text" id="expiracionTarjeta" class="form-control" placeholder="MM/AA" maxlength="5" required>
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="cvvTarjeta" class="form-label small text-muted">CVV</label>
-                                        <input type="password" id="cvvTarjeta" class="form-control" placeholder="123" maxlength="3" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-check p-3 border rounded mt-2">
-                                <input class="form-check-input" type="radio" name="metodoPago" id="transferencia" value="transferencia">
-                                <label class="form-check-label w-100 fw-bold ms-2" for="transferencia">
-                                    Transferencia Bancaria Directa
-                                </label>
-                            </div>
-                        </div>
+                    <div class="metodo">
+                        <input
+                            type="radio"
+                            name="metodoPago"
+                            id="transferencia"
+                            value="transferencia"
+                        >
+                        <label for="transferencia">
+                            Transferencia (simulación)
+                        </label>
                     </div>
+                </section>
 
-                    <button type="submit" class="btn btn-dark btn-lg w-100 py-3 fw-bold">
-                        <i class="bi bi-lock-fill me-2"></i>CONFIRMAR Y PAGAR
-                    </button>
-                </form>
-            </div>
+                <button type="submit">
+                    Confirmar compra simulada
+                </button>
 
-            <div class="col-lg-5">
-                <div class="card border-0 shadow-sm p-4">
-                    <h5 class="fw-bold mb-3">RESUMEN DEL PEDIDO</h5>
-                    <div id="itemsCheckout" class="mb-3"></div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Envío</span>
-                        <span class="text-success fw-bold">Gratis</span>
-                    </div>
-                    <div class="d-flex justify-content-between fs-4 fw-bold">
-                        <span>Total</span>
-                        <span id="totalPago">$0</span>
-                    </div>
+            </form>
+
+            <aside class="panel">
+                <h2>Resumen de compra</h2>
+
+                <div id="itemsCheckout"></div>
+
+                <hr>
+
+                <div class="total">
+                    <span>Total</span>
+                    <span id="totalPago">$0</span>
                 </div>
-            </div>
+
+                <p class="ayuda">
+                    Envío gratuito en esta demostración.
+                </p>
+            </aside>
 
         </div>
-    </div>
+    </main>
 
     <script src="js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const radioTarjeta = document.getElementById('tarjeta');
-            const radioTransferencia = document.getElementById('transferencia');
-            const camposTarjeta = document.getElementById('camposTarjeta');
-
-            if (radioTarjeta && radioTransferencia && camposTarjeta) {
-                const inputsTarjeta = camposTarjeta.querySelectorAll('input');
-                
-                function toggleTarjeta() {
-                    if (radioTarjeta.checked) {
-                        camposTarjeta.style.display = 'block';
-                        inputsTarjeta.forEach(i => i.required = true);
-                    } else {
-                        camposTarjeta.style.display = 'none';
-                        inputsTarjeta.forEach(i => i.required = false);
-                    }
-                }
-
-                radioTarjeta.addEventListener('change', toggleTarjeta);
-                radioTransferencia.addEventListener('change', toggleTarjeta);
-            }
-
-            const inputNumero = document.getElementById('numeroTarjeta');
-            const inputExp = document.getElementById('expiracionTarjeta');
-            const inputCvv = document.getElementById('cvvTarjeta');
-
-            if (inputNumero) {
-                inputNumero.addEventListener('input', (e) => {
-                    let valor = e.target.value.replace(/\D/g, '').substring(0, 16);
-                    let bloques = valor.match(/.{1,4}/g);
-                    e.target.value = bloques ? bloques.join(' ') : '';
-                });
-            }
-
-            if (inputExp) {
-                inputExp.addEventListener('input', (e) => {
-                    let valor = e.target.value.replace(/\D/g, '').substring(0, 4);
-                    if (valor.length >= 3) {
-                        e.target.value = valor.substring(0, 2) + '/' + valor.substring(2, 4);
-                    } else {
-                        e.target.value = valor;
-                    }
-                });
-            }
-
-            if (inputCvv) {
-                inputCvv.addEventListener('input', (e) => {
-                    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 3);
-                });
-            }
-
-            if (typeof inicializarCheckout === 'function') {
-                inicializarCheckout();
-            }
-        });
-    </script>
 </body>
 </html>
