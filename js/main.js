@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     inicializarGraficoVentas();
     prepararAyudasFormulario();
     renderizarHistorialUsuario();
+    inicializarFavoritos();
+    
 
     document.querySelectorAll('.btn-toggle-password').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -920,6 +922,12 @@ function actualizarNavbarUsuario() {
                 ${escaparHTML(usuarioActivo.nombres)} ${escaparHTML(usuarioActivo.apellidos || '')}
             </a>
             <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary" aria-labelledby="userDropdown">
+            <li>
+                <a class="dropdown-item text-light" href="favoritos.html">
+                    <i class="bi bi-heart-fill me-2"></i>
+                    Mis favoritos
+                </a>
+            </li>
                 ${usuarioActivo.rol === 'Administrador' ? '<li><a class="dropdown-item text-light" href="admin.html"><i class="bi bi-speedometer2 me-2"></i>Panel Admin</a></li><li><hr class="dropdown-divider border-secondary"></li>' : ''}
                 <li><a class="dropdown-item text-light" href="mis-compras.html"><i class="bi bi-bag-check me-2"></i>Mis Compras</a></li>
                 <li><hr class="dropdown-divider border-secondary"></li>
@@ -1376,4 +1384,280 @@ function renderizarHistorialUsuario() {
             </div>
         </div>
     `).join('');
+}
+
+// ===== FAVORITOS =====
+
+function obtenerUsuarioFavoritos() {
+    try {
+        const usuario = JSON.parse(
+            localStorage.getItem('usuario_activo')
+        );
+
+        if (!usuario) return null;
+
+        const identidad = usuario.id != null
+            ? 'id:' + String(usuario.id)
+            : 'email:' + String(usuario.email || '').trim().toLowerCase();
+
+        if (identidad === 'email:') return null;
+
+        return {
+            usuario,
+            clave: 'favoritos_moda_estilo:' + identidad
+        };
+    } catch (error) {
+        return null;
+    }
+}
+
+function obtenerFavoritos() {
+    const cuenta = obtenerUsuarioFavoritos();
+
+    if (!cuenta) return [];
+
+    try {
+        const guardados = JSON.parse(
+            localStorage.getItem(cuenta.clave)
+        ) || [];
+
+        if (!Array.isArray(guardados)) return [];
+
+        return [...new Set(guardados.map(String))];
+    } catch (error) {
+        return [];
+    }
+}
+
+function guardarFavoritos(ids) {
+    const cuenta = obtenerUsuarioFavoritos();
+
+    if (!cuenta) return false;
+
+    localStorage.setItem(
+        cuenta.clave,
+        JSON.stringify([...new Set(ids.map(String))])
+    );
+
+    return true;
+}
+
+function actualizarBotonesFavoritos() {
+    const favoritos = new Set(obtenerFavoritos());
+
+    document.querySelectorAll('.btn-favorito').forEach(boton => {
+        const seleccionado = favoritos.has(
+            String(boton.dataset.id)
+        );
+
+        const texto = seleccionado
+            ? 'Quitar de favoritos'
+            : 'Agregar a favoritos';
+
+        boton.setAttribute('aria-pressed', String(seleccionado));
+        boton.setAttribute('aria-label', texto);
+        boton.title = texto;
+
+        const icono = boton.querySelector('i');
+
+        if (icono) {
+            icono.classList.toggle('bi-heart', !seleccionado);
+            icono.classList.toggle('bi-heart-fill', seleccionado);
+        }
+    });
+}
+
+async function alternarFavorito(id) {
+    if (!obtenerUsuarioFavoritos()) {
+        await mostrarAviso(
+            'Inicia sesión',
+            'Inicia sesión con tu cuenta para guardar favoritos.'
+        );
+        return;
+    }
+
+    const productoId = String(id);
+    const favoritos = obtenerFavoritos();
+    const yaGuardado = favoritos.includes(productoId);
+
+    if (!yaGuardado) {
+        const producto = obtenerProductoPorId(productoId);
+
+        if (!producto || producto.activo === false) {
+            await mostrarAviso(
+                'Producto no disponible',
+                'Este producto ya no está disponible en el catálogo.'
+            );
+            return;
+        }
+    }
+
+    const actualizados = yaGuardado
+        ? favoritos.filter(guardado => guardado !== productoId)
+        : [...favoritos, productoId];
+
+    try {
+        guardarFavoritos(actualizados);
+    } catch (error) {
+        await mostrarAviso(
+            'No se pudo guardar',
+            'El navegador no pudo guardar el cambio. Inténtalo nuevamente.'
+        );
+        return;
+    }
+
+    actualizarBotonesFavoritos();
+    renderizarFavoritos();
+}
+
+function inicializarFavoritos() {
+    // Evita registrar el evento varias veces.
+    if (document.documentElement.dataset.favoritosListos === 'si') {
+        return;
+    }
+
+    document.documentElement.dataset.favoritosListos = 'si';
+
+    document.addEventListener('click', async (event) => {
+        const boton = event.target.closest('.btn-favorito');
+
+        if (!boton) return;
+
+        event.preventDefault();
+
+        if (boton.disabled) return;
+
+        boton.disabled = true;
+
+        try {
+            await alternarFavorito(boton.dataset.id);
+        } finally {
+            boton.disabled = false;
+        }
+    });
+
+    // Actualiza la vista cuando otra pestaña cambia favoritos o sesión.
+    window.addEventListener('storage', (event) => {
+        if (
+            event.key === null ||
+            event.key === 'usuario_activo' ||
+            event.key === PRODUCTOS_KEY ||
+            event.key.startsWith('favoritos_moda_estilo:')
+        ) {
+            actualizarBotonesFavoritos();
+            renderizarFavoritos();
+        }
+    });
+
+    actualizarBotonesFavoritos();
+    renderizarFavoritos();
+}
+
+function renderizarFavoritos() {
+    const contenedor = document.getElementById(
+        'contenedorFavoritos'
+    );
+
+    if (!contenedor) return;
+
+    if (!obtenerUsuarioFavoritos()) {
+        contenedor.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Inicia sesión para consultar tus favoritos.
+                    <a href="login.html" class="alert-link">
+                        Iniciar sesión
+                    </a>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const ids = new Set(obtenerFavoritos());
+
+    const productos = obtenerProductos().filter(producto =>
+        ids.has(String(producto.id)) &&
+        producto.activo !== false
+    );
+
+    if (productos.length === 0) {
+        contenedor.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-light border text-center">
+                    No tienes favoritos disponibles.
+                    <a href="productos.html">Explorar productos</a>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const formatoPrecio = new Intl.NumberFormat('es-CL', {
+        style: 'currency',
+        currency: 'CLP'
+    });
+
+    contenedor.innerHTML = productos.map(producto => {
+        const agotado = Number(producto.stock) <= 0;
+
+        const enlaceDetalle =
+            'producto-detalle.html?id=' +
+            encodeURIComponent(String(producto.id));
+
+        return `
+            <div class="col-12 col-sm-6 col-lg-3">
+                <article class="card h-100 shadow-sm border-0">
+                    <img
+                        src="${escaparHTML(producto.img || 'img/urbana.jpg')}"
+                        alt="${escaparHTML(producto.nombre)}"
+                        class="card-img-top"
+                        style="height:230px; object-fit:cover;"
+                    >
+
+                    <div class="card-body d-flex flex-column">
+                        <h2 class="h6 fw-bold">
+                            ${escaparHTML(producto.nombre)}
+                        </h2>
+
+                        <p class="text-muted small">
+                            ${escaparHTML(producto.categoria || '')}
+                        </p>
+
+                        <p class="fw-bold">
+                            ${formatoPrecio.format(Number(producto.precio))}
+                        </p>
+
+                        ${
+                            agotado
+                                ? '<span class="badge bg-danger align-self-start mb-3">Sin stock</span>'
+                                : ''
+                        }
+
+                        <div class="mt-auto d-grid gap-2">
+                            ${
+                                agotado
+                                    ? '<button type="button" class="btn btn-secondary" disabled>Sin stock disponible</button>'
+                                    : `<a href="${escaparHTML(enlaceDetalle)}" class="btn btn-dark">Ver producto y elegir talla</a>`
+                            }
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-danger btn-favorito"
+                                data-id="${escaparHTML(String(producto.id))}"
+                                aria-label="Quitar de favoritos"
+                                aria-pressed="true"
+                            >
+                                <i
+                                    class="bi bi-heart-fill"
+                                    aria-hidden="true"
+                                ></i>
+                                Quitar de favoritos
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        `;
+    }).join('');
 }

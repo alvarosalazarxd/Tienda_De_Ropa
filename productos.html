@@ -165,8 +165,14 @@
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3 tarjeta-producto" data-categoria="${p.categoriaSlug}">
                         <div class="card card-custom h-100 shadow-sm rounded-3 overflow-hidden position-relative">
                             ${badgeAgotado}
-                            <button type="button" class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm border-0 z-1" aria-label="Favorito">
-                                <i class="bi bi-heart text-gold"></i>
+                            <button
+                                type="button"
+                                class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm border-0 z-1 btn-favorito"
+                                data-id="${escaparHTML(String(p.id))}"
+                                aria-label="Agregar a favoritos"
+                                aria-pressed="false"
+                                title="Agregar a favoritos">
+                                    <i class="bi bi-heart text-gold" aria-hidden="true"></i>
                             </button>
 
                             <div class="bg-white text-center p-2" style="height: 250px;">
@@ -194,6 +200,8 @@
                     </div>
                 `;
             });
+            
+            actualizarBotonesFavoritos();
         }
 
         document.addEventListener('DOMContentLoaded', renderCatalogo);
