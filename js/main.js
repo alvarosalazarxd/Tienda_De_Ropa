@@ -183,10 +183,43 @@ function actualizarContadorCarrito() {
 
 function vincularBotonesAgregarCarrito() {
     document.addEventListener('click', (e) => {
+        const btnCantidad = e.target.closest('.btn-sumar-cantidad, .btn-restar-cantidad');
+
+if (btnCantidad) {
+    e.preventDefault();
+
+    const productoId = btnCantidad.dataset.productoId;
+
+    const input = document.querySelector(
+        `.cantidad-producto[data-producto-id="${productoId}"]`
+    );
+
+    if (!input) return;
+
+    let cantidad = parseInt(input.value, 10) || 1;
+    const maximo = parseInt(input.max, 10) || 1;
+
+    if (btnCantidad.classList.contains('btn-sumar-cantidad')) {
+        if (cantidad < maximo) {
+            cantidad++;
+        }
+    }
+
+    if (btnCantidad.classList.contains('btn-restar-cantidad')) {
+        if (cantidad > 1) {
+            cantidad--;
+        }
+    }
+
+    input.value = cantidad;
+
+    return;
+}
         const btn = e.target.closest('.btn-agregar-carrito, [data-agregar-carrito]');
         if (!btn) return;
 
         const textoBoton = btn.textContent.trim().toLowerCase();
+
         if (
             textoBoton.includes('ver') ||
             textoBoton.includes('detalle') ||
@@ -199,42 +232,113 @@ function vincularBotonesAgregarCarrito() {
         }
 
         e.preventDefault();
+
         let id = btn.getAttribute('data-id') || btn.dataset.id;
         let nombre = btn.dataset.nombre || btn.getAttribute('data-nombre');
         let precio = btn.dataset.precio || btn.getAttribute('data-precio');
         let imagen = btn.dataset.imagen || btn.getAttribute('data-imagen');
         let talla = btn.dataset.talla || btn.getAttribute('data-talla') || '';
+        let cantidad = 1;
 
-        const tarjeta = btn.closest('.card') || btn.closest('.tarjeta-producto') || btn.closest('.col') || btn.closest('.producto-item');
+        const tarjeta =
+            btn.closest('.card') ||
+            btn.closest('.tarjeta-producto') ||
+            btn.closest('.col') ||
+            btn.closest('.producto-item');
+
         if (tarjeta) {
             if (!nombre) {
-                const nombreElem = tarjeta.querySelector('.card-title, h5, h6, .titulo-producto, .nombre-producto');
-                nombre = nombreElem ? nombreElem.textContent.trim() : 'Producto';
+                const nombreElem = tarjeta.querySelector(
+                    '.card-title, h5, h6, .titulo-producto, .nombre-producto'
+                );
+
+                nombre = nombreElem
+                    ? nombreElem.textContent.trim()
+                    : 'Producto';
             }
+
             if (!precio) {
                 const tarjetaClon = tarjeta.cloneNode(true);
-                tarjetaClon.querySelectorAll('del, s, .text-decoration-line-through, .precio-anterior, .text-muted').forEach(el => el.remove());
-                const precioElem = tarjetaClon.querySelector('.text-gold, .fw-bold, .precio, .card-text, .price') || tarjetaClon;
-                precio = precioElem ? precioElem.textContent : '0';
+
+                tarjetaClon
+                    .querySelectorAll(
+                        'del, s, .text-decoration-line-through, .precio-anterior, .text-muted'
+                    )
+                    .forEach(el => el.remove());
+
+                const precioElem = tarjetaClon.querySelector(
+                    '.text-gold, .fw-bold, .precio, .card-text, .price'
+                ) || tarjetaClon;
+
+                precio = precioElem
+                    ? precioElem.textContent
+                    : '0';
             }
+
             if (!imagen) {
                 const imgElem = tarjeta.querySelector('img');
-                imagen = imgElem ? (imgElem.getAttribute('src') || imgElem.src) : 'img/urbana.jpg';
+
+                imagen = imgElem
+                    ? (imgElem.getAttribute('src') || imgElem.src)
+                    : 'img/urbana.jpg';
             }
+
             if (!talla) {
                 const selectTalla = tarjeta.querySelector('select');
-                talla = selectTalla ? selectTalla.value : '';
+                talla = selectTalla
+                    ? selectTalla.value
+                    : '';
+            }
+
+            const cantidadInput =
+                tarjeta.querySelector('.cantidad-producto');
+
+            cantidad = cantidadInput
+                ? parseInt(cantidadInput.value, 10)
+                : 1;
+
+            const producto = obtenerProductoPorId(id);
+
+            if (!Number.isSafeInteger(cantidad) || cantidad < 1) {
+                mostrarAviso(
+                    'Cantidad inválida',
+                    'La cantidad debe ser de al menos 1 unidad.'
+                );
+                return;
+            }
+
+            if (producto && cantidad > Number(producto.stock)) {
+                mostrarAviso(
+                    'Stock insuficiente',
+                    `Solo quedan ${producto.stock} unidades disponibles.`
+                );
+                return;
             }
         }
 
         const precioNumero = parsearPrecio(precio);
-        agregarAlCarrito(nombre, precioNumero, imagen, talla, id);
 
-        mostrarAviso('Producto agregado', nombre + ' se agregó al carrito.');
+        agregarAlCarrito(
+            nombre,
+            precioNumero,
+            imagen,
+            talla,
+            id,
+            cantidad
+        );
+
+        mostrarAviso(
+            'Producto agregado',
+            nombre + ' se agregó al carrito.'
+        );
 
         const textoOriginal = btn.innerHTML;
-        btn.innerHTML = '<i class="bi bi-check-circle me-1"></i> ¡Agregado!';
+
+        btn.innerHTML =
+            '<i class="bi bi-check-circle me-1"></i> ¡Agregado!';
+
         btn.classList.add('btn-success');
+
         setTimeout(() => {
             btn.innerHTML = textoOriginal;
             btn.classList.remove('btn-success');
@@ -242,22 +346,88 @@ function vincularBotonesAgregarCarrito() {
     });
 }
 
-function agregarAlCarrito(nombre, precio, imagen = '', talla = '', id = null) {
-    const nombreLimpio = typeof nombre === 'string' && !nombre.includes('[object') ? nombre.trim() : 'Producto';
+function agregarAlCarrito(
+    nombre,
+    precio,
+    imagen = '',
+    talla = '',
+    id = null,
+    cantidadSolicitada = 1
+) {
+    const nombreLimpio =
+        typeof nombre === 'string' &&
+        !nombre.includes('[object')
+            ? nombre.trim()
+            : 'Producto';
+
     const precioLimpio = parsearPrecio(precio);
-    const imagenLimpia = typeof imagen === 'string' && !imagen.includes('[object') ? imagen : 'img/urbana.jpg';
-    const tallaLimpia = typeof talla === 'string' ? talla.trim() : 'Única';
+
+    const imagenLimpia =
+        typeof imagen === 'string' &&
+        !imagen.includes('[object')
+            ? imagen
+            : 'img/urbana.jpg';
+
+    const tallaLimpia =
+        typeof talla === 'string'
+            ? talla.trim()
+            : 'Única';
+
+    const cantidad = Number(cantidadSolicitada);
+
+    if (!Number.isSafeInteger(cantidad) || cantidad < 1) {
+        return;
+    }
 
     let carrito = obtenerCarrito();
 
     const indice = carrito.findIndex(item =>
-        (id ? String(item.id) === String(id) : item.nombre === nombreLimpio) && 
-        String(item.talla || 'Única') === String(tallaLimpia || 'Única')
+        (id
+            ? String(item.id) === String(id)
+            : item.nombre === nombreLimpio) &&
+        String(item.talla || 'Única') ===
+        String(tallaLimpia || 'Única')
     );
 
+    const producto =
+        id != null
+            ? obtenerProductoPorId(id)
+            : null;
+
+    if (producto && producto.activo === false) {
+        mostrarAviso(
+            'Producto no disponible',
+            'Este producto no está disponible actualmente.'
+        );
+        return;
+    }
+
+    if (producto) {
+        const cantidadActual =
+            indice !== -1
+                ? parseInt(carrito[indice].cantidad, 10) || 0
+                : 0;
+
+        if (
+            cantidadActual + cantidad >
+            Number(producto.stock)
+        ) {
+            mostrarAviso(
+                'Stock insuficiente',
+                `Solo quedan ${producto.stock} unidades disponibles.`
+            );
+            return;
+        }
+    }
+
     if (indice !== -1) {
-        carrito[indice].cantidad = (parseInt(carrito[indice].cantidad, 10) || 0) + 1;
-        if (precioLimpio > 0) carrito[indice].precio = precioLimpio;
+        carrito[indice].cantidad =
+            (parseInt(carrito[indice].cantidad, 10) || 0) +
+            cantidad;
+
+        if (precioLimpio > 0) {
+            carrito[indice].precio = precioLimpio;
+        }
     } else {
         carrito.push({
             id: id ? parseInt(id, 10) : Date.now(),
@@ -265,7 +435,7 @@ function agregarAlCarrito(nombre, precio, imagen = '', talla = '', id = null) {
             precio: precioLimpio,
             imagen: imagenLimpia,
             talla: tallaLimpia || 'Única',
-            cantidad: 1
+            cantidad: cantidad
         });
     }
 
@@ -1285,36 +1455,122 @@ function renderizarCatalogoProductos() {
     if (!catalogo) return;
 
     const productos = obtenerProductos();
-    const formatoCLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
+    const formatoCLP = new Intl.NumberFormat('es-CL', {
+        style: 'currency',
+        currency: 'CLP'
+    });
 
     catalogo.innerHTML = '';
+
     productos.forEach(p => {
         const opcionesTallas = (p.tallas || ['Talla Única'])
-            .map(t => `<option value="${escaparHTML(t)}">${escaparHTML(t)}</option>`)
+            .map(t => `
+                <option value="${escaparHTML(t)}">
+                    ${escaparHTML(t)}
+                </option>
+            `)
             .join('');
+
+        const stockDisponible = parseInt(p.stock, 10) || 1;
 
         const col = document.createElement('div');
         col.className = 'col-md-6 col-lg-3 mb-4';
+
         col.innerHTML = `
             <div class="card h-100 border-0 shadow-sm tarjeta-producto">
-                <img src="${escaparHTML(p.img)}" class="card-img-top" alt="${escaparHTML(p.nombre)}" style="height: 250px; object-fit: cover;">
+
+                <img 
+                    src="${escaparHTML(p.img)}" 
+                    class="card-img-top" 
+                    alt="${escaparHTML(p.nombre)}"
+                    style="height: 250px; object-fit: cover;"
+                >
+
                 <div class="card-body d-flex flex-column">
-                    <span class="badge bg-secondary mb-2 align-self-start">${escaparHTML(p.categoria)}</span>
-                    <h5 class="card-title fw-bold">${escaparHTML(p.nombre)}</h5>
-                    <p class="card-text text-muted small flex-grow-1">${escaparHTML(p.desc || '')}</p>
+
+                    <span class="badge bg-secondary mb-2 align-self-start">
+                        ${escaparHTML(p.categoria)}
+                    </span>
+
+                    <h5 class="card-title fw-bold">
+                        ${escaparHTML(p.nombre)}
+                    </h5>
+
+                    <p class="card-text text-muted small flex-grow-1">
+                        ${escaparHTML(p.desc || '')}
+                    </p>
+
                     <div class="mb-3">
-                        <label class="form-label small text-muted">Talla:</label>
-                        <select class="form-select form-select-sm">${opcionesTallas}</select>
+                        <label class="form-label small text-muted">
+                            Talla:
+                        </label>
+
+                        <select 
+                            class="form-select form-select-sm"
+                            data-talla-producto="${p.id}"
+                        >
+                            ${opcionesTallas}
+                        </select>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mt-auto">
-                        <span class="fs-5 fw-bold text-dark">${formatoCLP.format(p.precio)}</span>
-                        <button class="btn btn-dark btn-sm btn-agregar-carrito" data-id="${p.id}" data-nombre="${escaparHTML(p.nombre)}" data-precio="${p.precio}" data-imagen="${escaparHTML(p.img)}">
-                            <i class="bi bi-cart-plus me-1"></i> Agregar
-                        </button>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">
+                            Cantidad:
+                        </label>
+
+                        <div class="input-group input-group-sm">
+                            <button 
+                                type="button"
+                                class="btn btn-outline-dark btn-restar-cantidad"
+                                data-producto-id="${p.id}"
+                            >
+                                −
+                            </button>
+
+                            <input 
+                                type="number"
+                                class="form-control text-center cantidad-producto"
+                                data-producto-id="${p.id}"
+                                min="1"
+                                max="${stockDisponible}"
+                                value="1"
+                            >
+
+                            <button 
+                                type="button"
+                                class="btn btn-outline-dark btn-sumar-cantidad"
+                                data-producto-id="${p.id}"
+                            >
+                                +
+                            </button>
+                        </div>
+
+                        <small class="text-muted">
+                            Stock disponible: ${stockDisponible}
+                        </small>
                     </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-auto mb-3">
+                        <span class="fs-5 fw-bold text-dark">
+                            ${formatoCLP.format(p.precio)}
+                        </span>
+                    </div>
+
+                    <button 
+                        class="btn btn-dark w-100 btn-agregar-carrito"
+                        data-id="${p.id}"
+                        data-nombre="${escaparHTML(p.nombre)}"
+                        data-precio="${p.precio}"
+                        data-imagen="${escaparHTML(p.img)}"
+                    >
+                        <i class="bi bi-cart-plus me-1"></i>
+                        Agregar al carrito
+                    </button>
+
                 </div>
             </div>
         `;
+
         catalogo.appendChild(col);
     });
 }
