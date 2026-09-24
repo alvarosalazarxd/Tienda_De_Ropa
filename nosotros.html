@@ -2,275 +2,334 @@
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Catálogo de Productos - Moda & Estilo</title>
+    <title>Sobre Nosotros - Moda & Estilo</title>
 
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet">
 
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet"
-        href="css/estilos.css">
+    <!-- CSS propio -->
+    <link rel="stylesheet" href="css/estilos.css">
 
     <style>
 
-        .catalogo-header {
-            background-color: var(--fashion-dark);
-            color: white;
-            border-bottom: 3px solid var(--fashion-gold);
-            padding: 2.2rem 0;
-        }
+        /* =====================================================
+           HERO NOSOTROS
+        ===================================================== */
 
-        .catalogo-header h2 {
-            letter-spacing: 1.5px;
-        }
-
-        .catalogo-linea {
-            width: 60px;
-            height: 3px;
-            background-color: var(--fashion-gold);
-            margin-top: 12px;
-            margin-bottom: 12px;
-        }
-
-        .filtros-catalogo {
-            background-color: #ffffff;
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 28px;
-            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .buscador-productos {
+        .nosotros-hero {
             position: relative;
-        }
-
-        .buscador-productos i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888888;
-            pointer-events: none;
-        }
-
-        .buscador-productos input {
-            padding-left: 43px;
-            height: 44px;
-        }
-
-        .filtros-catalogo .form-select {
-            height: 44px;
-        }
-
-        .resultado-catalogo {
-            color: #777777;
-            font-size: 0.9rem;
-            margin-top: 15px;
-            margin-bottom: 0;
-        }
-
-        .resultado-catalogo strong {
-            color: var(--fashion-dark);
-        }
-
-        .tarjeta-producto {
-            display: flex;
-        }
-
-        .tarjeta-producto .card {
-            width: 100%;
-        }
-
-        .producto-card {
-            min-height: 470px;
-            display: flex;
-            flex-direction: column;
-            border-radius: 14px !important;
-            overflow: hidden;
-            border: none !important;
-            background-color: #ffffff;
-            transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease;
-        }
-
-        .producto-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.14) !important;
-        }
-
-        .producto-imagen-container {
-            height: 220px;
-            background-color: #ffffff;
-            padding: 8px;
-            position: relative;
-        }
-
-        .producto-imagen-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .producto-imagen-container a {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        .btn-favorito {
-            width: 36px;
-            height: 36px;
+            height: 380px;
+            background-image: url("img/bannernosotros.jfif");
+            background-size: cover;
+            background-position: center 35%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: rgba(17, 17, 17, 0.88) !important;
-            transition: all 0.25s ease;
+            overflow: hidden;
+            border-bottom: 3px solid var(--fashion-gold);
         }
 
-        .btn-favorito:hover {
-            background-color: var(--fashion-gold) !important;
-            transform: scale(1.08);
+        .nosotros-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(17, 17, 17, 0.88),
+                rgba(17, 17, 17, 0.58),
+                rgba(17, 17, 17, 0.82)
+            );
         }
 
-        .btn-favorito:hover i {
-            color: #111111 !important;
-        }
-
-        .producto-card .card-body {
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .producto-categoria {
-            font-size: 0.68rem;
-            font-weight: 600;
-            padding: 5px 8px;
-            border-radius: 5px;
-        }
-
-        .producto-titulo {
-            font-size: 1rem;
-            font-weight: 700;
-            line-height: 1.3;
-            margin-bottom: 7px;
-        }
-
-        .producto-titulo a {
-            color: #111111;
-            transition: color 0.2s ease;
-        }
-
-        .producto-titulo a:hover {
-            color: var(--fashion-gold) !important;
-        }
-
-        .producto-descripcion {
-            color: #6b6b6b;
-            font-size: 0.85rem;
-            line-height: 1.55;
-            margin-bottom: 12px;
-        }
-
-        .precio-producto {
-            color: var(--fashion-gold);
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-
-        .cantidad-producto {
-            width: 75px;
+        .nosotros-hero-content {
+            position: relative;
+            z-index: 2;
+            color: white;
             text-align: center;
-            height: 38px;
+            max-width: 850px;
+            padding: 20px;
         }
 
-        .cantidad-label {
-            font-size: 0.8rem;
-            color: #777777;
-            margin-bottom: 4px;
-            display: block;
+        .nosotros-hero-content h1 {
+            font-size: 3rem;
+            letter-spacing: 2.5px;
+            margin-bottom: 18px;
         }
 
-        .btn-agregar-producto {
-            background-color: var(--fashion-dark) !important;
-            color: #ffffff !important;
-            border: 1px solid var(--fashion-dark) !important;
-            font-weight: 500;
-            height: 38px;
-            transition: all 0.25s ease;
+        .nosotros-hero-content p {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 700px;
+            margin: 0 auto 25px;
         }
 
-        .btn-agregar-producto:hover {
-            background-color: var(--fashion-gold) !important;
-            border-color: var(--fashion-gold) !important;
-            color: #111111 !important;
+        .hero-line {
+            width: 70px;
+            height: 3px;
+            background-color: var(--fashion-gold);
+            margin: 0 auto 22px;
         }
 
-        .btn-agregar-producto:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+
+        /* =====================================================
+           QUIÉNES SOMOS
+        ===================================================== */
+
+        .quienes-somos {
+            padding: 70px 0;
         }
 
-        .sin-resultados {
-            text-align: center;
-            padding: 70px 20px;
+        .quienes-somos-imagen {
+            width: 100%;
+            height: 390px;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
         }
 
-        .sin-resultados i {
-            font-size: 3.5rem;
-            color: var(--fashion-gold);
+        .quienes-somos-texto {
+            padding: 20px 20px 20px 35px;
+        }
+
+        .quienes-somos-texto h2 {
+            letter-spacing: 1.5px;
             margin-bottom: 20px;
         }
 
-        .sin-resultados h4 {
-            font-weight: 700;
-            margin-bottom: 10px;
+        .quienes-somos-texto .linea-dorada {
+            width: 55px;
+            height: 3px;
+            background-color: var(--fashion-gold);
+            margin-bottom: 25px;
         }
 
-        .sin-resultados p {
-            color: #777777;
+        .quienes-somos-texto p {
+            color: #666666;
+            line-height: 1.8;
         }
+
+
+        /* =====================================================
+           COLECCIONES
+        ===================================================== */
+
+        .colecciones-section {
+            padding: 30px 0 70px;
+        }
+
+        .titulo-seccion {
+            letter-spacing: 1.5px;
+        }
+
+        .subtitulo-seccion {
+            color: #777777;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .coleccion-card {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: #ffffff;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .coleccion-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.14);
+        }
+
+        .coleccion-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .coleccion-card:hover img {
+            transform: scale(1.04);
+        }
+
+        .coleccion-card .card-body {
+            padding: 25px;
+        }
+
+        .coleccion-card h5 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        .coleccion-card p {
+            color: #666666;
+            line-height: 1.65;
+            font-size: 0.92rem;
+        }
+
+        .coleccion-icon {
+            color: var(--fashion-gold);
+            font-size: 1.25rem;
+            margin-right: 8px;
+        }
+
+        .coleccion-card .btn {
+            padding: 10px 20px;
+        }
+
+
+        /* =====================================================
+           LO QUE NOS REPRESENTA
+        ===================================================== */
+
+        .valores-section {
+            background-color: #111111;
+            padding: 70px 0;
+            margin-top: 20px;
+            margin-bottom: 70px;
+        }
+
+        .valores-section h2 {
+            color: #ffffff;
+            letter-spacing: 1.5px;
+        }
+
+        .valores-subtitulo {
+            color: #aaaaaa;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .valor-card {
+            height: 100%;
+            text-align: center;
+            padding: 35px 25px;
+            border: 1px solid rgba(197, 168, 128, 0.25);
+            border-radius: 14px;
+            background-color: #181818;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .valor-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--fashion-gold);
+        }
+
+        .valor-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(197, 168, 128, 0.12);
+            color: var(--fashion-gold);
+            font-size: 1.8rem;
+        }
+
+        .valor-card h4 {
+            color: #ffffff;
+            font-size: 1.15rem;
+            margin-bottom: 12px;
+        }
+
+        .valor-card p {
+            color: #999999;
+            font-size: 0.92rem;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+
+        /* =====================================================
+           MISIÓN Y VISIÓN
+        ===================================================== */
+
+        .mision-vision {
+            margin-bottom: 70px;
+        }
+
+        .mision-card {
+            background-color: #ffffff;
+            border-radius: 14px;
+            padding: 30px;
+            height: 100%;
+            border-left: 4px solid var(--fashion-gold);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+        }
+
+        .mision-card h4 {
+            margin-bottom: 15px;
+        }
+
+        .mision-card p {
+            color: #666666;
+            line-height: 1.75;
+            margin-bottom: 0;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
 
         @media (max-width: 768px) {
 
-            .catalogo-header {
-                padding: 1.8rem 0;
+            .nosotros-hero {
+                height: 360px;
+                background-position: center 35%;
             }
 
-            .catalogo-header h2 {
-                font-size: 1.6rem;
+            .nosotros-hero-content h1 {
+                font-size: 2.3rem;
+                letter-spacing: 2px;
             }
 
-            .filtros-catalogo {
-                padding: 15px;
+            .nosotros-hero-content p {
+                font-size: 1rem;
             }
 
-            .producto-card {
-                min-height: 0;
+            .quienes-somos {
+                padding: 50px 0;
             }
 
-            .producto-imagen-container {
-                height: 230px;
+            .quienes-somos-texto {
+                padding: 30px 10px 10px;
             }
 
+            .quienes-somos-imagen {
+                height: 300px;
+            }
+
+            .colecciones-section {
+                padding-bottom: 50px;
+            }
+
+            .valores-section {
+                padding: 55px 0;
+                margin-bottom: 50px;
+            }
         }
 
     </style>
-
 </head>
 
+
 <body class="d-flex flex-column min-vh-100">
+
+
+    <!-- =====================================================
+         NAVBAR
+    ====================================================== -->
 
     <nav class="navbar navbar-expand-sm navbar-dark navbar-custom sticky-top">
 
@@ -283,6 +342,7 @@
 
             </a>
 
+
             <button class="navbar-toggler"
                 type="button"
                 data-bs-toggle="collapse"
@@ -292,8 +352,10 @@
 
             </button>
 
+
             <div class="collapse navbar-collapse"
                 id="collapsibleNavbar">
+
 
                 <ul class="navbar-nav me-auto">
 
@@ -308,9 +370,10 @@
 
                     </li>
 
+
                     <li class="nav-item">
 
-                        <a class="nav-link"
+                        <a class="nav-link active fw-semibold"
                             href="nosotros.html">
 
                             Nosotros
@@ -319,9 +382,10 @@
 
                     </li>
 
+
                     <li class="nav-item">
 
-                        <a class="nav-link active fw-semibold"
+                        <a class="nav-link"
                             href="productos.html">
 
                             Productos
@@ -332,7 +396,9 @@
 
                 </ul>
 
+
                 <ul class="navbar-nav ms-auto align-items-center">
+
 
                     <li class="nav-item">
 
@@ -353,6 +419,7 @@
 
                     </li>
 
+
                     <li class="nav-item">
 
                         <a class="nav-link"
@@ -363,6 +430,7 @@
                         </a>
 
                     </li>
+
 
                     <li class="nav-item">
 
@@ -383,189 +451,570 @@
 
     </nav>
 
-    <header class="catalogo-header">
 
-        <div class="container">
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
 
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <header class="nosotros-hero">
 
-                <div>
+        <div class="nosotros-hero-content">
 
-                    <span class="text-gold fw-semibold text-uppercase small">
+            <div class="hero-line"></div>
 
-                        Moda & Estilo
+            <h1 class="fw-bold text-uppercase">
 
-                    </span>
+                Nuestra Historia
 
-                    <h2 class="fw-bold text-uppercase mb-0 mt-1"
-                        id="titulo-catalogo">
+            </h1>
 
-                        Catálogo de Productos
+            <p>
 
-                    </h2>
+                Más que moda, una forma de expresar quién eres.
 
-                    <div class="catalogo-linea"></div>
+            </p>
 
-                    <p class="text-white-50 small mb-0"
-                        id="subtitulo-catalogo">
+            <a href="#quienes-somos"
+                class="btn btn-gold rounded-pill px-4 py-2">
 
-                        Descubre las últimas tendencias en moda urbana e
-                        indumentaria de alta calidad
+                Conócenos
 
-                    </p>
+                <i class="bi bi-arrow-down ms-2"></i>
 
-                </div>
-
-                <div>
-
-                    <a href="productos.html"
-                        id="btn-ver-todos"
-                        class="btn btn-outline-light btn-sm rounded-pill px-3 d-none">
-
-                        <i class="bi bi-grid me-1"></i>
-
-                        Ver todos los productos
-
-                    </a>
-
-                </div>
-
-            </div>
+            </a>
 
         </div>
 
     </header>
 
-    <main class="container mb-5 mt-4 flex-grow-1">
 
-        <section class="filtros-catalogo">
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL
+    ====================================================== -->
 
-            <div class="row g-3 align-items-center">
+    <main class="flex-grow-1">
 
-                <div class="col-12 col-lg-6">
 
-                    <div class="buscador-productos">
+        <!-- =================================================
+             QUIÉNES SOMOS
+        ================================================== -->
 
-                        <i class="bi bi-search"></i>
+        <section id="quienes-somos"
+            class="quienes-somos">
 
-                        <input type="search"
-                            id="buscadorProductos"
-                            class="form-control"
-                            placeholder="Buscar productos..."
-                            autocomplete="off">
+            <div class="container">
+
+                <div class="row align-items-center g-5">
+
+
+                    <div class="col-12 col-lg-6">
+
+                        <img src="img/casual.jpg"
+                            alt="Moda & Estilo"
+                            class="quienes-somos-imagen">
+
+                    </div>
+
+
+                    <div class="col-12 col-lg-6">
+
+                        <div class="quienes-somos-texto">
+
+                            <span class="text-gold fw-semibold text-uppercase">
+                                Moda & Estilo
+                            </span>
+
+                            <h2 class="fw-bold text-uppercase mt-2">
+
+                                Quiénes Somos
+
+                            </h2>
+
+                            <div class="linea-dorada"></div>
+
+                            <p>
+
+                                En Moda & Estilo creemos que la ropa es una
+                                forma de expresión. Por eso seleccionamos
+                                prendas y accesorios que combinan las
+                                tendencias actuales con diseños versátiles
+                                para acompañarte en cada ocasión.
+
+                            </p>
+
+                            <p>
+
+                                Nuestra propuesta busca entregar una
+                                experiencia de compra simple, moderna y
+                                segura, ofreciendo alternativas para
+                                distintos estilos y personalidades.
+
+                            </p>
+
+                            <a href="productos.html"
+                                class="btn btn-fashion rounded-pill px-4 mt-2">
+
+                                Explorar productos
+
+                                <i class="bi bi-arrow-right ms-2"></i>
+
+                            </a>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-                <div class="col-12 col-md-6 col-lg-3">
+            </div>
 
-                    <select id="filtroCategoria"
-                        class="form-select">
+        </section>
 
-                        <option value="todos">
 
-                            Todas las categorías
+        <!-- =================================================
+             COLECCIONES
+        ================================================== -->
 
-                        </option>
+        <section class="colecciones-section">
 
-                        <option value="urbano">
+            <div class="container">
 
-                            Estilo Urbano
+                <div class="text-center mb-5">
 
-                        </option>
+                    <span class="text-gold fw-semibold text-uppercase">
+                        Descubre tu estilo
+                    </span>
 
-                        <option value="casual">
+                    <h2 class="titulo-seccion fw-bold text-uppercase mt-2">
 
-                            Colección Casual
+                        Nuestras Colecciones
 
-                        </option>
+                    </h2>
 
-                        <option value="formal">
+                    <p class="subtitulo-seccion mt-3">
 
-                            Línea Formal
+                        Encuentra prendas y accesorios pensados para
+                        acompañarte en cada momento.
 
-                        </option>
-
-                        <option value="accesorios">
-
-                            Accesorios
-
-                        </option>
-
-                    </select>
+                    </p>
 
                 </div>
 
-                <div class="col-12 col-md-6 col-lg-3">
 
-                    <select id="ordenProductos"
-                        class="form-select">
+                <div class="row g-4">
 
-                        <option value="default">
 
-                            Ordenar por
+                    <!-- ESTILO URBANO -->
 
-                        </option>
+                    <div class="col-12 col-sm-6 col-lg-3">
 
-                        <option value="nombre-asc">
+                        <div class="coleccion-card shadow-sm">
 
-                            Nombre: A → Z
+                            <img src="img/urbana.jpg"
+                                alt="Estilo Urbano">
 
-                        </option>
+                            <div class="card-body d-flex flex-column">
 
-                        <option value="nombre-desc">
+                                <h5 class="fw-bold">
 
-                            Nombre: Z → A
+                                    <i class="bi bi-buildings coleccion-icon"></i>
 
-                        </option>
+                                    Estilo Urbano
 
-                        <option value="precio-asc">
+                                </h5>
 
-                            Precio: menor a mayor
+                                <p class="mb-4">
 
-                        </option>
+                                    Diseños modernos inspirados en la moda
+                                    de calle, combinando comodidad y
+                                    personalidad para tu día a día.
 
-                        <option value="precio-desc">
+                                </p>
 
-                            Precio: mayor a menor
+                                <a href="productos.html?categoria=urbano"
+                                    class="btn btn-fashion mt-auto rounded-pill">
 
-                        </option>
+                                    Explorar
 
-                    </select>
+                                    <i class="bi bi-arrow-right ms-2"></i>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- COLECCIÓN CASUAL -->
+
+                    <div class="col-12 col-sm-6 col-lg-3">
+
+                        <div class="coleccion-card shadow-sm">
+
+                            <img src="img/casual.jpg"
+                                alt="Colección Casual">
+
+                            <div class="card-body d-flex flex-column">
+
+                                <h5 class="fw-bold">
+
+                                    <i class="bi bi-sun coleccion-icon"></i>
+
+                                    Colección Casual
+
+                                </h5>
+
+                                <p class="mb-4">
+
+                                    Prendas esenciales y versátiles que
+                                    combinan comodidad, estilo y calidad
+                                    para cualquier ocasión.
+
+                                </p>
+
+                                <a href="productos.html?categoria=casual"
+                                    class="btn btn-fashion mt-auto rounded-pill">
+
+                                    Explorar
+
+                                    <i class="bi bi-arrow-right ms-2"></i>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LÍNEA FORMAL -->
+
+                    <div class="col-12 col-sm-6 col-lg-3">
+
+                        <div class="coleccion-card shadow-sm">
+
+                            <img src="img/formal.jpg"
+                                alt="Línea Formal">
+
+                            <div class="card-body d-flex flex-column">
+
+                                <h5 class="fw-bold">
+
+                                    <i class="bi bi-stars coleccion-icon"></i>
+
+                                    Línea Formal
+
+                                </h5>
+
+                                <p class="mb-4">
+
+                                    Cortes sofisticados y acabados de primera
+                                    calidad para ocasiones especiales y
+                                    momentos importantes.
+
+                                </p>
+
+                                <a href="productos.html?categoria=formal"
+                                    class="btn btn-fashion mt-auto rounded-pill">
+
+                                    Explorar
+
+                                    <i class="bi bi-arrow-right ms-2"></i>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACCESORIOS -->
+
+                    <div class="col-12 col-sm-6 col-lg-3">
+
+                        <div class="coleccion-card shadow-sm">
+
+                            <img src="img/accesorios.jpg"
+                                alt="Accesorios">
+
+                            <div class="card-body d-flex flex-column">
+
+                                <h5 class="fw-bold">
+
+                                    <i class="bi bi-gem coleccion-icon"></i>
+
+                                    Accesorios
+
+                                </h5>
+
+                                <p class="mb-4">
+
+                                    El detalle final que complementa tu look
+                                    y transforma cualquier atuendo.
+
+                                </p>
+
+                                <a href="productos.html?categoria=accesorios"
+                                    class="btn btn-fashion mt-auto rounded-pill">
+
+                                    Ver accesorios
+
+                                    <i class="bi bi-arrow-right ms-2"></i>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
             </div>
 
-            <p class="resultado-catalogo">
+        </section>
 
-                Mostrando
 
-                <strong id="contadorResultados">
+        <!-- =================================================
+             LO QUE NOS REPRESENTA
+        ================================================== -->
 
-                    0
+        <section class="valores-section">
 
-                </strong>
+            <div class="container">
 
-                productos
+                <div class="text-center mb-5">
 
-            </p>
+                    <span class="text-gold fw-semibold text-uppercase">
+
+                        Nuestra esencia
+
+                    </span>
+
+                    <h2 class="fw-bold text-uppercase mt-2">
+
+                        Lo que nos representa
+
+                    </h2>
+
+                    <p class="valores-subtitulo mt-3">
+
+                        Tres pilares que forman parte de nuestra manera
+                        de entender la moda y la experiencia de nuestros clientes.
+
+                    </p>
+
+                </div>
+
+
+                <div class="row g-4">
+
+
+                    <!-- CALIDAD -->
+
+                    <div class="col-12 col-md-4">
+
+                        <div class="valor-card">
+
+                            <div class="valor-icon">
+
+                                <i class="bi bi-award"></i>
+
+                            </div>
+
+                            <h4>
+
+                                Calidad
+
+                            </h4>
+
+                            <p>
+
+                                Seleccionamos nuestros productos buscando
+                                entregar una experiencia que combine diseño,
+                                comodidad y calidad.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ESTILO -->
+
+                    <div class="col-12 col-md-4">
+
+                        <div class="valor-card">
+
+                            <div class="valor-icon">
+
+                                <i class="bi bi-stars"></i>
+
+                            </div>
+
+                            <h4>
+
+                                Estilo
+
+                            </h4>
+
+                            <p>
+
+                                Seguimos las tendencias actuales sin dejar
+                                de lado la personalidad y autenticidad de
+                                cada persona.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CONFIANZA -->
+
+                    <div class="col-12 col-md-4">
+
+                        <div class="valor-card">
+
+                            <div class="valor-icon">
+
+                                <i class="bi bi-shield-check"></i>
+
+                            </div>
+
+                            <h4>
+
+                                Confianza
+
+                            </h4>
+
+                            <p>
+
+                                Buscamos ofrecer una experiencia de compra
+                                sencilla, segura y transparente para nuestros
+                                clientes.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </section>
 
-        <div class="row g-4 justify-content-start"
-            id="contenedor-productos">
 
-        </div>
+        <!-- =================================================
+             MISIÓN Y VISIÓN
+        ================================================== -->
+
+        <section class="container mision-vision">
+
+            <div class="text-center mb-5">
+
+                <span class="text-gold fw-semibold text-uppercase">
+
+                    Nuestro propósito
+
+                </span>
+
+                <h2 class="fw-bold text-uppercase mt-2">
+
+                    Misión y Visión
+
+                </h2>
+
+            </div>
+
+
+            <div class="row g-4">
+
+
+                <!-- MISIÓN -->
+
+                <div class="col-md-6">
+
+                    <div class="mision-card">
+
+                        <h4 class="fw-bold">
+
+                            <i class="bi bi-bullseye text-gold me-2"></i>
+
+                            Nuestra Misión
+
+                        </h4>
+
+                        <p>
+
+                            Ofrecer prendas de vestir que combinen tendencia,
+                            confort y sostenibilidad, permitiendo a cada
+                            persona expresar su identidad única a través
+                            de la moda.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VISIÓN -->
+
+                <div class="col-md-6">
+
+                    <div class="mision-card">
+
+                        <h4 class="fw-bold">
+
+                            <i class="bi bi-eye text-gold me-2"></i>
+
+                            Nuestra Visión
+
+                        </h4>
+
+                        <p>
+
+                            Convertirnos en la marca líder de moda urbana e
+                            indumentaria en la región, reconocida por nuestra
+                            calidad superior, innovación continua y compromiso
+                            socioambiental.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
 
     </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
 
     <footer class="footer-custom pt-5 pb-3 mt-auto">
 
         <div class="container">
 
             <div class="row g-4 align-items-start mb-4">
+
+
+                <!-- MODA & ESTILO -->
 
                 <div class="col-12 col-md-4">
 
@@ -596,6 +1045,9 @@
                     </div>
 
                 </div>
+
+
+                <!-- CONTACTO -->
 
                 <div class="col-12 col-md-4">
 
@@ -649,6 +1101,9 @@
                     </p>
 
                 </div>
+
+
+                <!-- REDES SOCIALES -->
 
                 <div class="col-12 col-md-4">
 
@@ -724,7 +1179,11 @@
 
             </div>
 
+
             <hr class="border-secondary border-opacity-25 my-3">
+
+
+            <!-- COPYRIGHT -->
 
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 text-white-50 small">
 
@@ -754,524 +1213,14 @@
 
     </footer>
 
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="js/main.js"></script>
-
-    <script>
-
-        const nombresCategorias = {
-
-            'urbano': 'Estilo Urbano',
-
-            'casual': 'Colección Casual',
-
-            'formal': 'Línea Formal',
-
-            'accesorios': 'Accesorios'
-
-        };
-
-        let todosLosProductos = [];
-
-        let categoriaActual = 'todos';
-
-        let textoBusqueda = '';
-
-        let ordenActual = 'default';
-
-        function renderCatalogo() {
-
-            const contenedor =
-                document.getElementById('contenedor-productos');
-
-            if (!contenedor) return;
-
-            const urlParams =
-                new URLSearchParams(window.location.search);
-
-            const categoriaURL =
-                urlParams.get('categoria');
-
-            todosLosProductos = obtenerProductos();
-
-            if (
-                categoriaURL &&
-                nombresCategorias[categoriaURL]
-            ) {
-
-                categoriaActual = categoriaURL;
-
-                document.getElementById('filtroCategoria').value =
-                    categoriaURL;
-
-                document.getElementById('titulo-catalogo').textContent =
-                    "Categoría: " +
-                    nombresCategorias[categoriaURL];
-
-                document.getElementById('subtitulo-catalogo').textContent =
-                    "Mostrando únicamente prendas de " +
-                    nombresCategorias[categoriaURL];
-
-                document.getElementById('btn-ver-todos')
-                    .classList.remove('d-none');
-
-            } else {
-
-                categoriaActual = 'todos';
-
-                document.getElementById('filtroCategoria').value =
-                    'todos';
-
-            }
-
-            aplicarFiltros();
-
-        }
-
-        function aplicarFiltros() {
-
-            const contenedor =
-                document.getElementById('contenedor-productos');
-
-            let productos =
-                [...todosLosProductos];
-
-            if (categoriaActual !== 'todos') {
-
-                productos =
-                    productos.filter(
-                        p =>
-                            p.categoriaSlug === categoriaActual
-                    );
-
-            }
-
-            if (textoBusqueda.trim() !== '') {
-
-                const texto =
-                    textoBusqueda
-                        .trim()
-                        .toLowerCase();
-
-                productos =
-                    productos.filter(p => {
-
-                        const nombre =
-                            String(p.nombre || '')
-                                .toLowerCase();
-
-                        const descripcion =
-                            String(p.desc || '')
-                                .toLowerCase();
-
-                        const categoria =
-                            String(p.categoria || '')
-                                .toLowerCase();
-
-                        return (
-                            nombre.includes(texto) ||
-                            descripcion.includes(texto) ||
-                            categoria.includes(texto)
-                        );
-
-                    });
-
-            }
-
-            switch (ordenActual) {
-
-                case 'nombre-asc':
-
-                    productos.sort((a, b) =>
-                        String(a.nombre)
-                            .localeCompare(
-                                String(b.nombre),
-                                'es'
-                            )
-                    );
-
-                    break;
-
-                case 'nombre-desc':
-
-                    productos.sort((a, b) =>
-                        String(b.nombre)
-                            .localeCompare(
-                                String(a.nombre),
-                                'es'
-                            )
-                    );
-
-                    break;
-
-                case 'precio-asc':
-
-                    productos.sort(
-                        (a, b) =>
-                            Number(a.precio) -
-                            Number(b.precio)
-                    );
-
-                    break;
-
-                case 'precio-desc':
-
-                    productos.sort(
-                        (a, b) =>
-                            Number(b.precio) -
-                            Number(a.precio)
-                    );
-
-                    break;
-
-            }
-
-            document.getElementById('contadorResultados')
-                .textContent = productos.length;
-
-            if (productos.length === 0) {
-
-                contenedor.innerHTML = `
-
-                    <div class="col-12">
-
-                        <div class="sin-resultados">
-
-                            <i class="bi bi-search"></i>
-
-                            <h4>
-                                No encontramos productos
-                            </h4>
-
-                            <p>
-                                Prueba con otro nombre,
-                                descripción o categoría.
-                            </p>
-
-                            <button
-                                type="button"
-                                class="btn btn-fashion rounded-pill px-4"
-                                onclick="limpiarFiltros()">
-
-                                <i class="bi bi-arrow-counterclockwise me-1"></i>
-
-                                Limpiar filtros
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                `;
-
-                return;
-
-            }
-
-            contenedor.innerHTML = '';
-
-            productos.forEach(p => {
-
-                const badgeAgotado =
-                    p.stock === 0
-
-                        ? `
-
-                            <span
-                                class="badge bg-danger position-absolute top-0 start-0 m-2 z-1 px-2 py-1">
-
-                                Agotado
-
-                            </span>
-
-                        `
-
-                        : '';
-
-                const disabledAttr =
-                    p.stock === 0
-                        ? 'disabled'
-                        : '';
-
-                contenedor.innerHTML += `
-
-                    <div
-                        class="col-12 col-sm-6 col-md-4 col-lg-3 tarjeta-producto"
-                        data-categoria="${p.categoriaSlug}">
-
-                        <div
-                            class="card producto-card shadow-sm position-relative">
-
-                            ${badgeAgotado}
-
-                            <button
-
-                                type="button"
-
-                                class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm border-0 z-1 btn-favorito"
-
-                                data-id="${escaparHTML(String(p.id))}"
-
-                                aria-label="Agregar a favoritos"
-
-                                aria-pressed="false"
-
-                                title="Agregar a favoritos">
-
-                                <i
-                                    class="bi bi-heart text-gold"
-                                    aria-hidden="true">
-                                </i>
-
-                            </button>
-
-                            <div
-                                class="producto-imagen-container">
-
-                                <a
-                                    href="producto-detalle.html?id=${p.id}">
-
-                                    <img
-
-                                        src="${p.img}"
-
-                                        class="card-img-top"
-
-                                        alt="${escaparHTML(p.nombre)}"
-
-                                    >
-
-                                </a>
-
-                            </div>
-
-                            <div
-                                class="card-body">
-
-                                <span
-                                    class="badge bg-light text-dark border align-self-start producto-categoria mb-2">
-
-                                    ${escaparHTML(p.categoria)}
-
-                                </span>
-
-                                <h5
-                                    class="producto-titulo">
-
-                                    <a
-                                        href="producto-detalle.html?id=${p.id}"
-                                        class="text-decoration-none">
-
-                                        ${escaparHTML(p.nombre)}
-
-                                    </a>
-
-                                </h5>
-
-                                <p
-                                    class="producto-descripcion">
-
-                                    ${escaparHTML(p.desc)}
-
-                                </p>
-
-                                <div class="mt-auto">
-
-                                    <div
-                                        class="d-flex align-items-end justify-content-between gap-2 mb-2">
-
-                                        <div>
-                                            <span class="precio-producto">
-                                                $${p.precio.toLocaleString('es-CL')}
-                                            </span>
-                                        </div>
-
-                                        <div>
-                                            <label
-                                                class="cantidad-label"
-                                                for="cantidad-${p.id}">
-                                                Cantidad
-                                            </label>
-
-                                            <input
-                                                type="number"
-                                                id="cantidad-${p.id}"
-                                                class="form-control form-control-sm cantidad-producto"
-                                                min="1"
-                                                max="${p.stock > 0 ? p.stock : 1}"
-                                                value="1"
-                                                ${disabledAttr}>
-                                        </div>
-
-                                    </div>
-
-                                    <button
-                                        type="button"
-                                        class="btn btn-agregar-producto btn-sm w-100 btn-agregar-carrito agregar-carrito"
-                                        data-id="${p.id}"
-                                        data-nombre="${escaparHTML(p.nombre)}"
-                                        data-precio="${p.precio}"
-                                        data-imagen="${p.img}"
-                                        data-stock="${p.stock}"
-                                        ${disabledAttr}>
-
-                                        <i class="bi bi-cart-plus me-1"></i>
-
-                                        ${p.stock === 0
-                                            ? 'Sin stock'
-                                            : 'Agregar al carrito'}
-
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            });
-
-            actualizarBotonesFavoritos();
-
-        }
-
-        document
-            .getElementById('buscadorProductos')
-            .addEventListener('input', function () {
-
-                textoBusqueda =
-                    this.value;
-
-                aplicarFiltros();
-
-            });
-
-        document
-            .getElementById('filtroCategoria')
-            .addEventListener('change', function () {
-
-                categoriaActual =
-                    this.value;
-
-                const nuevaURL =
-                    categoriaActual === 'todos'
-
-                        ? 'productos.html'
-
-                        : 'productos.html?categoria=' +
-                          encodeURIComponent(categoriaActual);
-
-                window.history.replaceState(
-                    {},
-                    '',
-                    nuevaURL
-                );
-
-                if (categoriaActual === 'todos') {
-
-                    document.getElementById('titulo-catalogo')
-                        .textContent =
-                        'Catálogo de Productos';
-
-                    document.getElementById('subtitulo-catalogo')
-                        .textContent =
-                        'Descubre las últimas tendencias en moda urbana e indumentaria de alta calidad';
-
-                    document.getElementById('btn-ver-todos')
-                        .classList.add('d-none');
-
-                } else {
-
-                    document.getElementById('titulo-catalogo')
-                        .textContent =
-                        'Categoría: ' +
-                        nombresCategorias[categoriaActual];
-
-                    document.getElementById('subtitulo-catalogo')
-                        .textContent =
-                        'Mostrando únicamente prendas de ' +
-                        nombresCategorias[categoriaActual];
-
-                    document.getElementById('btn-ver-todos')
-                        .classList.remove('d-none');
-
-                }
-
-                aplicarFiltros();
-
-            });
-
-        document
-            .getElementById('ordenProductos')
-            .addEventListener('change', function () {
-
-                ordenActual =
-                    this.value;
-
-                aplicarFiltros();
-
-            });
-
-        function limpiarFiltros() {
-
-            textoBusqueda = '';
-
-            categoriaActual = 'todos';
-
-            ordenActual = 'default';
-
-            document.getElementById('buscadorProductos')
-                .value = '';
-
-            document.getElementById('filtroCategoria')
-                .value = 'todos';
-
-            document.getElementById('ordenProductos')
-                .value = 'default';
-
-            document.getElementById('titulo-catalogo')
-                .textContent =
-                'Catálogo de Productos';
-
-            document.getElementById('subtitulo-catalogo')
-                .textContent =
-                'Descubre las últimas tendencias en moda urbana e indumentaria de alta calidad';
-
-            document.getElementById('btn-ver-todos')
-                .classList.add('d-none');
-
-            window.history.replaceState(
-                {},
-                '',
-                'productos.html'
-            );
-
-            aplicarFiltros();
-
-        }
-
-        document
-            .getElementById('btn-ver-todos')
-            .addEventListener('click', function (e) {
-
-                e.preventDefault();
-
-                limpiarFiltros();
-
-            });
-
-        document.addEventListener(
-            'DOMContentLoaded',
-            renderCatalogo
-        );
-
-    </script>
 
 </body>
 
