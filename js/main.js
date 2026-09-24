@@ -351,13 +351,43 @@ function renderizarCarrito() {
     contenedor.querySelectorAll('.cantidad-item').forEach(input => {
         input.addEventListener('change', (e) => {
             const idx = parseInt(e.target.getAttribute('data-index'), 10);
-            const nuevaCant = parseInt(e.target.value, 10);
+            const nuevaCant = Number(e.target.value);
             let cart = obtenerCarrito();
-            if (nuevaCant >= 1 && cart[idx]) {
-                cart[idx].cantidad = nuevaCant;
-                guardarCarrito(cart);
+            if (!cart[idx]) return;
+
+            const producto = obtenerProductoPorId(cart[idx].id);
+
+            const otrasUnidades = cart.reduce((total, item, posicion) => {
+                if (
+                    posicion !== idx &&
+                    String(item.id) === String(cart[idx].id)
+                ) {
+                    return total + Number(item.cantidad);
+                }
+
+                return total;
+            }, 0);
+
+            if (
+                !Number.isSafeInteger(nuevaCant) ||
+                nuevaCant <= 0 ||
+                !Number.isSafeInteger(otrasUnidades) ||
+                otrasUnidades < 0 ||
+                !producto ||
+                producto.activo === false ||
+                nuevaCant + otrasUnidades > Number(producto.stock)
+            ) {
+                mostrarAviso(
+                    'Revisa la cantidad',
+                    'Usa un número entero mayor que cero y dentro del stock disponible.'
+                );
                 renderizarCarrito();
+                return;
             }
+
+            cart[idx].cantidad = nuevaCant;
+            guardarCarrito(cart);
+            renderizarCarrito();
         });
     });
 
@@ -520,37 +550,121 @@ function inicializarCheckout() {
                         return;
                     }
 
+                    const [mes, anio] = exp.split('/').map(Number);
+                    const finVigencia = new Date(2000 + anio, mes, 1);
+
+                    if (finVigencia <= new Date()) {
+                        await mostrarAviso(
+                            'Tarjeta vencida',
+                            'La fecha de vencimiento debe ser vigente.'
+                        );
+                        return;
+                    }
+
                     if (inputCvv.value !== '123') {
                         await mostrarAviso('CVV de demostración', 'El CVV de prueba es 123.');
                         return;
                     }
                 }
+                const firmaCarrito = JSON.stringify(carritoActual);
+                const firmaProductos = JSON.stringify(obtenerProductos());
+                const firmaUsuario = localStorage.getItem('usuario_activo');
 
+                const leerFormulario = () => JSON.stringify(
+                    Array.from(
+                        formCheckout.querySelectorAll('input, select, textarea')
+                    ).map(campo => [
+                        campo.id,
+                        campo.value,
+                        campo.checked
+                    ])
+                );
+
+                const firmaFormulario = leerFormulario();
                 const confirmado = await pedirConfirmacion(
                     'Confirmar compra simulada',
                     'Total: ' + totalPagoElem.textContent + '. ¿Quieres continuar con el pedido?'
                 );
                 if (!confirmado) return;
+                if (
+                    JSON.stringify(obtenerCarrito()) !== firmaCarrito ||
+                    JSON.stringify(obtenerProductos()) !== firmaProductos ||
+                    localStorage.getItem('usuario_activo') !== firmaUsuario ||
+                    leerFormulario() !== firmaFormulario
+                ) {
+                    throw new Error(
+                        'La compra cambió mientras confirmabas. Recarga la página y revisa nuevamente el resumen.'
+                    );
+                }
 
                 const productosDB = obtenerProductos();
                 let montoTotalVenta = 0;
                 const cantidades = new Map();
 
                 carritoActual.forEach(item => {
-                    const id = String(item.id);
-                    cantidades.set(id, (cantidades.get(id) || 0) + Number(item.cantidad));
-                });
+                    const cantidad = Number(item.cantidad);
 
-                cantidades.forEach((cantidad, id) => {
-                    const p = productosDB.find(p => String(p.id) === id);
-                    if (!p || p.activo === false || cantidad > p.stock) {
-                        throw new Error('Un producto ya no está disponible en la cantidad solicitada.');
+                    if (!Number.isSafeInteger(cantidad) || cantidad <= 0) {
+                        throw new Error(
+                            'Hay una cantidad inválida en el carrito. Revísalo antes de comprar.'
+                        );
+                    }
+
+                    const producto = productosDB.find(
+                        p => String(p.id) === String(item.id)
+                    );
+
+                    if (!producto || producto.activo === false) {
+                        throw new Error(
+                            'Un producto del carrito ya no está disponible.'
+                        );
+                    }
+
+                    const precioActual = Number(producto.precio);
+                    const stockActual = Number(producto.stock);
+
+                    if (
+                        !Number.isSafeInteger(precioActual) ||
+                        precioActual <= 0 ||
+                        !Number.isSafeInteger(stockActual) ||
+                        stockActual < 0
+                    ) {
+                        throw new Error(
+                            'Un producto tiene información inválida. Contacta al administrador.'
+                        );
+                    }
+
+                    if (Number(item.precio) !== precioActual) {
+                        throw new Error(
+                            'Cambió el precio de un producto. Quítalo del carrito y agrégalo nuevamente para revisar el precio actualizado.'
+                        );
+                    }
+
+                    const id = String(item.id);
+                    const acumulada = (cantidades.get(id) || 0) + cantidad;
+
+                    if (!Number.isSafeInteger(acumulada)) {
+                        throw new Error('La cantidad solicitada no es válida.');
+                    }
+
+                    cantidades.set(id, acumulada);
+                    montoTotalVenta += precioActual * cantidad;
+
+                    if (!Number.isSafeInteger(montoTotalVenta)) {
+                        throw new Error('El total de la compra no es válido.');
                     }
                 });
 
-                carritoActual.forEach(item => {
-                    const p = productosDB.find(p => String(p.id) === String(item.id));
-                    montoTotalVenta += Number(p.precio) * Number(item.cantidad);
+                cantidades.forEach((cantidad, id) => {
+                    const producto = productosDB.find(
+                        p => String(p.id) === id
+                    );
+
+                    if (cantidad > Number(producto.stock)) {
+                        throw new Error(
+                            'No queda stock suficiente para completar esta compra.'
+                        );
+                    }
                 });
 
                 cantidades.forEach((cantidad, id) => {
@@ -577,6 +691,13 @@ function inicializarCheckout() {
                 const ubicaFormateada = `${comuna}, ${ciudad}, ${region} (CP: ${postal})`;
 
                 const nuevoPedido = {
+                    usuarioId: usuarioActivo && usuarioActivo.id != null
+                        ? String(usuarioActivo.id)
+                        : null,
+
+                    fechaISO: new Date().toISOString(),
+                    stockDescontado: true,
+                    stockDevuelto: false,
                     id: 'PED-' + Math.floor(100000 + Math.random() * 900000),
                     fecha: new Date().toLocaleDateString('es-CL'),
                     clienteNombre: `${nombre} ${apellido}`.trim() || 'Cliente Sin Nombre',
@@ -673,11 +794,90 @@ function guardarNuevoPedido(nuevoPedido) {
 }
 
 function actualizarEstadoPedidoEnStorage(idPedido, nuevoEstado) {
-    let pedidos = obtenerPedidos();
-    const idx = pedidos.findIndex(p => p.id === idPedido);
-    if (idx !== -1) {
-        pedidos[idx].estado = nuevoEstado;
+    const pedidos = obtenerPedidos();
+    const pedido = pedidos.find(p => p.id === idPedido);
+
+    if (!pedido) {
+        throw new Error('El pedido ya no existe.');
+    }
+
+    if (pedido.estado === nuevoEstado) return;
+
+    const transiciones = {
+        'Pendiente de Pago': ['Recibido', 'Cancelado'],
+        'Recibido': ['Preparando', 'Cancelado'],
+        'Preparando': ['Enviado', 'Cancelado'],
+        'Enviado': ['Entregado'],
+        'Entregado': [],
+        'Cancelado': []
+    };
+
+    const permitidos = transiciones[pedido.estado] || [];
+
+    if (!permitidos.includes(nuevoEstado)) {
+        throw new Error(
+            `No se puede pasar de "${pedido.estado}" a "${nuevoEstado}".`
+        );
+    }
+
+    let productosOriginales = null;
+
+    if (nuevoEstado === 'Cancelado' && !pedido.stockDevuelto) {
+        if (pedido.stockDescontado !== true) {
+            throw new Error(
+                'Este pedido antiguo o de ejemplo no tiene registro del descuento de stock. Debe revisarse antes de devolver existencias.'
+            );
+        }
+
+        productosOriginales = obtenerProductos();
+
+        const productos = productosOriginales.map(
+            producto => ({ ...producto })
+        );
+
+        pedido.items.forEach(item => {
+            const cantidad = Number(item.cantidad);
+
+            if (!Number.isSafeInteger(cantidad) || cantidad <= 0) {
+                throw new Error(
+                    'El pedido contiene una cantidad inválida.'
+                );
+            }
+
+            const producto = productos.find(
+                p => String(p.id) === String(item.id)
+            );
+
+            // Un producto eliminado no se vuelve a crear automáticamente.
+            if (!producto) return;
+
+            const nuevoStock = Number(producto.stock) + cantidad;
+
+            if (!Number.isSafeInteger(nuevoStock) || nuevoStock < 0) {
+                throw new Error(
+                    'No se pudo calcular la devolución de stock.'
+                );
+            }
+
+            producto.stock = nuevoStock;
+        });
+
+        guardarProductos(productos);
+        pedido.stockDevuelto = true;
+    }
+
+    pedido.estado = nuevoEstado;
+    pedido.actualizadoEn = new Date().toISOString();
+
+    try {
         localStorage.setItem(PEDIDOS_KEY, JSON.stringify(pedidos));
+    } catch (error) {
+        // Recupera el stock si falla el guardado del pedido.
+        if (productosOriginales) {
+            guardarProductos(productosOriginales);
+        }
+
+        throw error;
     }
 }
 
@@ -786,30 +986,49 @@ function inicializarPanelAdminPedidos() {
         if (modalDetalle) modalDetalle.show();
     }
 
-    const btnGuardarEstado = document.getElementById('btnGuardarEstadoPedido');
+    const btnGuardarEstado =
+        document.getElementById('btnGuardarEstadoPedido');
+
     if (btnGuardarEstado) {
         btnGuardarEstado.onclick = async () => {
-            if (!pedidoSeleccionadoActual) return;
-            const nuevoEst = document.getElementById('selectEstadoPedidoModal').value;
-            const estadoAnterior = pedidoSeleccionadoActual.estado;
-
-            if (nuevoEst === 'Cancelado' && estadoAnterior !== 'Cancelado') {
-                const productosDB = obtenerProductos();
-                pedidoSeleccionadoActual.items.forEach(item => {
-                    const prod = productosDB.find(p => String(p.id) === String(item.id) || p.nombre === item.nombre);
-                    if (prod) {
-                        prod.stock = Number(prod.stock || 0) + Number(item.cantidad || 0);
-                    }
-                });
-                guardarProductos(productosDB);
+            if (!pedidoSeleccionadoActual || btnGuardarEstado.disabled) {
+                return;
             }
 
-            actualizarEstadoPedidoEnStorage(pedidoSeleccionadoActual.id, nuevoEst);
-            if (modalDetalle) modalDetalle.hide();
-            await mostrarAviso('Pedido Actualizado', `El pedido ${pedidoSeleccionadoActual.id} ahora está en estado "${nuevoEst}".`);
-            renderTablaPedidos();
-            if (typeof inicializarPanelAdminProductos === 'function') {
-                inicializarPanelAdminProductos();
+            btnGuardarEstado.disabled = true;
+
+            try {
+                const nuevoEstado =
+                    document.getElementById('selectEstadoPedidoModal').value;
+
+                actualizarEstadoPedidoEnStorage(
+                    pedidoSeleccionadoActual.id,
+                    nuevoEstado
+                );
+
+                if (modalDetalle) {
+                    modalDetalle.hide();
+                }
+
+                renderTablaPedidos();
+
+                document.dispatchEvent(
+                    new Event('productosActualizados')
+                );
+
+                inicializarGraficoVentas();
+
+                await mostrarAviso(
+                    'Pedido actualizado',
+                    'Se guardó el estado del pedido.'
+                );
+            } catch (error) {
+                await mostrarAviso(
+                    'No se pudo actualizar',
+                    error.message
+                );
+            } finally {
+                btnGuardarEstado.disabled = false;
             }
         };
     }
@@ -840,23 +1059,76 @@ function inicializarGraficoVentas() {
     if (!canvas || typeof Chart === 'undefined') return;
 
     const ctx = canvas.getContext('2d');
-    const ventas = obtenerVentasHistorial();
-    const totalVentasRegistradas = ventas.reduce((acc, v) => acc + (v.monto || 0), 0);
+    const ahora = new Date();
+
+    const estadosContabilizados = [
+        'Recibido',
+        'Preparando',
+        'Enviado',
+        'Entregado'
+    ];
+
+    const ventas = obtenerPedidos()
+        .filter(p =>
+            estadosContabilizados.includes(p.estado) &&
+            p.fechaISO &&
+            Number.isFinite(Number(p.total))
+        )
+        .map(p => ({
+            monto: Number(p.total),
+            fecha: new Date(p.fechaISO)
+        }))
+        .filter(v => !Number.isNaN(v.fecha.getTime()));
+
+    const totalMes = ventas
+        .filter(v =>
+            v.fecha.getFullYear() === ahora.getFullYear() &&
+            v.fecha.getMonth() === ahora.getMonth()
+        )
+        .reduce((total, venta) => total + venta.monto, 0);
 
     const dashVentasMes = document.getElementById('dashVentasMes');
+
     if (dashVentasMes) {
-        dashVentasMes.textContent = `$${totalVentasRegistradas.toLocaleString('es-CL')}`;
+        dashVentasMes.textContent =
+            '$' + totalMes.toLocaleString('es-CL');
     }
 
-    const datosGrafico = [0, 0, 0, 0, 0, 0, totalVentasRegistradas];
-    if (window.miGraficoVentasInstance) {
-        window.miGraficoVentasInstance.destroy();
+    function claveDia(fecha) {
+        return [
+            fecha.getFullYear(),
+            fecha.getMonth(),
+            fecha.getDate()
+        ].join('-');
     }
+
+    const dias = Array.from({ length: 7 }, (_, indice) => {
+        return new Date(
+            ahora.getFullYear(),
+            ahora.getMonth(),
+            ahora.getDate() - 6 + indice
+        );
+    });
+
+    const etiquetasGrafico = dias.map(fecha =>
+        fecha.toLocaleDateString('es-CL', {
+            day: '2-digit',
+            month: '2-digit'
+        })
+    );
+
+    const datosGrafico = dias.map(dia =>
+        ventas
+            .filter(venta =>
+                claveDia(venta.fecha) === claveDia(dia)
+            )
+            .reduce((total, venta) => total + venta.monto, 0)
+    );
 
     window.miGraficoVentasInstance = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            labels: etiquetasGrafico,
             datasets: [{
                 label: 'Ventas ($)',
                 data: datosGrafico,
@@ -1094,6 +1366,11 @@ function inicializarPanelAdminProductos() {
         if (dashAlertas) dashAlertas.textContent = `${alertas} ítems bajos`;
     }
 
+    document.addEventListener(
+        'productosActualizados',
+        renderTablaAdmin
+    );  
+
     const btnAbrir = document.getElementById('btnAbrirModalAgregar');
     if (btnAbrir) {
         btnAbrir.addEventListener('click', () => {
@@ -1147,10 +1424,24 @@ function inicializarPanelAdminProductos() {
             const tallasTexto = document.getElementById('prodTallas').value.trim();
             const tallas = tallasTexto ? tallasTexto.split(',').map(t => t.trim()) : ['Talla Única'];
 
+            const categorias = {
+                'Ropa Urbana': 'urbano',
+                'Ropa Casual': 'casual',
+                'Ropa Formal': 'formal',
+                'Accesorios': 'accesorios'
+            };
+
             const productoData = {
                 id: id !== '-1' ? Number(id) : Date.now(),
-                nombre, categoria, precio, stock, img, desc, tallas
-            };
+                nombre,
+                categoria,
+                categoriaSlug: categorias[categoria],
+                precio,
+                stock,
+                img,
+                desc,
+                tallas
+            };  
 
             if (id !== '-1') {
                 actualizarProducto(productoData);
@@ -1339,7 +1630,12 @@ function renderizarHistorialUsuario() {
     }
 
     const pedidos = obtenerPedidos();
-    const misPedidos = pedidos.filter(p => p.clienteEmail && p.clienteEmail.toLowerCase() === usuarioActivo.email.toLowerCase());
+    const misPedidos = usuarioActivo.id == null
+    ? []
+    : pedidos.filter(p =>
+        p.usuarioId != null &&
+        String(p.usuarioId) === String(usuarioActivo.id)
+    );
 
     if (misPedidos.length === 0) {
         contenedor.innerHTML = '<div class="alert alert-light text-center border">Aún no has realizado ninguna compra.</div>';
