@@ -402,5 +402,225 @@ dialog[open] {
     .coleccion-card img {
         height: 250px;
     }
+
+    /* Correo del formulario de registro */
+.correo-registro {
+    --correo-acento: #d0aa79;
+    --correo-texto: #f5f5f5;
+    --correo-secundario: #b8bcc5;
+}
+
+.correo-registro > .form-label {
+    color: var(--correo-texto);
+    margin-bottom: 10px;
+}
+
+.correo-registro .correo-panel {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px;
+    background: #202329;
+    border: 1px solid #42464f;
+    border-radius: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.correo-registro .correo-panel:focus-within {
+    border-color: var(--correo-acento);
+    box-shadow: 0 0 0 3px rgb(208 170 121 / 15%);
+}
+
+.correo-registro .correo-icono {
+    display: grid;
+    place-items: center;
+    flex: 0 0 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgb(208 170 121 / 12%);
+    color: var(--correo-acento);
+    font-size: 22px;
+}
+
+.correo-registro .correo-campos {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.correo-registro .correo-campos label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--correo-secundario);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.correo-registro .form-control,
+.correo-registro .form-select {
+    min-height: 46px;
+    background-color: #16181d;
+    border: 1px solid #454a54;
+    border-radius: 9px;
+    color: var(--correo-texto);
+    font-size: 14px;
+    color-scheme: dark;
+}
+
+.correo-registro .form-control::placeholder {
+    color: #a5aab4;
+    opacity: 1;
+}
+
+.correo-registro .form-select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23d0aa79' stroke-width='2' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+}
+
+.correo-registro .form-control:focus,
+.correo-registro .form-select:focus {
+    background-color: #16181d;
+    color: var(--correo-texto);
+    border-color: var(--correo-acento);
+    box-shadow: 0 0 0 2px rgb(208 170 121 / 20%);
+}
+
+.correo-registro .correo-ayuda {
+    margin: 10px 2px 0;
+    color: var(--correo-secundario);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+@media (max-width: 575px) {
+    .correo-registro .correo-panel {
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .correo-registro .correo-campos {
+        grid-template-columns: 1fr;
+    }
+
+    .correo-registro .correo-icono {
+        flex-basis: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+}
+
+/* Correo del formulario de registro */
+.correo-registro {
+    --correo-acento: #d0aa79;
+    --correo-texto: #f5f5f5;
+    --correo-secundario: #b8bcc5;
+}
+
+.correo-registro > .form-label {
+    color: var(--correo-texto);
+    margin-bottom: 10px;
+}
+
+.correo-registro .correo-panel {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px;
+    background: #202329;
+    border: 1px solid #42464f;
+    border-radius: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.correo-registro .correo-panel:focus-within {
+    border-color: var(--correo-acento);
+    box-shadow: 0 0 0 3px rgb(208 170 121 / 15%);
+}
+
+.correo-registro .correo-icono {
+    display: grid;
+    place-items: center;
+    flex: 0 0 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgb(208 170 121 / 12%);
+    color: var(--correo-acento);
+    font-size: 22px;
+}
+
+.correo-registro .correo-campos {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.correo-registro .correo-campos label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--correo-secundario);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.correo-registro .form-control,
+.correo-registro .form-select {
+    min-height: 46px;
+    background-color: #16181d;
+    border: 1px solid #454a54;
+    border-radius: 9px;
+    color: var(--correo-texto);
+    font-size: 14px;
+    color-scheme: dark;
+}
+
+.correo-registro .form-control::placeholder {
+    color: #a5aab4;
+    opacity: 1;
+}
+
+.correo-registro .form-select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23d0aa79' stroke-width='2' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+}
+
+.correo-registro .form-control:focus,
+.correo-registro .form-select:focus {
+    background-color: #16181d;
+    color: var(--correo-texto);
+    border-color: var(--correo-acento);
+    box-shadow: 0 0 0 2px rgb(208 170 121 / 20%);
+}
+
+.correo-registro .correo-ayuda {
+    margin: 10px 2px 0;
+    color: var(--correo-secundario);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+@media (max-width: 575px) {
+    .correo-registro .correo-panel {
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .correo-registro .correo-campos {
+        grid-template-columns: 1fr;
+    }
+
+    .correo-registro .correo-icono {
+        flex-basis: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+}
  
 }

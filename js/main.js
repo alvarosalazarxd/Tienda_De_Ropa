@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     prepararAyudasFormulario();
     renderizarHistorialUsuario();
     inicializarFavoritos();
-    
+
     document.querySelectorAll('.btn-toggle-password').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -142,33 +142,40 @@ const PEDIDOS_KEY = 'pedidos_moda_estilo';
 const PRODUCTOS_KEY = 'productos_moda_estilo';
 
 function obtenerCarrito() {
-    // 1. Intentar leer desde los parámetros de la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const datosUrl = urlParams.get('data');
-    if (datosUrl) {
-        try {
-            return JSON.parse(decodeURIComponent(datosUrl));
-        } catch (e) {}
-    }
-    // 2. Leer del localStorage si existe el registro (incluso si es un arreglo vacío [])
+    // La clave principal tiene prioridad, incluso cuando contiene [].
+    // Las claves antiguas se consultan solamente si la principal no existe.
     try {
-        const data = localStorage.getItem('carrito') || localStorage.getItem(CARRITO_KEY) || localStorage.getItem('carritoCompras');
-        if (data !== null) {
-            return JSON.parse(data);
+        for (const clave of [CARRITO_KEY, 'carrito', 'carritoCompras']) {
+            const data = localStorage.getItem(clave);
+
+            if (data === null) continue;
+
+            const carrito = JSON.parse(data);
+
+            if (!Array.isArray(carrito)) return [];
+
+            if (clave !== CARRITO_KEY) {
+                localStorage.setItem(
+                    CARRITO_KEY,
+                    JSON.stringify(carrito)
+                );
+            }
+
+            return carrito;
         }
-    } catch (e) {}
-    // 3. Respaldo por defecto solo si es la primera sesión sin datos previos
-    return [
-        { id: 3, nombre: "Chaqueta Formal Fit", precio: 45990, cantidad: 2, talla: "Única", img: "img/formal.jpg" },
-        { id: 2, nombre: "Pantalón Jean Classic", precio: 29990, cantidad: 1, talla: "Única", img: "img/casual.jpg" }
-    ];
+    } catch (error) {
+        console.error('No se pudo leer el carrito:', error);
+    }
+
+    // Nunca agregar productos de ejemplo automáticamente.
+    return [];
 }
 function guardarCarrito(carrito) {
     try {
         localStorage.setItem('carrito', JSON.stringify(carrito));
         localStorage.setItem(CARRITO_KEY, JSON.stringify(carrito));
         localStorage.setItem('carritoCompras', JSON.stringify(carrito));
-    } catch (e) {}
+    } catch (e) { }
     actualizarContadorCarrito();
 }
 function actualizarContadorCarrito() {
@@ -317,13 +324,13 @@ function agregarAlCarrito(
 ) {
     const nombreLimpio =
         typeof nombre === 'string' &&
-        !nombre.includes('[object')
+            !nombre.includes('[object')
             ? nombre.trim()
             : 'Producto';
     const precioLimpio = parsearPrecio(precio);
     const imagenLimpia =
         typeof imagen === 'string' &&
-        !imagen.includes('[object')
+            !imagen.includes('[object')
             ? imagen
             : 'img/urbana.jpg';
     const tallaLimpia =
@@ -389,7 +396,7 @@ function agregarAlCarrito(
     guardarCarrito(carrito);
     renderizarCarrito();
 }
-window.eliminarDelCarrito = function(index) {
+window.eliminarDelCarrito = function (index) {
     let carrito = obtenerCarrito();
     if (index >= 0 && index < carrito.length) {
         carrito.splice(index, 1);
@@ -496,17 +503,12 @@ function renderizarCarrito() {
     });
 }
 function vaciarCarrito() {
-    // 1. Guardar un arreglo completamente vacío en localStorage
-    localStorage.setItem('carrito_moda_estilo', JSON.stringify([]));
-    
-    // Si usabas otra clave antigua, asegúrate de limpiarla también
-    localStorage.setItem('carritoCompras', JSON.stringify([]));
+    // Usa la función existente para actualizar todas las claves del carrito.
+    guardarCarrito([]);
 
-    // 2. Actualizar la vista del carrito y el contador del navbar
+    // Actualiza los productos mostrados.
     renderizarCarrito();
-    actualizarContadorCarrito();
 }
-
 // Vincular la acción al botón de vaciar
 function vincularBotonVaciar() {
     const btnVaciar = document.getElementById('btnVaciarCarrito');
@@ -521,17 +523,23 @@ function vincularBotonVaciar() {
 }
 function vincularBotonPagar() {
     const btnPagar = document.getElementById('btnPagar');
-    if (btnPagar) {
-        btnPagar.onclick = () => {
-            const carrito = obtenerCarrito();
-            if (carrito.length === 0) {
-                mostrarAviso('Carrito vacío', 'Agrega productos antes de proceder al pago.');
-                return;
-            }
-            const datosCodificados = encodeURIComponent(JSON.stringify(carrito));
-            window.location.href = 'checkout.html?data=' + datosCodificados;
-        };
-    }
+
+    if (!btnPagar) return;
+
+    btnPagar.onclick = () => {
+        const carrito = obtenerCarrito();
+
+        if (carrito.length === 0) {
+            mostrarAviso(
+                'Carrito vacío',
+                'Agrega productos antes de proceder al pago.'
+            );
+            return;
+        }
+
+        // El checkout recupera el carrito del almacenamiento.
+        window.location.href = 'checkout.html';
+    };
 }
 function inicializarCheckout() {
     const itemsContainer = document.getElementById('itemsCheckout');
@@ -577,6 +585,7 @@ function inicializarCheckout() {
         }
         radioTarjeta.addEventListener('change', toggleTarjeta);
         radioTransferencia.addEventListener('change', toggleTarjeta);
+        toggleTarjeta();
     }
     const carrito = obtenerCarrito();
     const formatoCLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
@@ -609,7 +618,7 @@ function inicializarCheckout() {
         let procesando = false;
         formCheckout.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (procesando) return;
+            if (procesando || !formCheckout.reportValidity()) return;
             const boton = formCheckout.querySelector('button[type="submit"]');
             procesando = true;
             boton.disabled = true;
@@ -617,18 +626,18 @@ function inicializarCheckout() {
                 // Validación estricta para números telefónicos de Chile (+569XXXXXXXX)
                 const telefono = document.getElementById('telefonoCheckout');
 
-if (telefono) {
-    // Eliminar espacios en blanco para la validación
-    const telLimpio = telefono.value.trim().replace(/\s+/g, '');
+                if (telefono) {
+                    // Eliminar espacios en blanco para la validación
+                    const telLimpio = telefono.value.trim().replace(/[\s-]+/g, '');
 
-    // Acepta: +56912345678, 56912345678 o 912345678
-    const esValido = /^(\+?56)?9\d{8}$/.test(telLimpio);
+                    // Acepta: +56912345678, 56912345678 o 912345678
+                    const esValido = /^(\+?56)?9\d{8}$/.test(telLimpio);
 
-    if (!esValido) {
-        await mostrarAviso('Teléfono inválido', 'Ingresa un número chileno válido de 9 dígitos (ej: 912345678 o +56912345678).');
-        return;
-    }
-}
+                    if (!esValido) {
+                        await mostrarAviso('Teléfono inválido', 'Ingresa un número chileno válido de 9 dígitos (ej: 912345678 o +56912345678).');
+                        return;
+                    }
+                }
                 const carritoActual = obtenerCarrito();
                 if (!carritoActual.length) {
                     await mostrarAviso('Carrito vacío', 'No hay productos en el pedido.');
@@ -659,13 +668,13 @@ if (telefono) {
                         return;
                     }
                 }
-                
+
                 const confirmado = await pedirConfirmacion(
                     'Confirmar compra simulada',
                     'Total: ' + totalPagoElem.textContent + '. ¿Quieres continuar con el pedido?'
                 );
                 if (!confirmado) return;
-                
+
                 const productosDB = obtenerProductos();
                 let montoTotalVenta = 0;
                 const cantidades = new Map();
@@ -679,14 +688,14 @@ if (telefono) {
                     const producto = productosDB.find(
                         p => String(p.id) === String(item.id)
                     );
-                    
+
                     const precioActual = producto ? Number(producto.precio) : parsearPrecio(item.precio);
                     const id = String(item.id);
                     const acumulada = (cantidades.get(id) || 0) + cantidad;
                     cantidades.set(id, acumulada);
                     montoTotalVenta += precioActual * cantidad;
                 });
-                
+
                 cantidades.forEach((cantidad, id) => {
                     const producto = productosDB.find(
                         p => String(p.id) === id
@@ -697,7 +706,7 @@ if (telefono) {
                 });
                 guardarProductos(productosDB);
                 let usuarioActivo = null;
-                try { usuarioActivo = JSON.parse(localStorage.getItem('usuario_activo')); } catch(err){}
+                try { usuarioActivo = JSON.parse(localStorage.getItem('usuario_activo')); } catch (err) { }
                 const nombre = document.getElementById('nombreCheckout')?.value || '';
                 const apellido = document.getElementById('apellidoCheckout')?.value || '';
                 const calle = document.getElementById('calleCheckout')?.value || '';
@@ -1096,7 +1105,7 @@ function inicializarGraficoVentas() {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             return '$' + context.parsed.y.toLocaleString('es-CL');
                         }
                     }
@@ -1107,7 +1116,7 @@ function inicializarGraficoVentas() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        callback: function(value) { return '$' + (value / 1000) + 'k'; }
+                        callback: function (value) { return '$' + (value / 1000) + 'k'; }
                     }
                 }
             }
@@ -1358,7 +1367,7 @@ function inicializarPanelAdminProductos() {
     document.addEventListener(
         'productosActualizados',
         renderTablaAdmin
-    );  
+    );
     const btnAbrir = document.getElementById('btnAbrirModalAgregar');
     if (btnAbrir) {
         btnAbrir.addEventListener('click', () => {
@@ -1423,7 +1432,7 @@ function inicializarPanelAdminProductos() {
                 img,
                 desc,
                 tallas
-            };  
+            };
             if (id !== '-1') {
                 actualizarProducto(productoData);
             } else {
@@ -1551,20 +1560,76 @@ function pedirConfirmacion(titulo, texto) {
     return abrirDialogo({ titulo, html: '<p>' + escaparHTML(texto) + '</p>', aceptar: 'Confirmar' });
 }
 function prepararAyudasFormulario() {
-    const telefono = document.getElementById('telefonoCheckout');
-    if (telefono) {
-        telefono.addEventListener('focus', function() {
-            if (!telefono.value.trim()) {
-                telefono.value = '+569';
+    const correo = document.getElementById('correoCheckout');
+
+    if (correo) {
+        correo.addEventListener('focus', () => {
+            if (correo.value === '@gmail.com') {
+                correo.setSelectionRange(0, 0);
             }
         });
-        telefono.addEventListener('input', function() {
-            let valor = telefono.value;
-            if (!valor.startsWith('+569')) {
-                valor = '+569' + valor.replace(/^\+?5?6?9?/, '');
+    }
+    const telefono = document.getElementById('telefonoCheckout');
+
+    if (telefono) {
+        const prefijo = '+56';
+
+        function formatearTelefono() {
+            let numero = telefono.value;
+
+            // Separar el prefijo de los números ingresados.
+            if (numero.startsWith(prefijo)) {
+                numero = numero.slice(prefijo.length);
             }
-            const numerosAdicionales = valor.slice(4).replace(/\D/g, '').slice(0, 8);
-            telefono.value = '+569' + numerosAdicionales;
+
+            // Permitir solamente 9 dígitos después del +56.
+            numero = numero.replace(/\D/g, '').slice(0, 9);
+
+            telefono.value = prefijo + numero;
+        }
+
+        // Mostrar el prefijo desde el inicio.
+        formatearTelefono();
+
+        telefono.addEventListener('input', formatearTelefono);
+
+        // Evitar borrar el prefijo con Backspace o Suprimir.
+        telefono.addEventListener('keydown', (evento) => {
+            const inicio = telefono.selectionStart;
+            const fin = telefono.selectionEnd;
+
+            if (
+                (evento.key === 'Backspace' && inicio <= 3) ||
+                (evento.key === 'Delete' && inicio < 3)
+            ) {
+                evento.preventDefault();
+
+                // Si hay números seleccionados, eliminarlos
+                // conservando siempre el prefijo.
+                if (fin > 3) {
+                    telefono.value =
+                        prefijo + telefono.value.slice(fin);
+
+                    telefono.setSelectionRange(3, 3);
+                }
+            }
+        });
+
+        // Al entrar al campo, ubicar el cursor después del prefijo.
+        telefono.addEventListener('focus', () => {
+            if (telefono.value === prefijo) {
+                telefono.setSelectionRange(3, 3);
+            }
+        });
+    }
+
+    const postal = document.getElementById('postalCheckout');
+
+    if (postal) {
+        postal.addEventListener('input', () => {
+            postal.value = postal.value
+                .replace(/\D/g, '')
+                .slice(0, 7);
         });
     }
 }
@@ -1572,18 +1637,18 @@ function renderizarHistorialUsuario() {
     const contenedor = document.getElementById('contenedorHistorialUsuario');
     if (!contenedor) return;
     let usuarioActivo = null;
-    try { usuarioActivo = JSON.parse(localStorage.getItem('usuario_activo')); } catch(e){}
+    try { usuarioActivo = JSON.parse(localStorage.getItem('usuario_activo')); } catch (e) { }
     if (!usuarioActivo) {
         contenedor.innerHTML = '<div class="alert alert-warning text-center">Debes iniciar sesión para ver tu historial de compras.</div>';
         return;
     }
     const pedidos = obtenerPedidos();
     const misPedidos = usuarioActivo.id == null
-    ? []
-    : pedidos.filter(p =>
-        p.usuarioId != null &&
-        String(p.usuarioId) === String(usuarioActivo.id)
-    );
+        ? []
+        : pedidos.filter(p =>
+            p.usuarioId != null &&
+            String(p.usuarioId) === String(usuarioActivo.id)
+        );
     if (misPedidos.length === 0) {
         contenedor.innerHTML = '<div class="alert alert-light text-center border">Aún no has realizado ninguna compra.</div>';
         return;
@@ -1815,17 +1880,15 @@ function renderizarFavoritos() {
                         <p class="fw-bold">
                             ${formatoPrecio.format(Number(producto.precio))}
                         </p>
-                        ${
-                            agotado
-                                ? '<span class="badge bg-danger align-self-start mb-3">Sin stock</span>'
-                                : ''
-                        }
+                        ${agotado
+                ? '<span class="badge bg-danger align-self-start mb-3">Sin stock</span>'
+                : ''
+            }
                         <div class="mt-auto d-grid gap-2">
-                            ${
-                                agotado
-                                    ? '<button type="button" class="btn btn-secondary" disabled>Sin stock disponible</button>'
-                                    : `<a href="${escaparHTML(enlaceDetalle)}" class="btn btn-dark">Ver producto y elegir talla</a>`
-                            }
+                            ${agotado
+                ? '<button type="button" class="btn btn-secondary" disabled>Sin stock disponible</button>'
+                : `<a href="${escaparHTML(enlaceDetalle)}" class="btn btn-dark">Ver producto y elegir talla</a>`
+            }
                             <button
                                 type="button"
                                 class="btn btn-outline-danger btn-favorito"
