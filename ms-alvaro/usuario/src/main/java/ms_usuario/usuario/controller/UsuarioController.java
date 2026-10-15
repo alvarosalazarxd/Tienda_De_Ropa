@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -53,4 +54,19 @@ public class UsuarioController {
         usuarioService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/{id}/favoritos")
+    public Set<Long> obtenerFavoritos(@PathVariable Long id) {
+        return usuarioService.obtenerFavoritos(id);
+    }
+
+    @PostMapping("/{id}/favoritos/{productoId}")
+    public Set<Long> agregarFavorito(@PathVariable Long id, @PathVariable Long productoId) {
+        return usuarioService.agregarFavorito(id, productoId);
+    }
+
+    @DeleteMapping("/{id}/favoritos/{productoId}")
+    public Set<Long> eliminarFavorito(@PathVariable Long id, @PathVariable Long productoId) {
+        return usuarioService.eliminarFavorito(id, productoId);
+    }
+
 }

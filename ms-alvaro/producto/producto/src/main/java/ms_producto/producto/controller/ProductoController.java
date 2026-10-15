@@ -51,4 +51,33 @@ public class ProductoController {
         productoService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+    public record StockRespuesta(Long productoId, Integer stock, Integer stockMinimo,
+                                 boolean stockBajo) {}
+    public record AjusteStock(Integer stock, Integer stockMinimo) {}
+    public record MovimientoStock(Integer cantidad) {}
+
+    private StockRespuesta respuestaStock(Producto p) {
+        return new StockRespuesta(p.getId(), p.getStock(), p.getStockMinimo(), p.tieneStockBajo());
+    }
+
+    @GetMapping("/{id}/stock")
+    public StockRespuesta consultarStock(@PathVariable Long id) {
+        return respuestaStock(productoService.consultarStock(id));
+    }
+
+    @PatchMapping("/{id}/stock")
+    public StockRespuesta actualizarStock(@PathVariable Long id, @RequestBody AjusteStock datos) {
+        return respuestaStock(productoService.actualizarStock(id, datos.stock(), datos.stockMinimo()));
+    }
+
+    @PostMapping("/{id}/stock/aumentar")
+    public StockRespuesta aumentarStock(@PathVariable Long id, @RequestBody MovimientoStock datos) {
+        return respuestaStock(productoService.aumentarStock(id, datos.cantidad()));
+    }
+
+    @PostMapping("/{id}/stock/descontar")
+    public StockRespuesta descontarStock(@PathVariable Long id, @RequestBody MovimientoStock datos) {
+        return respuestaStock(productoService.descontarStock(id, datos.cantidad()));
+    }
+
 }

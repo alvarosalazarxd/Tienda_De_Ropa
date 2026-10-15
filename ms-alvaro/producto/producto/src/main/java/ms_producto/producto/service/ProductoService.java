@@ -11,4 +11,8 @@ public interface ProductoService {
     Producto guardar(Producto producto);
     Producto actualizar(Long id, Producto producto);
     void eliminar(Long id);
+    Producto consultarStock(Long id);
+    Producto actualizarStock(Long id, Integer stock, Integer stockMinimo);
+    Producto aumentarStock(Long id, Integer cantidad);
+    Producto descontarStock(Long id, Integer cantidad);
 }
