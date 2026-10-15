@@ -1,0 +1,45 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-UsuarioApplication<usuario>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_usuario.usuario.UsuarioApplication",
+            "projectName": "usuario",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ProductoApplication<producto>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_producto.producto.ProductoApplication",
+            "projectName": "producto",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=64582 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=producto"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-PedidoApplication<pedido>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_pedido.pedido.PedidoApplication",
+            "projectName": "pedido",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-CarritoApplication<carrito>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_carrito.carrito.CarritoApplication",
+            "projectName": "carrito",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

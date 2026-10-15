@@ -1,6 +1,9 @@
+
 package ms_usuario.usuario.model;
 
+import ms_usuario.usuario.enums.RolUsuario;
 import jakarta.persistence.*;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,29 +18,88 @@ public class Usuario {
     private String nombre;
     private String email;
     private String password;
-    private String rol; // CLIENTE, ADMIN
 
+    // ROL DEL USUARIO
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RolUsuario rol = RolUsuario.CLIENTE;
+
+    // ESTADO DEL USUARIO
+    @Column(nullable = false)
+    private Boolean activo = true;
+
+    // PRODUCTOS FAVORITOS
     @ElementCollection
     @CollectionTable(name = "usuario_favoritos", joinColumns = @JoinColumn(name = "usuario_id"), uniqueConstraints = @UniqueConstraint(columnNames = {
             "usuario_id", "producto_id" }))
     @Column(name = "producto_id", nullable = false)
     private Set<Long> favoritos = new HashSet<>();
 
+    // CONSTRUCTOR VACÍO
     public Usuario() {
     }
 
+    // CONSTRUCTOR CON ROL
     public Usuario(
             String nombre,
             String email,
             String password,
-            String rol) {
+            RolUsuario rol) {
+
         this.nombre = nombre;
         this.email = email;
         this.password = password;
-        this.rol = rol;
+        setRol(rol);
+        this.activo = true;
     }
 
+    // CONSTRUCTOR PARA CLIENTES
+    public Usuario(
+            String nombre,
+            String email,
+            String password) {
+
+        this.nombre = nombre;
+        this.email = email;
+        this.password = password;
+        this.rol = RolUsuario.CLIENTE;
+        this.activo = true;
+    }
+
+    // =========================
+    // GESTIÓN DE ESTADO
+    // =========================
+
+    public void deshabilitar() {
+        this.activo = false;
+    }
+
+    public void habilitar() {
+        this.activo = true;
+    }
+
+    public boolean estaActivo() {
+        return Boolean.TRUE.equals(activo);
+    }
+
+    // =========================
+    // GESTIÓN DE ROLES
+    // =========================
+
+    public boolean esAdministrador() {
+        return rol == RolUsuario.ADMIN;
+    }
+
+    public boolean esCliente() {
+        return rol == RolUsuario.CLIENTE;
+    }
+
+    // =========================
+    // GESTIÓN DE FAVORITOS
+    // =========================
+
     public void agregarFavorito(Long productoId) {
+
         if (productoId == null || productoId <= 0) {
             throw new IllegalArgumentException(
                     "El ID del producto debe ser válido.");
@@ -53,6 +115,10 @@ public class Usuario {
     public boolean tieneFavorito(Long productoId) {
         return favoritos.contains(productoId);
     }
+
+    // =========================
+    // GETTERS Y SETTERS
+    // =========================
 
     public Long getId() {
         return id;
@@ -86,12 +152,32 @@ public class Usuario {
         this.password = password;
     }
 
-    public String getRol() {
+    public RolUsuario getRol() {
         return rol;
     }
 
-    public void setRol(String rol) {
+    public void setRol(RolUsuario rol) {
+
+        if (rol == null) {
+            throw new IllegalArgumentException(
+                    "El rol no puede ser nulo.");
+        }
+
         this.rol = rol;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+
+        if (activo == null) {
+            throw new IllegalArgumentException(
+                    "El estado del usuario no puede ser nulo.");
+        }
+
+        this.activo = activo;
     }
 
     public Set<Long> getFavoritos() {
