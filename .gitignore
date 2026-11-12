@@ -1,0 +1,13 @@
+# Ignorar dependencias pesadas de React y compilados de Java
+**/node_modules/
+**/dist/
+**/target/
+
+# Ignorar archivos comprimidos .zip y el ejemplo de mascotas del profesor
+*.zip
+conexion_react_springboot-master/
+
+# Ignorar archivos temporales del sistema
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cl.modaestilo</groupId>
+    <artifactId>tienda-ropa-microservicios-root</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Tienda de Ropa - Microservicios (Root)</name>
+
+    <modules>
+        <module>ms-alvaro/usuario</module>
+        <module>ms-alvaro/producto/producto</module>
+        <module>ms-alvaro/carrito/carrito</module>
+        <module>ms-alvaro/pedido/pedido</module>
+    </modules>
+</project>

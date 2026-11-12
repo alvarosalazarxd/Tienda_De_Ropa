@@ -1,0 +1,55 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-CarritoApplication<carrito>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_carrito.carrito.CarritoApplication",
+            "projectName": "carrito",
+            "args": "",
+            "vmArgs": "-Xms48m -Xmx128m -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -Dspring.jmx.enabled=false"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-PedidoApplication<pedido>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_pedido.pedido.PedidoApplication",
+            "projectName": "pedido",
+            "args": "",
+            "vmArgs": "-Xms48m -Xmx128m -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -Dspring.jmx.enabled=false"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ProductoApplication<producto>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_producto.producto.ProductoApplication",
+            "projectName": "producto",
+            "args": "",
+            "vmArgs": "-Xms48m -Xmx128m -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -Dspring.jmx.enabled=false"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-UsuarioApplication<usuario>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_usuario.usuario.UsuarioApplication",
+            "projectName": "usuario",
+            "args": "",
+            "vmArgs": "-Xms48m -Xmx128m -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -Dspring.jmx.enabled=false"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Iniciar los 4 Microservicios",
+            "configurations": [
+                "Spring Boot-UsuarioApplication<usuario>",
+                "Spring Boot-ProductoApplication<producto>",
+                "Spring Boot-PedidoApplication<pedido>",
+                "Spring Boot-CarritoApplication<carrito>"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,5 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "spring-boot.ls.Problem.application-properties.PROP_UNKNOWN_PROPERTY": "IGNORE",
+    "boot-java.live-information.automatic-tracking.on": false
+}

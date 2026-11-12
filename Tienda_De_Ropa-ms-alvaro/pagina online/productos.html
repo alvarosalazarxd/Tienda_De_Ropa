@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos - Moda & Estilo</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top">
+
+    <div class="container-fluid">
+
+        <!-- LOGO -->
+
+        <a class="navbar-brand fw-bold" href="index.html">
+            <i class="bi bi-bag-heart-fill me-2 text-warning"></i>
+            Moda & Estilo
+        </a>
+
+
+        <!-- BOTÓN RESPONSIVE -->
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+            <!-- MENÚ -->
+
+            <ul class="navbar-nav">
+
+                <li class="nav-item">
+
+                    <a class="nav-link" href="index.html">
+                        Inicio
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+
+                    <a class="nav-link" href="nosotros.html">
+                        Nosotros
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+
+                    <a class="nav-link active" href="productos.html">
+                        Productos
+                    </a>
+
+                </li>
+
+            </ul>
+
+
+            <!-- PARTE DERECHA -->
+
+            <ul class="navbar-nav ms-auto align-items-sm-center">
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="carrito.html">
+                            <i class="bi bi-cart3 fs-5"></i>
+                            <span id="contadorCarrito" class="badge rounded-pill bg-warning text-dark position-absolute top-0 start-100 translate-middle" style="font-size:0.65rem;">0</span>
+                        </a>
+                    </li>
+
+
+                <li class="nav-item me-sm-2">
+
+                    <a class="nav-link" href="login.html">
+                        <i class="bi bi-person me-1"></i>
+                        Iniciar Sesión
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item me-sm-3">
+
+                    <a class="nav-link" href="registro.html">
+                        Registrarse
+                    </a>
+
+                </li>
+
+
+                <!-- CARRITO -->
+
+                <li class="nav-item">
+
+                    <button type="button" class="btn btn-warning position-relative" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasCarrito" aria-controls="offcanvasCarrito">
+
+                        <i class="bi bi-cart3 fs-5"></i>
+
+                        <span id="contadorCarrito"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            0
+                        </span>
+
+                    </button>
+
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>
+    <header class="p-5 bg-dark text-white text-center">
+        <h1>Catálogo de Temporada</h1>
+        <p>Explora nuestras prendas exclusivas al mejor precio y renueva tu closet hoy mismo.</p>
+    </header>
+
+    <main class="container-fluid my-4 flex-grow-1">
+        <div class="row mb-3">
+            
+            
+            <div class="container my-5">
+            
+                <div class="row g-4 justify-content-center">
+            
+                    <!-- Producto 1 -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card producto-card h-100 shadow-sm">
+            
+                            <a href="producto-detalle.html?id=1" class="producto-imagen-link">
+                                <img class="imagen-producto" src="img/urbana.jpg" alt="Polera Oversize Negra">
+                            </a>
+            
+                            <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+            
+                                <div>
+                                    <h5 class="card-title">
+                                        Polera Oversize Negra
+                                    </h5>
+            
+                                    <p class="card-text">
+                                        Polera de algodón 100% con estilo urbano holgado,
+                                        ideal para un look cómodo y moderno.
+                                    </p>
+                                </div>
+            
+                                <div>
+                                    <h5 class="text-warning producto-precio">
+                                        $19.990
+                                    </h5>
+            
+                                    <a href="producto-detalle.html?id=1" class="btn btn-primary w-100 producto-btn">
+                                        Ver Detalle
+                                    </a>
+                                </div>
+            
+                            </div>
+                        </div>
+                    </div>
+            
+            
+                    <!-- Producto 2 -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card producto-card h-100 shadow-sm">
+            
+                            <a href="producto-detalle.html?id=2" class="producto-imagen-link">
+                                <img class="imagen-producto" src="img/casual.jpg" alt="Pantalón Jean Classic">
+                            </a>
+            
+                            <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+            
+                                <div>
+                                    <h5 class="card-title">
+                                        Pantalón Jean Classic
+                                    </h5>
+            
+                                    <p class="card-text">
+                                        Jeans de corte recto con material resistente
+                                        y flexible, perfecto para combinar a diario.
+                                    </p>
+                                </div>
+            
+                                <div>
+                                    <h5 class="text-warning producto-precio">
+                                        $29.990
+                                    </h5>
+            
+                                    <a href="producto-detalle.html?id=2" class="btn btn-primary w-100 producto-btn">
+                                        Ver Detalle
+                                    </a>
+                                </div>
+            
+                            </div>
+                        </div>
+                    </div>
+            
+            
+                    <!-- Producto 3 -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card producto-card h-100 shadow-sm">
+            
+                            <a href="producto-detalle.html?id=3" class="producto-imagen-link">
+                                <img class="imagen-producto" src="img/formal.jpg" alt="Chaqueta Formal Fit">
+                            </a>
+            
+                            <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+            
+                                <div>
+                                    <h5 class="card-title">
+                                        Chaqueta Formal Fit
+                                    </h5>
+            
+                                    <p class="card-text">
+                                        Chaqueta de diseño elegante para eventos especiales,
+                                        confeccionada con terminaciones finas.
+                                    </p>
+                                </div>
+            
+                                <div>
+                                    <h5 class="text-warning producto-precio">
+                                        $45.990
+                                    </h5>
+            
+                                    <a href="producto-detalle.html?id=3" class="btn btn-primary w-100 producto-btn">
+                                        Ver Detalle
+                                    </a>
+                                </div>
+            
+                            </div>
+                        </div>
+                    </div>
+            
+            
+                    <!-- Producto 4 -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card producto-card h-100 shadow-sm">
+            
+                            <a href="producto-detalle.html?id=4" class="producto-imagen-link">
+                                <img class="imagen-producto" src="img/accesorios.jpg" alt="Gorro Beanie Urbano">
+                            </a>
+            
+                            <div class="card-body bg-dark text-light d-flex flex-column justify-content-between">
+            
+                                <div>
+                                    <h5 class="card-title">
+                                        Gorro Beanie Urbano
+                                    </h5>
+            
+                                    <p class="card-text">
+                                        Gorro tejido de lana acrílica,
+                                        el accesorio perfecto para complementar tu vestimenta.
+                                    </p>
+                                </div>
+            
+                                <div>
+                                    <h5 class="text-warning producto-precio">
+                                        $8.990
+                                    </h5>
+            
+                                    <a href="producto-detalle.html?id=4" class="btn btn-primary w-100 producto-btn">
+                                        Ver Detalle
+                                    </a>
+                                </div>
+            
+                            </div>
+                        </div>
+                    </div>
+            
+                </div>
+            
+            </div>
+
+        </div>
+    </main>
+    <!-- =====================================================
+         CARRITO DE COMPRAS
+    ===================================================== -->
+    
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
+    
+        <!-- CABECERA -->
+    
+        <div class="offcanvas-header bg-dark text-white">
+    
+            <h5 class="offcanvas-title" id="offcanvasCarritoLabel">
+    
+                <i class="bi bi-cart3 me-2"></i>
+    
+                Mi carrito
+    
+            </h5>
+    
+    
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                aria-label="Cerrar"></button>
+    
+        </div>
+    
+    
+        <!-- CONTENIDO -->
+    
+        <div class="offcanvas-body d-flex flex-column">
+    
+            <!-- PRODUCTOS -->
+    
+            <div id="listaCarrito" class="flex-grow-1">
+    
+                <!-- Los productos aparecerán mediante main.js -->
+    
+            </div>
+    
+    
+            <!-- TOTAL -->
+    
+            <div class="border-top pt-3">
+    
+                <div class="d-flex justify-content-between mb-3">
+    
+                    <strong>
+                        Total:
+                    </strong>
+    
+                    <strong id="totalCarrito" class="text-warning">
+                        $0
+                    </strong>
+    
+                </div>
+    
+    
+                <!-- BOTONES -->
+    
+                <div class="d-grid gap-2">
+    
+                    <button type="button" id="btnComprar" class="btn btn-primary">
+    
+                        <i class="bi bi-credit-card me-1"></i>
+    
+                        Comprar
+    
+                    </button>
+    
+    
+                    <button type="button" id="btnVaciar" class="btn btn-outline-danger">
+    
+                        <i class="bi bi-trash me-1"></i>
+    
+                        Vaciar carrito
+    
+                    </button>
+    
+                </div>
+    
+            </div>
+    
+        </div>
+    
+    </div>
+    
+    <footer class="bg-dark text-light pt-5 pb-4 mt-auto">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-uppercase fw-bold">Moda & Estilo</h5>
+                    <p class="text-white">
+                        Somos una tienda enfocada en entregar las últimas tendencias de ropa y accesorios con la mejor calidad y atención personalizada.
+                    </p>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-uppercase fw-bold">Contacto</h5>
+                    <p class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> Santiago, Chile</p>
+                    <p class="mb-2">
+                        <i class="bi bi-telephone-fill me-2"></i>
+                        <a href="tel:+56912345678" class="text-white text-decoration-none">+56 9 1234 5678</a>
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-envelope-fill me-2"></i>
+                        <a href="mailto:contacto@tiendaderopa.cl" class="text-white text-decoration-none">contacto@tiendaderopa.cl</a>
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-whatsapp me-2"></i>
+                        <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">
+                            Escríbenos por WhatsApp
+                        </a>
+                    </p>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-uppercase fw-bold">Síguenos</h5>
+                    <div class="mb-3">
+                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" class="text-white me-3 fs-4" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="text-white me-3 fs-4" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" class="text-white me-3 fs-4" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" class="text-white fs-4" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Términos y condiciones</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Política de privacidad</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Contáctanos</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <hr class="border-secondary">
+
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 text-white-50">&copy; 2026 Moda & Estilo. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+                    <span class="text-white-50">Diseñado con Bootstrap 5</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
