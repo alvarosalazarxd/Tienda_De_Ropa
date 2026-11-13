@@ -16,4 +16,6 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     Optional<Producto> buscarParaActualizar(@Param("id") Long id);
 
     List<Producto> findByCategoria(CategoriaProducto categoria);
+
+    boolean existsByNombre(String nombre);
 }

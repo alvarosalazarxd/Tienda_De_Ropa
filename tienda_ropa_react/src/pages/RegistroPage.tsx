@@ -1,7 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import UsuarioService from '../services/usuario.service';
-import { validarCorreoRealActivo } from '../utils/validaciones';
 
 const RegistroPage = () => {
   const navigate = useNavigate();
@@ -46,13 +45,6 @@ const RegistroPage = () => {
 
     setLoading(true);
     try {
-      const validacionCorreo = await validarCorreoRealActivo(emailFinal);
-      if (!validacionCorreo.valido) {
-        setError(validacionCorreo.mensaje);
-        setLoading(false);
-        return;
-      }
-
       // Revisamos primero si el correo ya esta registrado en MySQL
       const existente = await UsuarioService.obtenerPorEmail(emailFinal);
       if (existente) {

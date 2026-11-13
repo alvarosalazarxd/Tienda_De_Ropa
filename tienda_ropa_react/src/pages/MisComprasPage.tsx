@@ -12,6 +12,7 @@ import PedidoService, {
   obtenerDespachoPedido,
   Pedido
 } from '../services/pedido.service';
+import { obtenerUsuarioIdCarrito } from '../services/carrito.service';
 import { obtenerSesionUsuario } from '../services/usuario.service';
 
 function claseBadgeEstado(estado: EstadoPedido): string {
@@ -29,9 +30,8 @@ function claseBadgeEstado(estado: EstadoPedido): string {
 
 const MisComprasPage = () => {
   const sesion = obtenerSesionUsuario();
-  const { pedidos, loading, error, recargar } = usePedidos(
-    sesion ? sesion.id : null
-  );
+  const usuarioComprasId = sesion ? sesion.id : obtenerUsuarioIdCarrito();
+  const { pedidos, loading, error, recargar } = usePedidos(usuarioComprasId);
   const { productos } = useProductos();
   const [mensaje, setMensaje] = useState<string | null>(null);
 
@@ -78,15 +78,19 @@ const MisComprasPage = () => {
         </Link>
       </div>
 
-      {!sesion ? (
-        <div className="alert alert-warning text-center">
-          Debes iniciar sesión para ver tu historial de compras.{' '}
-          <Link to="/login" className="alert-link">
+      {!sesion && (
+        <div className="alert alert-secondary d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <span>
+            <i className="bi bi-info-circle me-2"></i>
+            Mostrando compras realizadas sin iniciar sesión en este navegador.
+          </span>
+          <Link to="/login" className="btn btn-sm btn-outline-dark">
             Iniciar sesión
           </Link>
         </div>
-      ) : (
-        <>
+      )}
+
+      <>
           {mensaje && (
             <div className="alert alert-info alert-dismissible fade show">
               {mensaje}
@@ -108,7 +112,9 @@ const MisComprasPage = () => {
 
           {!loading && pedidos.length === 0 ? (
             <div className="alert alert-light text-center border py-4">
-              Aún no has realizado ninguna compra con tu cuenta.
+              {sesion
+                ? 'Aún no has realizado ninguna compra con tu cuenta.'
+                : 'Aún no has realizado compras desde este navegador.'}
             </div>
           ) : (
             pedidos.map((pedido) => {
@@ -206,8 +212,7 @@ const MisComprasPage = () => {
               );
             })
           )}
-        </>
-      )}
+      </>
     </main>
   );
 };

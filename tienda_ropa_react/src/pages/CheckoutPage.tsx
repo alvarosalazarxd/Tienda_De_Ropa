@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import useCarrito from '../hooks/useCarrito';
 import useProductos from '../hooks/useProductos';
@@ -14,20 +14,7 @@ import ProductoService, {
 import PedidoService, {
   guardarDespachoPedido
 } from '../services/pedido.service';
-import UsuarioService, {
-  obtenerSesionUsuario
-} from '../services/usuario.service';
-import {
-  contarDigitosMovil,
-  LONGITUD_TELEFONO_CL,
-  manejarTeclaTelefono,
-  MAX_DIGITOS_MOVIL_CL,
-  normalizarTelefonoChileno,
-  PREFIJO_TELEFONO_CL,
-  validarCorreoRealActivo,
-  validarFormatoCorreoReal,
-  validarTelefonoChileno
-} from '../utils/validaciones';
+import { obtenerSesionUsuario } from '../services/usuario.service';
 
 const regionesChile = [
   'Arica y Parinacota',
@@ -60,11 +47,7 @@ const CheckoutPage = () => {
     partesNombre.slice(1).join(' ') ?? ''
   );
   const [correo, setCorreo] = useState(sesion?.email ?? '');
-  const [telefono, setTelefono] = useState(PREFIJO_TELEFONO_CL);
-  const [estadoCorreo, setEstadoCorreo] = useState<
-    'verificando' | 'ok' | 'error' | 'offline' | null
-  >(null);
-  const [mensajeCorreo, setMensajeCorreo] = useState('');
+  const [telefono, setTelefono] = useState('');
   const [region, setRegion] = useState('');
   const [ciudad, setCiudad] = useState('');
   const [comuna, setComuna] = useState('');
@@ -96,64 +79,6 @@ const CheckoutPage = () => {
   const items = carrito?.items ?? [];
   const total = carrito?.total ?? 0;
 
-  const digitosMovil = contarDigitosMovil(telefono);
-  const checkTelefono = validarTelefonoChileno(telefono);
-
-  useEffect(() => {
-    const limpio = correo.trim();
-    if (!limpio) {
-      setEstadoCorreo(null);
-      setMensajeCorreo('');
-      return;
-    }
-
-    const sintaxis = validarFormatoCorreoReal(limpio);
-    if (!sintaxis.valido) {
-      setEstadoCorreo('error');
-      setMensajeCorreo(sintaxis.mensaje ?? 'Correo electrónico inválido.');
-      return;
-    }
-
-    let cancelado = false;
-    setEstadoCorreo('verificando');
-    setMensajeCorreo('Verificando servidor de correo activo...');
-
-    const timer = window.setTimeout(async () => {
-      const res = await validarCorreoRealActivo(limpio);
-      if (cancelado) return;
-
-      if (!res.valido) {
-        setEstadoCorreo('error');
-        setMensajeCorreo(res.mensaje);
-        return;
-      }
-
-      try {
-        const cuenta = await UsuarioService.obtenerPorEmail(
-          limpio.toLowerCase()
-        );
-        if (cancelado) return;
-        if (cuenta && !cuenta.activo) {
-          setEstadoCorreo('error');
-          setMensajeCorreo(
-            'La cuenta registrada con este correo está deshabilitada o inactiva.'
-          );
-          return;
-        }
-      } catch {
-        // Si el microservicio no responde en la vista previa, se validará al enviar
-      }
-
-      setEstadoCorreo(res.estado);
-      setMensajeCorreo(res.mensaje);
-    }, 400);
-
-    return () => {
-      cancelado = true;
-      window.clearTimeout(timer);
-    };
-  }, [correo]);
-
   const formatearInputTarjeta = (valor: string) => {
     const digitos = valor.replace(/\D/g, '').slice(0, 16);
     const bloques = digitos.match(/.{1,4}/g);
@@ -176,12 +101,13 @@ const CheckoutPage = () => {
       return;
     }
 
-    const validacionTel = validarTelefonoChileno(telefono);
-    if (!validacionTel.valido) {
-      setError(
-        validacionTel.mensaje ??
-          'Ingresa un teléfono móvil chileno válido (+569 seguido de 8 dígitos).'
-      );
+    if (!correo.trim()) {
+      setError('Por favor ingresa un correo de contacto.');
+      return;
+    }
+
+    if (!telefono.trim()) {
+      setError('Por favor ingresa un número de teléfono.');
       return;
     }
 
@@ -217,31 +143,6 @@ const CheckoutPage = () => {
     setProcesando(true);
     setError(null);
     setExito(null);
-
-    const correoLimpio = correo.trim().toLowerCase();
-    const validacionCorreo = await validarCorreoRealActivo(correoLimpio);
-    if (!validacionCorreo.valido) {
-      setEstadoCorreo('error');
-      setMensajeCorreo(validacionCorreo.mensaje);
-      setError(validacionCorreo.mensaje);
-      setProcesando(false);
-      return;
-    }
-
-    try {
-      const cuentaAsociada = await UsuarioService.obtenerPorEmail(correoLimpio);
-      if (cuentaAsociada && !cuentaAsociada.activo) {
-        const msgInactiva =
-          'La cuenta asociada a este correo está inactiva o deshabilitada. Usa un correo activo.';
-        setEstadoCorreo('error');
-        setMensajeCorreo(msgInactiva);
-        setError(msgInactiva);
-        setProcesando(false);
-        return;
-      }
-    } catch {
-      // Si el servicio de usuarios no está disponible, se continúa si el correo tiene dominio real activo
-    }
 
     // Guardamos que productos descontamos por si ocurre un error a mitad de camino
     const descontados: { productoId: number; cantidad: number }[] = [];
@@ -306,7 +207,7 @@ const CheckoutPage = () => {
       );
 
       window.setTimeout(() => {
-        navigate(sesion ? '/mis-compras' : '/');
+        navigate('/mis-compras');
       }, 1400);
     } catch (err) {
       console.error(err);
@@ -400,89 +301,29 @@ const CheckoutPage = () => {
 
                   <div className="col-md-6">
                     <label className="form-label fw-medium">
-                      Correo electrónico (real y activo)
+                      Correo electrónico
                     </label>
                     <input
-                      type="email"
-                      className={`form-control${
-                        estadoCorreo === 'error'
-                          ? ' is-invalid'
-                          : estadoCorreo === 'ok'
-                            ? ' is-valid'
-                            : ''
-                      }`}
-                      placeholder="nombre@gmail.com"
+                      type="text"
+                      className="form-control"
+                      placeholder="correo@ejemplo.com"
                       maxLength={150}
                       value={correo}
                       onChange={(e) => setCorreo(e.target.value)}
                       required
                     />
-                    {estadoCorreo && (
-                      <div
-                        className={`form-text ${
-                          estadoCorreo === 'error'
-                            ? 'text-danger fw-medium'
-                            : estadoCorreo === 'ok'
-                              ? 'text-success fw-medium'
-                              : 'text-muted'
-                        }`}
-                      >
-                        {mensajeCorreo}
-                      </div>
-                    )}
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label fw-medium">
-                      Teléfono (+569 + 8 dígitos)
-                    </label>
+                    <label className="form-label fw-medium">Teléfono</label>
                     <input
                       type="tel"
-                      inputMode="numeric"
-                      className={`form-control${
-                        digitosMovil === MAX_DIGITOS_MOVIL_CL &&
-                        !checkTelefono.valido
-                          ? ' is-invalid'
-                          : checkTelefono.valido
-                            ? ' is-valid'
-                            : ''
-                      }`}
+                      className="form-control"
                       placeholder="+56912345678"
-                      maxLength={LONGITUD_TELEFONO_CL}
                       value={telefono}
-                      onChange={(e) =>
-                        setTelefono(normalizarTelefonoChileno(e.target.value))
-                      }
-                      onKeyDown={(e) =>
-                        manejarTeclaTelefono(e, telefono, setTelefono)
-                      }
-                      onFocus={(e) => {
-                        const pos = e.currentTarget.selectionStart ?? 0;
-                        if (pos < PREFIJO_TELEFONO_CL.length) {
-                          e.currentTarget.setSelectionRange(
-                            PREFIJO_TELEFONO_CL.length,
-                            PREFIJO_TELEFONO_CL.length
-                          );
-                        }
-                      }}
+                      onChange={(e) => setTelefono(e.target.value)}
                       required
                     />
-                    <div
-                      className={`form-text ${
-                        checkTelefono.valido
-                          ? 'text-success fw-medium'
-                          : digitosMovil === MAX_DIGITOS_MOVIL_CL
-                            ? 'text-danger fw-medium'
-                            : 'text-muted'
-                      }`}
-                    >
-                      {checkTelefono.valido
-                        ? `✓ ${digitosMovil}/${MAX_DIGITOS_MOVIL_CL} dígitos válidos después de +569`
-                        : digitosMovil === MAX_DIGITOS_MOVIL_CL &&
-                            checkTelefono.mensaje
-                          ? checkTelefono.mensaje
-                          : `${digitosMovil}/${MAX_DIGITOS_MOVIL_CL} dígitos después de +569`}
-                    </div>
                   </div>
 
                   <div className="col-12">

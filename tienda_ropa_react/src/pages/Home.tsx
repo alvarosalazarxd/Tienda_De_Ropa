@@ -25,7 +25,7 @@ const Home = () => {
     return () => window.clearInterval(intervalo);
   }, []);
 
-  const destacados = productos.slice(0, 4);
+  const destacados = productos.slice(0, 8);
 
   return (
     <div>

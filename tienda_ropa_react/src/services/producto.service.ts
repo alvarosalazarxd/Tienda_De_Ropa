@@ -169,6 +169,14 @@ export function guardarExtrasProducto(
   localStorage.setItem(EXTRAS_KEY, JSON.stringify(mapa));
 }
 
+const IMAGENES_POR_NOMBRE: Array<{ termino: string; imagen: string }> = [
+  { termino: 'cortaviento', imagen: '/img/deportiva.jpg' },
+  { termino: 'deportiv', imagen: '/img/deportiva.jpg' },
+  { termino: 'jogger', imagen: '/img/joggers.jpg' },
+  { termino: 'camisa', imagen: '/img/camisa.jpg' },
+  { termino: 'mochila', imagen: '/img/mochila.jpg' }
+];
+
 export function obtenerImagenPorCategoria(
   categoria?: CategoriaProducto | string
 ): string {
@@ -182,7 +190,7 @@ export function obtenerImagenPorCategoria(
     case 'ACCESORIOS':
       return '/img/accesorios.jpg';
     case 'DEPORTIVO':
-      return '/img/urbana.jpg';
+      return '/img/deportiva.jpg';
     default:
       return '/img/urbana.jpg';
   }
@@ -193,6 +201,13 @@ export function obtenerImagenProducto(producto: Producto): string {
   if (extras?.imagen) {
     return normalizarRutaImagen(extras.imagen);
   }
+  const nombreLower = (producto.nombre || '').toLowerCase();
+  const coincidencia = IMAGENES_POR_NOMBRE.find((item) =>
+    nombreLower.includes(item.termino)
+  );
+  if (coincidencia) {
+    return coincidencia.imagen;
+  }
   return obtenerImagenPorCategoria(producto.categoria);
 }
 
@@ -200,6 +215,9 @@ export function obtenerTallasProducto(producto: Producto): string[] {
   const extras = leerMapaExtras()[String(producto.id)];
   if (extras?.tallas && extras.tallas.length > 0) {
     return extras.tallas;
+  }
+  if ((producto.nombre || '').toLowerCase().includes('camisa')) {
+    return ['S - Small', 'M - Medium', 'L - Large', 'XL - Extra Large'];
   }
   switch (producto.categoria) {
     case 'CASUAL':

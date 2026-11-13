@@ -104,6 +104,17 @@ const Navbar = () => {
               <>
                 <li className="nav-item">
                   <NavLink
+                    to="/mis-compras"
+                    className={({ isActive }) =>
+                      `nav-link ${isActive ? 'active fw-semibold' : ''}`
+                    }
+                  >
+                    <i className="bi bi-bag-check me-1"></i>
+                    Mis Compras
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink
                     to="/login"
                     className={({ isActive }) =>
                       `nav-link ${isActive ? 'active fw-semibold' : ''}`

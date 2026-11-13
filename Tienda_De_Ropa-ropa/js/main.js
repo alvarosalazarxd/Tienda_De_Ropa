@@ -140,6 +140,16 @@ const CARRITO_KEY = 'carrito_moda_estilo';
 const VENTAS_KEY = 'ventas_moda_estilo';
 const PEDIDOS_KEY = 'pedidos_moda_estilo';
 const PRODUCTOS_KEY = 'productos_moda_estilo';
+const GUEST_ID_KEY = 'invitado_id_moda_estilo';
+
+function obtenerGuestIdHtml() {
+    let guestId = localStorage.getItem(GUEST_ID_KEY);
+    if (!guestId) {
+        guestId = 'guest_' + Date.now() + '_' + Math.floor(1000 + Math.random() * 9000);
+        localStorage.setItem(GUEST_ID_KEY, guestId);
+    }
+    return guestId;
+}
 
 function obtenerCarrito() {
     // La clave principal tiene prioridad, incluso cuando contiene [].
@@ -623,25 +633,16 @@ function inicializarCheckout() {
             procesando = true;
             boton.disabled = true;
             try {
-                // Validación estricta para correo real y activo
                 const correoInput = document.getElementById('correoCheckout');
-                if (correoInput) {
-                    const checkCorreo = await validarCorreoRealActivoHtml(correoInput.value);
-                    if (!checkCorreo.valido) {
-                        await mostrarAviso('Correo inválido', checkCorreo.mensaje);
-                        return;
-                    }
+                if (correoInput && !correoInput.value.trim()) {
+                    await mostrarAviso('Correo requerido', 'Ingresa un correo de contacto.');
+                    return;
                 }
 
-                // Validación estricta para números telefónicos de Chile (+569 + 8 dígitos)
                 const telefono = document.getElementById('telefonoCheckout');
-
-                if (telefono) {
-                    const checkTel = validarTelefonoChilenoHtml(telefono.value);
-                    if (!checkTel.valido) {
-                        await mostrarAviso('Teléfono inválido', checkTel.mensaje);
-                        return;
-                    }
+                if (telefono && !telefono.value.trim()) {
+                    await mostrarAviso('Teléfono requerido', 'Ingresa un número de teléfono.');
+                    return;
                 }
                 const carritoActual = obtenerCarrito();
                 if (!carritoActual.length) {
@@ -727,7 +728,7 @@ function inicializarCheckout() {
                 const nuevoPedido = {
                     usuarioId: usuarioActivo && usuarioActivo.id != null
                         ? String(usuarioActivo.id)
-                        : null,
+                        : obtenerGuestIdHtml(),
                     fechaISO: new Date().toISOString(),
                     stockDescontado: true,
                     stockDevuelto: false,
@@ -755,7 +756,7 @@ function inicializarCheckout() {
                 registrarVentaHistorial(montoTotalVenta);
                 guardarCarrito([]);
                 await mostrarAviso('¡Compra completada con éxito!', `Su pedido ${nuevoPedido.id} fue procesado correctamente.`);
-                location.href = 'index.html';
+                location.href = 'mis-compras.html';
             } catch (error) {
                 await mostrarAviso('No se pudo completar', error.message);
             } finally {
@@ -1171,6 +1172,22 @@ function actualizarNavbarUsuario() {
         navDerecho.appendChild(liUsuario);
         const btnLogout = liUsuario.querySelector('#btnCerrarSesion');
         if (btnLogout) btnLogout.addEventListener('click', cerrarSesion);
+    } else if (!navDerecho.querySelector('a[href="mis-compras.html"]')) {
+        const liCompras = document.createElement('li');
+        liCompras.className = 'nav-item';
+        const esMisCompras = window.location.pathname.endsWith('mis-compras.html');
+        liCompras.innerHTML = `
+            <a class="nav-link ${esMisCompras ? 'active fw-semibold' : ''}" href="mis-compras.html">
+                <i class="bi bi-bag-check me-1"></i>Mis Compras
+            </a>
+        `;
+        const loginLink = navDerecho.querySelector('a[href="login.html"]');
+        const liLogin = loginLink ? loginLink.closest('li') : null;
+        if (liLogin) {
+            navDerecho.insertBefore(liCompras, liLogin);
+        } else {
+            navDerecho.appendChild(liCompras);
+        }
     }
 }
 async function cerrarSesion(e) {
@@ -1183,10 +1200,34 @@ const productosPorDefecto = [
     { id: 1, nombre: "Polera Oversize Negra", categoria: "Ropa Urbana", categoriaSlug: "urbano", precio: 19990, img: "img/urbana.jpg", desc: "Polera de algodón 100% con estilo urbano holgado.", tallas: ["S - Small", "M - Medium", "L - Large", "XL - Extra Large"], stock: 15 },
     { id: 2, nombre: "Pantalón Jean Classic", categoria: "Ropa Casual", categoriaSlug: "casual", precio: 29990, img: "img/casual.jpg", desc: "Jeans de corte recto con material resistente y flexible.", tallas: ["38 - S", "40 - M", "42 - L", "44 - XL"], stock: 8 },
     { id: 3, nombre: "Chaqueta Formal Fit", categoria: "Ropa Formal", categoriaSlug: "formal", precio: 45990, img: "img/formal.jpg", desc: "Chaqueta de diseño elegante para eventos especiales.", tallas: ["S - Small", "M - Medium", "L - Large"], stock: 10 },
-    { id: 4, nombre: "Gorro Beanie Urbano", categoria: "Accesorios", categoriaSlug: "accesorios", precio: 8990, img: "img/accesorios.jpg", desc: "Gorro tejido de lana acrílica perfecto para complementar.", tallas: ["Talla Única (Estandard)"], stock: 20 }
+    { id: 4, nombre: "Gorro Beanie Urbano", categoria: "Accesorios", categoriaSlug: "accesorios", precio: 8990, img: "img/accesorios.jpg", desc: "Gorro tejido de lana acrílica perfecto para complementar.", tallas: ["Talla Única (Estandard)"], stock: 20 },
+    { id: 5, nombre: "Cortaviento Deportivo Pro", categoria: "Línea Deportiva", categoriaSlug: "deportivo", precio: 34990, img: "img/deportiva.jpg", desc: "Chaqueta cortaviento ligera e impermeable ideal para entrenar o uso diario.", tallas: ["S - Small", "M - Medium", "L - Large", "XL - Extra Large"], stock: 12 },
+    { id: 6, nombre: "Pantalón Jogger Cargo", categoria: "Ropa Urbana", categoriaSlug: "urbano", precio: 27990, img: "img/joggers.jpg", desc: "Jogger urbano negro con bolsillos laterales cargo y puño elasticado.", tallas: ["S - Small", "M - Medium", "L - Large", "XL - Extra Large"], stock: 14 },
+    { id: 7, nombre: "Camisa Oxford Slim", categoria: "Ropa Casual", categoriaSlug: "casual", precio: 24990, img: "img/camisa.jpg", desc: "Camisa casual de tela Oxford transpirable con calce moderno.", tallas: ["S - Small", "M - Medium", "L - Large", "XL - Extra Large"], stock: 10 },
+    { id: 8, nombre: "Mochila Urbana Minimalista", categoria: "Accesorios", categoriaSlug: "accesorios", precio: 32990, img: "img/mochila.jpg", desc: "Mochila resistente de diseño minimalista con compartimento para notebook.", tallas: ["Talla Única (Estandard)"], stock: 9 }
 ];
 function inicializarProductos() {
-    if (!localStorage.getItem(PRODUCTOS_KEY)) {
+    const raw = localStorage.getItem(PRODUCTOS_KEY);
+    if (!raw) {
+        localStorage.setItem(PRODUCTOS_KEY, JSON.stringify(productosPorDefecto));
+        return;
+    }
+    try {
+        const existentes = JSON.parse(raw);
+        if (!Array.isArray(existentes)) {
+            localStorage.setItem(PRODUCTOS_KEY, JSON.stringify(productosPorDefecto));
+            return;
+        }
+        const nombresExistentes = new Set(
+            existentes.map(p => String(p.nombre || '').trim().toLowerCase())
+        );
+        const faltantes = productosPorDefecto.filter(
+            p => !nombresExistentes.has(p.nombre.trim().toLowerCase())
+        );
+        if (faltantes.length > 0) {
+            localStorage.setItem(PRODUCTOS_KEY, JSON.stringify([...existentes, ...faltantes]));
+        }
+    } catch (e) {
         localStorage.setItem(PRODUCTOS_KEY, JSON.stringify(productosPorDefecto));
     }
 }
@@ -1425,6 +1466,7 @@ function inicializarPanelAdminProductos() {
                 'Ropa Urbana': 'urbano',
                 'Ropa Casual': 'casual',
                 'Ropa Formal': 'formal',
+                'Línea Deportiva': 'deportivo',
                 'Accesorios': 'accesorios'
             };
             const productoData = {
@@ -1564,169 +1606,7 @@ function mostrarAviso(titulo, texto) {
 function pedirConfirmacion(titulo, texto) {
     return abrirDialogo({ titulo, html: '<p>' + escaparHTML(texto) + '</p>', aceptar: 'Confirmar' });
 }
-const TELEFONOS_PRUEBA_HTML = new Set([
-    '12345678',
-    '87654321',
-    '01234567',
-    '76543210',
-    '23456789',
-    '98765432'
-]);
-
-const DOMINIOS_CORREO_FALSOS_HTML = new Set([
-    'example.com', 'example.org', 'example.net', 'example.cl',
-    'test.com', 'test.cl', 'prueba.com', 'prueba.cl',
-    'fake.com', 'fake.cl', 'falso.com', 'falso.cl',
-    'correo.com', 'correo.cl', 'modaestilo.cl', 'tienda.cl',
-    'dominio.com', 'dominio.cl', 'mailinator.com', 'yopmail.com',
-    'yopmail.fr', 'tempmail.com', 'temp-mail.org', 'guerrillamail.com',
-    '10minutemail.com', 'trashmail.com', 'getnada.com', 'dispostable.com',
-    'sharklasers.com', 'localhost', 'invalid'
-]);
-
-const TYPOS_CORREO_HTML = {
-    'gmail.cl': 'gmail.com',
-    'gmail.con': 'gmail.com',
-    'gamil.com': 'gmail.com',
-    'gmial.com': 'gmail.com',
-    'gmal.com': 'gmail.com',
-    'hotmal.com': 'hotmail.com',
-    'hotmial.com': 'hotmail.com',
-    'hotmail.con': 'hotmail.com',
-    'outlok.com': 'outlook.com',
-    'outlook.con': 'outlook.com',
-    'yahoo.con': 'yahoo.com',
-    'iclod.com': 'icloud.com'
-};
-
-function validarTelefonoChilenoHtml(valor) {
-    const limpio = String(valor || '').trim().replace(/[\s-]+/g, '');
-    if (!/^\+569\d{8}$/.test(limpio)) {
-        return {
-            valido: false,
-            mensaje: 'Ingresa exactamente 8 dígitos después del prefijo +569 (ej: +56912345678).'
-        };
-    }
-    const cuerpo = limpio.slice(4);
-    if (/^(\d)\1{7}$/.test(cuerpo) || TELEFONOS_PRUEBA_HTML.has(cuerpo)) {
-        return {
-            valido: false,
-            mensaje: 'Ingresa un número telefónico móvil real (sin dígitos repetidos ni secuencias de prueba).'
-        };
-    }
-    return { valido: true };
-}
-
-async function validarCorreoRealActivoHtml(valor) {
-    const correo = String(valor || '').trim().toLowerCase();
-    const regex = /^[a-z0-9](?:[a-z0-9._%+-]{0,62}[a-z0-9])?@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.[a-z]{2,}$/;
-    if (!regex.test(correo) || correo.includes('..')) {
-        return {
-            valido: false,
-            mensaje: 'Ingresa un correo electrónico válido (ej: nombre@gmail.com).'
-        };
-    }
-    const dominio = correo.split('@')[1];
-    if (TYPOS_CORREO_HTML[dominio]) {
-        return {
-            valido: false,
-            mensaje: `El dominio "${dominio}" no es válido. ¿Quisiste decir "@${TYPOS_CORREO_HTML[dominio]}"?`
-        };
-    }
-    if (DOMINIOS_CORREO_FALSOS_HTML.has(dominio)) {
-        return {
-            valido: false,
-            mensaje: `El dominio "${dominio}" no corresponde a un correo real activo.`
-        };
-    }
-    try {
-        const controller = new AbortController();
-        const tid = setTimeout(() => controller.abort(), 3500);
-        const resp = await fetch(
-            `https://dns.google/resolve?name=${encodeURIComponent(dominio)}&type=MX`,
-            { signal: controller.signal }
-        );
-        clearTimeout(tid);
-        if (resp.ok) {
-            const data = await resp.json();
-            const tieneMx = (data.Answer || []).some((ans) => {
-                if (ans.type !== 15 || !ans.data) return false;
-                const host = ans.data.trim().split(/\s+/).pop() || '';
-                return host !== '' && host !== '.';
-            });
-            if (data.Status === 3 || (data.Status === 0 && !tieneMx)) {
-                return {
-                    valido: false,
-                    mensaje: `El dominio "${dominio}" no existe o no tiene servidor de correo activo.`
-                };
-            }
-        }
-    } catch {
-        // Sin conexión se mantiene la validación de formato y lista de dominios
-    }
-    return { valido: true };
-}
-
 function prepararAyudasFormulario() {
-    const telefono = document.getElementById('telefonoCheckout');
-
-    if (telefono) {
-        const prefijo = '+569';
-
-        function formatearTelefono() {
-            let numero = telefono.value;
-
-            if (numero.startsWith(prefijo)) {
-                numero = numero.slice(prefijo.length);
-            } else {
-                const digitos = numero.replace(/\D/g, '');
-                numero = digitos.startsWith('569')
-                    ? digitos.slice(3)
-                    : digitos.startsWith('9') && digitos.length === 9
-                        ? digitos.slice(1)
-                        : digitos;
-            }
-
-            // Permitir solamente un máximo estricto de 8 dígitos después de +569.
-            numero = numero.replace(/\D/g, '').slice(0, 8);
-
-            telefono.value = prefijo + numero;
-        }
-
-        // Mostrar el prefijo +569 desde el inicio.
-        formatearTelefono();
-
-        telefono.addEventListener('input', formatearTelefono);
-
-        // Evitar borrar el prefijo +569 con Backspace o Suprimir.
-        telefono.addEventListener('keydown', (evento) => {
-            const inicio = telefono.selectionStart;
-            const fin = telefono.selectionEnd;
-
-            if (
-                (evento.key === 'Backspace' && inicio <= 4 && fin <= 4) ||
-                (evento.key === 'Delete' && inicio < 4 && fin <= 4)
-            ) {
-                evento.preventDefault();
-            } else if (
-                (evento.key === 'Backspace' || evento.key === 'Delete') &&
-                inicio < 4 &&
-                fin > 4
-            ) {
-                evento.preventDefault();
-                telefono.value = prefijo + telefono.value.slice(fin);
-                telefono.setSelectionRange(4, 4);
-            }
-        });
-
-        // Al entrar al campo, ubicar el cursor después del prefijo +569.
-        telefono.addEventListener('focus', () => {
-            if ((telefono.selectionStart ?? 0) < 4) {
-                telefono.setSelectionRange(4, 4);
-            }
-        });
-    }
-
     const postal = document.getElementById('postalCheckout');
 
     if (postal) {
@@ -1742,22 +1622,28 @@ function renderizarHistorialUsuario() {
     if (!contenedor) return;
     let usuarioActivo = null;
     try { usuarioActivo = JSON.parse(localStorage.getItem('usuario_activo')); } catch (e) { }
-    if (!usuarioActivo) {
-        contenedor.innerHTML = '<div class="alert alert-warning text-center">Debes iniciar sesión para ver tu historial de compras.</div>';
-        return;
-    }
+    const identidadActiva = usuarioActivo ? usuarioActivo.id : obtenerGuestIdHtml();
+    const bannerInvitado = !usuarioActivo
+        ? `<div class="alert alert-secondary d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <span><i class="bi bi-info-circle me-2"></i>Mostrando compras realizadas sin iniciar sesión en este navegador.</span>
+                <a href="login.html" class="btn btn-sm btn-outline-dark">Iniciar sesión</a>
+           </div>`
+        : '';
     const pedidos = obtenerPedidos();
-    const misPedidos = usuarioActivo.id == null
+    const misPedidos = identidadActiva == null
         ? []
         : pedidos.filter(p =>
             p.usuarioId != null &&
-            String(p.usuarioId) === String(usuarioActivo.id)
+            String(p.usuarioId) === String(identidadActiva)
         );
     if (misPedidos.length === 0) {
-        contenedor.innerHTML = '<div class="alert alert-light text-center border">Aún no has realizado ninguna compra.</div>';
+        const msgVacio = usuarioActivo
+            ? 'Aún no has realizado ninguna compra.'
+            : 'Aún no has realizado compras desde este navegador.';
+        contenedor.innerHTML = `${bannerInvitado}<div class="alert alert-light text-center border">${msgVacio}</div>`;
         return;
     }
-    contenedor.innerHTML = misPedidos.map(p => `
+    contenedor.innerHTML = bannerInvitado + misPedidos.map(p => `
         <div class="card mb-3 border-0 shadow-sm">
             <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                 <div>
