@@ -1,4 +1,3 @@
-
 package ms_usuario.usuario.controller;
 
 import ms_usuario.usuario.enums.RolUsuario;
@@ -37,7 +36,7 @@ public class UsuarioController {
 
         @GetMapping("/{id}")
         public ResponseEntity<Usuario> obtenerPorId(
-                        @PathVariable Long id) {
+                        @PathVariable("id") Long id) {
 
                 return usuarioService.obtenerPorId(id)
                                 .map(ResponseEntity::ok)
@@ -50,7 +49,7 @@ public class UsuarioController {
 
         @GetMapping("/email/{email}")
         public ResponseEntity<Usuario> obtenerPorEmail(
-                        @PathVariable String email) {
+                        @PathVariable("email") String email) {
 
                 return usuarioService.obtenerPorEmail(email)
                                 .map(ResponseEntity::ok)
@@ -78,7 +77,7 @@ public class UsuarioController {
 
         @PutMapping("/{id}")
         public ResponseEntity<Usuario> actualizar(
-                        @PathVariable Long id,
+                        @PathVariable("id") Long id,
                         @RequestBody Usuario usuario) {
 
                 return ResponseEntity.ok(
@@ -91,7 +90,7 @@ public class UsuarioController {
 
         @PatchMapping("/{id}/deshabilitar")
         public ResponseEntity<Usuario> deshabilitar(
-                        @PathVariable Long id) {
+                        @PathVariable("id") Long id) {
 
                 return ResponseEntity.ok(
                                 usuarioService.deshabilitar(id));
@@ -99,8 +98,8 @@ public class UsuarioController {
 
         @PatchMapping("/{id}/rol")
         public ResponseEntity<Usuario> cambiarRol(
-                        @PathVariable Long id,
-                        @RequestParam RolUsuario rol) {
+                        @PathVariable("id") Long id,
+                        @RequestParam("rol") RolUsuario rol) {
 
                 return ResponseEntity.ok(
                                 usuarioService.cambiarRol(id, rol));
@@ -112,7 +111,7 @@ public class UsuarioController {
 
         @PatchMapping("/{id}/habilitar")
         public ResponseEntity<Usuario> habilitar(
-                        @PathVariable Long id) {
+                        @PathVariable("id") Long id) {
 
                 return ResponseEntity.ok(
                                 usuarioService.habilitar(id));
@@ -124,7 +123,7 @@ public class UsuarioController {
 
         @GetMapping("/{id}/favoritos")
         public ResponseEntity<Set<Long>> obtenerFavoritos(
-                        @PathVariable Long id) {
+                        @PathVariable("id") Long id) {
 
                 return ResponseEntity.ok(
                                 usuarioService.obtenerFavoritos(id));
@@ -136,8 +135,8 @@ public class UsuarioController {
 
         @PostMapping("/{id}/favoritos/{productoId}")
         public ResponseEntity<Set<Long>> agregarFavorito(
-                        @PathVariable Long id,
-                        @PathVariable Long productoId) {
+                        @PathVariable("id") Long id,
+                        @PathVariable("productoId") Long productoId) {
 
                 return ResponseEntity.ok(
                                 usuarioService.agregarFavorito(id, productoId));
@@ -149,8 +148,8 @@ public class UsuarioController {
 
         @DeleteMapping("/{id}/favoritos/{productoId}")
         public ResponseEntity<Set<Long>> eliminarFavorito(
-                        @PathVariable Long id,
-                        @PathVariable Long productoId) {
+                        @PathVariable("id") Long id,
+                        @PathVariable("productoId") Long productoId) {
 
                 return ResponseEntity.ok(
                                 usuarioService.eliminarFavorito(id, productoId));

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { FormEvent, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import useCarrito from '../hooks/useCarrito';
@@ -216,9 +217,23 @@ const CheckoutPage = () => {
           // ignorar error secundario
         }
       }
-      setError(
-        'No se pudo completar la compra. Revisa el stock disponible y que los microservicios estén activos.'
-      );
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 409) {
+          setError('No hay suficiente stock disponible para completar la compra.');
+        } else if (!err.response) {
+          setError(
+            'No se pudo conectar con uno de los microservicios (revisa que Productos 8085, Pedidos 8083 y Carrito 8084 estén encendidos).'
+          );
+        } else {
+          setError(
+            `Error del servidor (${err.response.status}) al procesar la compra. Revisa el stock y la conexión a MySQL.`
+          );
+        }
+      } else {
+        setError(
+          'No se pudo completar la compra. Revisa el stock disponible y que los microservicios estén activos.'
+        );
+      }
     } finally {
       setProcesando(false);
     }

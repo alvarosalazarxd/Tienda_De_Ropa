@@ -17,30 +17,32 @@ public class CarritoController {
     }
 
     @GetMapping("/{usuarioId}")
-    public ResponseEntity<Carrito> obtenerCarrito(@PathVariable Long usuarioId) {
+    public ResponseEntity<Carrito> obtenerCarrito(@PathVariable("usuarioId") Long usuarioId) {
         return ResponseEntity.ok(carritoService.obtenerPorUsuarioId(usuarioId));
     }
 
     @PostMapping("/{usuarioId}/items")
-    public ResponseEntity<Carrito> agregarItem(@PathVariable Long usuarioId, @RequestBody ItemCarrito item) {
+    public ResponseEntity<Carrito> agregarItem(@PathVariable("usuarioId") Long usuarioId, @RequestBody ItemCarrito item) {
         return ResponseEntity.ok(carritoService.agregarItem(usuarioId, item));
     }
 
     @PutMapping("/{usuarioId}/items/{itemId}")
     public ResponseEntity<Carrito> actualizarCantidad(
-            @PathVariable Long usuarioId,
-            @PathVariable Long itemId,
-            @RequestParam Integer cantidad) {
+            @PathVariable("usuarioId") Long usuarioId,
+            @PathVariable("itemId") Long itemId,
+            @RequestParam("cantidad") Integer cantidad) {
         return ResponseEntity.ok(carritoService.actualizarCantidadItem(usuarioId, itemId, cantidad));
     }
 
     @DeleteMapping("/{usuarioId}/items/{itemId}")
-    public ResponseEntity<Carrito> eliminarItem(@PathVariable Long usuarioId, @PathVariable Long itemId) {
+    public ResponseEntity<Carrito> eliminarItem(
+            @PathVariable("usuarioId") Long usuarioId,
+            @PathVariable("itemId") Long itemId) {
         return ResponseEntity.ok(carritoService.eliminarItem(usuarioId, itemId));
     }
 
     @DeleteMapping("/{usuarioId}")
-    public ResponseEntity<Carrito> vaciarCarrito(@PathVariable Long usuarioId) {
+    public ResponseEntity<Carrito> vaciarCarrito(@PathVariable("usuarioId") Long usuarioId) {
         return ResponseEntity.ok(carritoService.vaciarCarrito(usuarioId));
     }
 }

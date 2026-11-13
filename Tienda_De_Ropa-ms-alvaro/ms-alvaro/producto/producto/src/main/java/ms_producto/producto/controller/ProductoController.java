@@ -24,14 +24,14 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<Producto> obtenerPorId(@PathVariable("id") Long id) {
         return productoService.obtenerPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/categoria/{categoria}")
-    public ResponseEntity<List<Producto>> obtenerPorCategoria(@PathVariable String categoria) {
+    public ResponseEntity<List<Producto>> obtenerPorCategoria(@PathVariable("categoria") String categoria) {
         return ResponseEntity.ok(productoService.obtenerPorCategoria(categoria));
     }
 
@@ -41,15 +41,16 @@ public class ProductoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizar(@PathVariable Long id, @RequestBody Producto producto) {
+    public ResponseEntity<Producto> actualizar(@PathVariable("id") Long id, @RequestBody Producto producto) {
         return ResponseEntity.ok(productoService.actualizar(id, producto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable("id") Long id) {
         productoService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+
     public record StockRespuesta(Long productoId, Integer stock, Integer stockMinimo,
                                  boolean stockBajo) {}
     public record AjusteStock(Integer stock, Integer stockMinimo) {}
@@ -60,22 +61,22 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}/stock")
-    public StockRespuesta consultarStock(@PathVariable Long id) {
+    public StockRespuesta consultarStock(@PathVariable("id") Long id) {
         return respuestaStock(productoService.consultarStock(id));
     }
 
     @PatchMapping("/{id}/stock")
-    public StockRespuesta actualizarStock(@PathVariable Long id, @RequestBody AjusteStock datos) {
+    public StockRespuesta actualizarStock(@PathVariable("id") Long id, @RequestBody AjusteStock datos) {
         return respuestaStock(productoService.actualizarStock(id, datos.stock(), datos.stockMinimo()));
     }
 
     @PostMapping("/{id}/stock/aumentar")
-    public StockRespuesta aumentarStock(@PathVariable Long id, @RequestBody MovimientoStock datos) {
+    public StockRespuesta aumentarStock(@PathVariable("id") Long id, @RequestBody MovimientoStock datos) {
         return respuestaStock(productoService.aumentarStock(id, datos.cantidad()));
     }
 
     @PostMapping("/{id}/stock/descontar")
-    public StockRespuesta descontarStock(@PathVariable Long id, @RequestBody MovimientoStock datos) {
+    public StockRespuesta descontarStock(@PathVariable("id") Long id, @RequestBody MovimientoStock datos) {
         return respuestaStock(productoService.descontarStock(id, datos.cantidad()));
     }
 

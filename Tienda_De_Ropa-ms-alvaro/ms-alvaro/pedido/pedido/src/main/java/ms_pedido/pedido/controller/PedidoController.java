@@ -1,4 +1,3 @@
-
 package ms_pedido.pedido.controller;
 
 import ms_pedido.pedido.model.Pedido;
@@ -41,7 +40,7 @@ public class PedidoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Pedido> obtenerPedidoPorId(
-            @PathVariable Long id) {
+            @PathVariable("id") Long id) {
 
         return ResponseEntity.ok(
                 pedidoService.obtenerPedidoPorId(id)
@@ -54,7 +53,7 @@ public class PedidoController {
 
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<Pedido>> obtenerPedidosPorUsuario(
-            @PathVariable Long usuarioId) {
+            @PathVariable("usuarioId") Long usuarioId) {
 
         return ResponseEntity.ok(
                 pedidoService.obtenerPedidosPorUsuario(usuarioId)
@@ -79,8 +78,8 @@ public class PedidoController {
 
     @PutMapping("/{id}/estado")
     public ResponseEntity<Pedido> cambiarEstado(
-            @PathVariable Long id,
-            @RequestParam EstadoPedido estado) {
+            @PathVariable("id") Long id,
+            @RequestParam("estado") EstadoPedido estado) {
 
         return ResponseEntity.ok(
                 pedidoService.cambiarEstado(id, estado)
@@ -93,7 +92,7 @@ public class PedidoController {
 
     @PatchMapping("/{id}/cancelar")
     public ResponseEntity<Pedido> cancelarPedido(
-            @PathVariable Long id) {
+            @PathVariable("id") Long id) {
 
         return ResponseEntity.ok(
                 pedidoService.cancelarPedido(id)
