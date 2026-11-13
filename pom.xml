@@ -11,6 +11,7 @@
     <name>Tienda de Ropa con React - Microservicios</name>
 
     <modules>
+        <module>Tienda_De_Ropa-ms-alvaro/ms-alvaro/gateway</module>
         <module>Tienda_De_Ropa-ms-alvaro/ms-alvaro/usuario</module>
         <module>Tienda_De_Ropa-ms-alvaro/ms-alvaro/producto/producto</module>
         <module>Tienda_De_Ropa-ms-alvaro/ms-alvaro/carrito/carrito</module>

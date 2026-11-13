@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_GATEWAY_URL } from './api.config';
 import { obtenerSesionUsuario } from './usuario.service';
 
 export interface ItemCarrito {
@@ -19,9 +20,9 @@ export interface Carrito {
 export type ItemCarritoPayload = Omit<ItemCarrito, 'id' | 'subtotal'>;
 // Payload para enviar un item al carrito sin id ni subtotal (el backend lo calcula)
 
-// Puerto 8084 corresponde al microservicio de carrito
+// Todas las peticiones pasan por el API Gateway (8080 -> carrito 8084)
 const API_BASE_URL =
-  import.meta.env.VITE_API_CARRITO_URL ?? 'http://localhost:8084/api';
+  import.meta.env.VITE_API_CARRITO_URL ?? API_GATEWAY_URL;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

@@ -49,7 +49,7 @@ const LoginPage = () => {
     } catch (err) {
       console.error(err);
       setError(
-        'No fue posible conectar con el microservicio de usuarios (puerto 8081).'
+        'No fue posible conectar con el servicio de usuarios a través del Gateway (puerto 8080).'
       );
     } finally {
       setLoading(false);

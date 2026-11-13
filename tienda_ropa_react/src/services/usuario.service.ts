@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_GATEWAY_URL } from './api.config';
 
 export type RolUsuario = 'CLIENTE' | 'ADMIN';
 
@@ -18,9 +19,9 @@ export interface UsuarioPayload {
   password: string;
 }
 
-// Puerto 8081 corresponde al microservicio de usuarios
+// Todas las peticiones pasan por el API Gateway (8080 -> usuario 8081)
 const API_BASE_URL =
-  import.meta.env.VITE_API_USUARIOS_URL ?? 'http://localhost:8081/api';
+  import.meta.env.VITE_API_USUARIOS_URL ?? API_GATEWAY_URL;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

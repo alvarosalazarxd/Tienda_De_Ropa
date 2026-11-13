@@ -154,7 +154,7 @@ const ProductoList = () => {
       }, 1200);
     } catch {
       setMensaje(
-        'No se pudo conectar con el microservicio de carrito (puerto 8084).'
+        'No se pudo conectar con el servicio de carrito a través del Gateway (puerto 8080).'
       );
     }
   };
@@ -218,8 +218,8 @@ const ProductoList = () => {
 
         {error && (
           <div className="alert alert-danger">
-            No se pudo conectar con el microservicio de productos en{' '}
-            <code>http://localhost:8085/api/productos</code>.
+            No se pudo conectar con los productos a través del Gateway en{' '}
+            <code>http://localhost:8080/api/productos</code>.
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_GATEWAY_URL } from './api.config';
 
 export type EstadoPedido = 'PENDIENTE' | 'PAGADO' | 'CANCELADO';
 
@@ -24,9 +25,9 @@ export interface PedidoPayload {
   items: Omit<ItemPedido, 'id' | 'subtotal'>[];
 }
 
-// Puerto 8083 corresponde al microservicio de pedidos
+// Todas las peticiones pasan por el API Gateway (8080 -> pedido 8083)
 const API_BASE_URL =
-  import.meta.env.VITE_API_PEDIDOS_URL ?? 'http://localhost:8083/api';
+  import.meta.env.VITE_API_PEDIDOS_URL ?? API_GATEWAY_URL;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

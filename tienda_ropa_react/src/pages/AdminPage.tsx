@@ -517,10 +517,10 @@ const AdminPage = () => {
 
           {(errorProductos || errorPedidos || errorUsuarios) && (
             <div className="alert alert-warning">
-              Algunos microservicios no responden:{' '}
-              {errorProductos && <span className="me-2">[Productos: 8085]</span>}
-              {errorPedidos && <span className="me-2">[Pedidos: 8083]</span>}
-              {errorUsuarios && <span>[Usuarios: 8081]</span>}
+              No se pudo conectar vía Gateway (8080):{' '}
+              {errorProductos && <span className="me-2">[Productos (8085)]</span>}
+              {errorPedidos && <span className="me-2">[Pedidos (8083)]</span>}
+              {errorUsuarios && <span>[Usuarios (8081)]</span>}
             </div>
           )}
 

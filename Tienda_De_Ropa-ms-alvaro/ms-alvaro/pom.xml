@@ -11,6 +11,7 @@
     <name>Microservicios Moda y Estilo</name>
 
     <modules>
+        <module>gateway</module>
         <module>usuario</module>
         <module>producto/producto</module>
         <module>carrito/carrito</module>

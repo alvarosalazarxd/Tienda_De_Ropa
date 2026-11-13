@@ -222,7 +222,7 @@ const CheckoutPage = () => {
           setError('No hay suficiente stock disponible para completar la compra.');
         } else if (!err.response) {
           setError(
-            'No se pudo conectar con uno de los microservicios (revisa que Productos 8085, Pedidos 8083 y Carrito 8084 estén encendidos).'
+            'No se pudo conectar con los microservicios a través del Gateway (revisa que Gateway 8080, Productos 8085, Pedidos 8083 y Carrito 8084 estén encendidos).'
           );
         } else {
           setError(

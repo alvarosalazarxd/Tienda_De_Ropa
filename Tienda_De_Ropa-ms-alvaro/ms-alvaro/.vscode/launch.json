@@ -39,16 +39,24 @@
             "projectName": "usuario",
             "args": "",
             "vmArgs": "-Xms48m -Xmx128m -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -Dspring.jmx.enabled=false"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-GatewayApplication<gateway>",
+            "request": "launch",
+            "mainClass": "ms_gateway.gateway.GatewayApplication",
+            "projectName": "gateway"
         }
     ],
     "compounds": [
         {
-            "name": "Iniciar los 4 Microservicios",
+            "name": "Iniciar Microservicios con Gateway",
             "configurations": [
                 "Spring Boot-UsuarioApplication<usuario>",
                 "Spring Boot-ProductoApplication<producto>",
                 "Spring Boot-PedidoApplication<pedido>",
-                "Spring Boot-CarritoApplication<carrito>"
+                "Spring Boot-CarritoApplication<carrito>",
+                "Spring Boot-GatewayApplication<gateway>"
             ]
         }
     ]

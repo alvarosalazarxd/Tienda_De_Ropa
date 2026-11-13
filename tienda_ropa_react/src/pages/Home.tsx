@@ -180,8 +180,8 @@ const Home = () => {
           {loading && <p className="text-muted">Cargando productos...</p>}
           {error && (
             <div className="alert alert-warning">
-              No se pudo conectar al microservicio de productos (puerto 8085).
-              Verifica que esté encendido junto con MySQL en XAMPP.
+              No se pudo conectar al servicio de productos a través del Gateway (puerto 8080).
+              Verifica que el Gateway y los microservicios estén encendidos junto con MySQL en XAMPP.
             </div>
           )}
 

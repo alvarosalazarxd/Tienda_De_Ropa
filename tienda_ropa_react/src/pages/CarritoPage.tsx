@@ -68,8 +68,8 @@ const CarritoPage = () => {
       <main className="container my-4">
         {error && (
           <div className="alert alert-danger">
-            No se pudo conectar con el microservicio de carrito en el puerto
-            8084.
+            No se pudo conectar con el servicio de carrito a través del Gateway
+            (puerto 8080 / Carrito 8084).
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_GATEWAY_URL } from './api.config';
 
 export type CategoriaProducto =
   | 'URBANO'
@@ -28,7 +29,7 @@ export interface StockRespuesta {
 }
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_PRODUCTOS_URL ?? 'http://localhost:8085/api';
+  import.meta.env.VITE_API_PRODUCTOS_URL ?? API_GATEWAY_URL;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

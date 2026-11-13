@@ -11,6 +11,7 @@
     <name>Tienda de Ropa - Microservicios (Root)</name>
 
     <modules>
+        <module>ms-alvaro/gateway</module>
         <module>ms-alvaro/usuario</module>
         <module>ms-alvaro/producto/producto</module>
         <module>ms-alvaro/carrito/carrito</module>

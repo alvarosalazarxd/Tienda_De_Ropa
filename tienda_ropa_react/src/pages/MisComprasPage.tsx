@@ -100,7 +100,7 @@ const MisComprasPage = () => {
 
           {error && (
             <div className="alert alert-danger">
-              No se pudo conectar con el microservicio de pedidos (puerto 8083).
+              No se pudo conectar con el servicio de pedidos a través del Gateway (puerto 8080).
             </div>
           )}
 
