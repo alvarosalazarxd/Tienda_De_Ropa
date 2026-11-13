@@ -623,18 +623,23 @@ function inicializarCheckout() {
             procesando = true;
             boton.disabled = true;
             try {
-                // Validación estricta para números telefónicos de Chile (+569XXXXXXXX)
+                // Validación estricta para correo real y activo
+                const correoInput = document.getElementById('correoCheckout');
+                if (correoInput) {
+                    const checkCorreo = await validarCorreoRealActivoHtml(correoInput.value);
+                    if (!checkCorreo.valido) {
+                        await mostrarAviso('Correo inválido', checkCorreo.mensaje);
+                        return;
+                    }
+                }
+
+                // Validación estricta para números telefónicos de Chile (+569 + 8 dígitos)
                 const telefono = document.getElementById('telefonoCheckout');
 
                 if (telefono) {
-                    // Eliminar espacios en blanco para la validación
-                    const telLimpio = telefono.value.trim().replace(/[\s-]+/g, '');
-
-                    // Acepta: +56912345678, 56912345678 o 912345678
-                    const esValido = /^(\+?56)?9\d{8}$/.test(telLimpio);
-
-                    if (!esValido) {
-                        await mostrarAviso('Teléfono inválido', 'Ingresa un número chileno válido de 9 dígitos (ej: 912345678 o +56912345678).');
+                    const checkTel = validarTelefonoChilenoHtml(telefono.value);
+                    if (!checkTel.valido) {
+                        await mostrarAviso('Teléfono inválido', checkTel.mensaje);
                         return;
                     }
                 }
@@ -1559,66 +1564,165 @@ function mostrarAviso(titulo, texto) {
 function pedirConfirmacion(titulo, texto) {
     return abrirDialogo({ titulo, html: '<p>' + escaparHTML(texto) + '</p>', aceptar: 'Confirmar' });
 }
-function prepararAyudasFormulario() {
-    const correo = document.getElementById('correoCheckout');
+const TELEFONOS_PRUEBA_HTML = new Set([
+    '12345678',
+    '87654321',
+    '01234567',
+    '76543210',
+    '23456789',
+    '98765432'
+]);
 
-    if (correo) {
-        correo.addEventListener('focus', () => {
-            if (correo.value === '@gmail.com') {
-                correo.setSelectionRange(0, 0);
-            }
-        });
+const DOMINIOS_CORREO_FALSOS_HTML = new Set([
+    'example.com', 'example.org', 'example.net', 'example.cl',
+    'test.com', 'test.cl', 'prueba.com', 'prueba.cl',
+    'fake.com', 'fake.cl', 'falso.com', 'falso.cl',
+    'correo.com', 'correo.cl', 'modaestilo.cl', 'tienda.cl',
+    'dominio.com', 'dominio.cl', 'mailinator.com', 'yopmail.com',
+    'yopmail.fr', 'tempmail.com', 'temp-mail.org', 'guerrillamail.com',
+    '10minutemail.com', 'trashmail.com', 'getnada.com', 'dispostable.com',
+    'sharklasers.com', 'localhost', 'invalid'
+]);
+
+const TYPOS_CORREO_HTML = {
+    'gmail.cl': 'gmail.com',
+    'gmail.con': 'gmail.com',
+    'gamil.com': 'gmail.com',
+    'gmial.com': 'gmail.com',
+    'gmal.com': 'gmail.com',
+    'hotmal.com': 'hotmail.com',
+    'hotmial.com': 'hotmail.com',
+    'hotmail.con': 'hotmail.com',
+    'outlok.com': 'outlook.com',
+    'outlook.con': 'outlook.com',
+    'yahoo.con': 'yahoo.com',
+    'iclod.com': 'icloud.com'
+};
+
+function validarTelefonoChilenoHtml(valor) {
+    const limpio = String(valor || '').trim().replace(/[\s-]+/g, '');
+    if (!/^\+569\d{8}$/.test(limpio)) {
+        return {
+            valido: false,
+            mensaje: 'Ingresa exactamente 8 dígitos después del prefijo +569 (ej: +56912345678).'
+        };
     }
+    const cuerpo = limpio.slice(4);
+    if (/^(\d)\1{7}$/.test(cuerpo) || TELEFONOS_PRUEBA_HTML.has(cuerpo)) {
+        return {
+            valido: false,
+            mensaje: 'Ingresa un número telefónico móvil real (sin dígitos repetidos ni secuencias de prueba).'
+        };
+    }
+    return { valido: true };
+}
+
+async function validarCorreoRealActivoHtml(valor) {
+    const correo = String(valor || '').trim().toLowerCase();
+    const regex = /^[a-z0-9](?:[a-z0-9._%+-]{0,62}[a-z0-9])?@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.[a-z]{2,}$/;
+    if (!regex.test(correo) || correo.includes('..')) {
+        return {
+            valido: false,
+            mensaje: 'Ingresa un correo electrónico válido (ej: nombre@gmail.com).'
+        };
+    }
+    const dominio = correo.split('@')[1];
+    if (TYPOS_CORREO_HTML[dominio]) {
+        return {
+            valido: false,
+            mensaje: `El dominio "${dominio}" no es válido. ¿Quisiste decir "@${TYPOS_CORREO_HTML[dominio]}"?`
+        };
+    }
+    if (DOMINIOS_CORREO_FALSOS_HTML.has(dominio)) {
+        return {
+            valido: false,
+            mensaje: `El dominio "${dominio}" no corresponde a un correo real activo.`
+        };
+    }
+    try {
+        const controller = new AbortController();
+        const tid = setTimeout(() => controller.abort(), 3500);
+        const resp = await fetch(
+            `https://dns.google/resolve?name=${encodeURIComponent(dominio)}&type=MX`,
+            { signal: controller.signal }
+        );
+        clearTimeout(tid);
+        if (resp.ok) {
+            const data = await resp.json();
+            const tieneMx = (data.Answer || []).some((ans) => {
+                if (ans.type !== 15 || !ans.data) return false;
+                const host = ans.data.trim().split(/\s+/).pop() || '';
+                return host !== '' && host !== '.';
+            });
+            if (data.Status === 3 || (data.Status === 0 && !tieneMx)) {
+                return {
+                    valido: false,
+                    mensaje: `El dominio "${dominio}" no existe o no tiene servidor de correo activo.`
+                };
+            }
+        }
+    } catch {
+        // Sin conexión se mantiene la validación de formato y lista de dominios
+    }
+    return { valido: true };
+}
+
+function prepararAyudasFormulario() {
     const telefono = document.getElementById('telefonoCheckout');
 
     if (telefono) {
-        const prefijo = '+56';
+        const prefijo = '+569';
 
         function formatearTelefono() {
             let numero = telefono.value;
 
-            // Separar el prefijo de los números ingresados.
             if (numero.startsWith(prefijo)) {
                 numero = numero.slice(prefijo.length);
+            } else {
+                const digitos = numero.replace(/\D/g, '');
+                numero = digitos.startsWith('569')
+                    ? digitos.slice(3)
+                    : digitos.startsWith('9') && digitos.length === 9
+                        ? digitos.slice(1)
+                        : digitos;
             }
 
-            // Permitir solamente 9 dígitos después del +56.
-            numero = numero.replace(/\D/g, '').slice(0, 9);
+            // Permitir solamente un máximo estricto de 8 dígitos después de +569.
+            numero = numero.replace(/\D/g, '').slice(0, 8);
 
             telefono.value = prefijo + numero;
         }
 
-        // Mostrar el prefijo desde el inicio.
+        // Mostrar el prefijo +569 desde el inicio.
         formatearTelefono();
 
         telefono.addEventListener('input', formatearTelefono);
 
-        // Evitar borrar el prefijo con Backspace o Suprimir.
+        // Evitar borrar el prefijo +569 con Backspace o Suprimir.
         telefono.addEventListener('keydown', (evento) => {
             const inicio = telefono.selectionStart;
             const fin = telefono.selectionEnd;
 
             if (
-                (evento.key === 'Backspace' && inicio <= 3) ||
-                (evento.key === 'Delete' && inicio < 3)
+                (evento.key === 'Backspace' && inicio <= 4 && fin <= 4) ||
+                (evento.key === 'Delete' && inicio < 4 && fin <= 4)
             ) {
                 evento.preventDefault();
-
-                // Si hay números seleccionados, eliminarlos
-                // conservando siempre el prefijo.
-                if (fin > 3) {
-                    telefono.value =
-                        prefijo + telefono.value.slice(fin);
-
-                    telefono.setSelectionRange(3, 3);
-                }
+            } else if (
+                (evento.key === 'Backspace' || evento.key === 'Delete') &&
+                inicio < 4 &&
+                fin > 4
+            ) {
+                evento.preventDefault();
+                telefono.value = prefijo + telefono.value.slice(fin);
+                telefono.setSelectionRange(4, 4);
             }
         });
 
-        // Al entrar al campo, ubicar el cursor después del prefijo.
+        // Al entrar al campo, ubicar el cursor después del prefijo +569.
         telefono.addEventListener('focus', () => {
-            if (telefono.value === prefijo) {
-                telefono.setSelectionRange(3, 3);
+            if ((telefono.selectionStart ?? 0) < 4) {
+                telefono.setSelectionRange(4, 4);
             }
         });
     }

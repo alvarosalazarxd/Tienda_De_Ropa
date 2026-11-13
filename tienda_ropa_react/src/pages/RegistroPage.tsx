@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import UsuarioService from '../services/usuario.service';
+import { validarCorreoRealActivo } from '../utils/validaciones';
 
 const RegistroPage = () => {
   const navigate = useNavigate();
@@ -38,11 +39,6 @@ const RegistroPage = () => {
       return;
     }
 
-    if (!emailFinal.includes('@')) {
-      setError('Ingresa un correo electrónico válido.');
-      return;
-    }
-
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
@@ -50,6 +46,13 @@ const RegistroPage = () => {
 
     setLoading(true);
     try {
+      const validacionCorreo = await validarCorreoRealActivo(emailFinal);
+      if (!validacionCorreo.valido) {
+        setError(validacionCorreo.mensaje);
+        setLoading(false);
+        return;
+      }
+
       // Revisamos primero si el correo ya esta registrado en MySQL
       const existente = await UsuarioService.obtenerPorEmail(emailFinal);
       if (existente) {
@@ -153,9 +156,11 @@ const RegistroPage = () => {
                       onChange={(e) => setDominio(e.target.value)}
                     >
                       <option value="@gmail.com">@gmail.com</option>
-                      <option value="@gmail.cl">@gmail.cl</option>
                       <option value="@hotmail.com">@hotmail.com</option>
+                      <option value="@hotmail.cl">@hotmail.cl</option>
                       <option value="@outlook.com">@outlook.com</option>
+                      <option value="@outlook.cl">@outlook.cl</option>
+                      <option value="@live.cl">@live.cl</option>
                       <option value="@icloud.com">@icloud.com</option>
                       <option value="">Otro</option>
                     </select>
