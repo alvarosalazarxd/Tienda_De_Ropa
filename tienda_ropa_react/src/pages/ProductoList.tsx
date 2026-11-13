@@ -13,6 +13,15 @@ import UsuarioService, {
   obtenerSesionUsuario
 } from '../services/usuario.service';
 
+const CATEGORIAS_FILTRO = [
+  { valor: 'TODOS', etiqueta: 'Todas' },
+  { valor: 'URBANO', etiqueta: 'Urbano' },
+  { valor: 'CASUAL', etiqueta: 'Casual' },
+  { valor: 'FORMAL', etiqueta: 'Formal' },
+  { valor: 'DEPORTIVO', etiqueta: 'Deportivo' },
+  { valor: 'ACCESORIOS', etiqueta: 'Accesorios' }
+];
+
 const ProductoList = () => {
   // Hook personalizado que consulta el microservicio de productos en Spring Boot
   const { productos, loading, error, recargar } = useProductos();
@@ -175,7 +184,8 @@ const ProductoList = () => {
               </h2>
               <div className="catalogo-linea"></div>
               <p className="text-white-50 small mb-0">
-                Carga directa desde MySQL con Spring Boot
+                Prendas urbanas, casuales, deportivas, formales y accesorios de
+                temporada
               </p>
             </div>
 
@@ -231,7 +241,7 @@ const ProductoList = () => {
                 <input
                   type="search"
                   className="form-control"
-                  placeholder="Buscar productos..."
+                  placeholder="Buscar prendas, estilos o accesorios..."
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}
                 />
@@ -268,15 +278,33 @@ const ProductoList = () => {
             </div>
           </div>
 
-          <p className="text-muted small mt-3 mb-0">
-            Mostrando <strong className="text-dark">{productosFiltrados.length}</strong>{' '}
-            productos
-          </p>
+          <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 pt-3 border-top border-light-subtle">
+            <div className="d-flex flex-wrap gap-2">
+              {CATEGORIAS_FILTRO.map((cat) => (
+                <button
+                  key={cat.valor}
+                  type="button"
+                  className={`chip-categoria ${
+                    categoriaFiltro === cat.valor ? 'active' : ''
+                  }`}
+                  onClick={() => handleCambiarCategoria(cat.valor)}
+                >
+                  {cat.etiqueta}
+                </button>
+              ))}
+            </div>
+
+            <p className="text-muted small mb-0">
+              Mostrando{' '}
+              <strong className="text-dark">{productosFiltrados.length}</strong>{' '}
+              productos
+            </p>
+          </div>
         </section>
 
         {productosFiltrados.length === 0 && !loading ? (
           <div className="text-center py-5">
-            <i className="bi bi-search fs-1 text-gold d-block mb-3"></i>
+            <i className="bi bi-search fs-1 text-gold-deep d-block mb-3"></i>
             <h4 className="fw-bold">No encontramos productos</h4>
             <p className="text-muted">
               Prueba con otro nombre, descripción o categoría.
@@ -293,6 +321,7 @@ const ProductoList = () => {
           <div className="row g-4">
             {productosFiltrados.map((producto) => {
               const agotado = producto.stock <= 0;
+              const bajoStock = producto.stock > 0 && producto.stock <= 5;
               const esFavorito = favoritos.includes(producto.id);
               const cantidad = obtenerCantidad(producto.id);
               const recienAgregado = productoAgregadoId === producto.id;
@@ -304,14 +333,19 @@ const ProductoList = () => {
                 >
                   <div className="card producto-card shadow-sm position-relative w-100">
                     {agotado && (
-                      <span className="badge bg-danger position-absolute top-0 start-0 m-2 z-1 px-2 py-1">
+                      <span className="badge bg-danger position-absolute top-0 start-0 m-3 z-1 px-2 py-1 rounded-pill">
                         Agotado
+                      </span>
+                    )}
+                    {bajoStock && (
+                      <span className="badge bg-dark text-gold border border-gold position-absolute top-0 start-0 m-3 z-1 px-2 py-1 rounded-pill">
+                        Últimas {producto.stock} u.
                       </span>
                     )}
 
                     <button
                       type="button"
-                      className="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm border-0 z-1 btn-favorito"
+                      className="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-3 shadow-sm border-0 z-1 btn-favorito"
                       onClick={() => void handleToggleFavorito(producto.id)}
                       title={
                         esFavorito
@@ -337,15 +371,15 @@ const ProductoList = () => {
                       </Link>
                     </div>
 
-                    <div className="card-body d-flex flex-column">
-                      <span className="badge bg-light text-dark border align-self-start mb-2">
+                    <div className="card-body d-flex flex-column p-3">
+                      <span className="badge-categoria-pill align-self-start mb-2">
                         {obtenerNombreCategoria(producto.categoria)}
                       </span>
 
                       <h5 className="fw-bold fs-6 mb-1">
                         <Link
                           to={`/productos/${producto.id}`}
-                          className="text-dark text-decoration-none"
+                          className="text-dark text-decoration-none hover-link"
                         >
                           {producto.nombre}
                         </Link>
@@ -356,16 +390,17 @@ const ProductoList = () => {
                       </p>
 
                       <small className="text-muted d-block mb-2">
-                        Stock disponible: <strong>{producto.stock}</strong>
+                        Stock disponible:{' '}
+                        <strong className="text-dark">{producto.stock}</strong>
                       </small>
 
-                      <div className="mt-auto">
-                        <div className="d-flex align-items-end justify-content-between gap-2 mb-2">
+                      <div className="mt-auto pt-2 border-top border-light-subtle">
+                        <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
                           <span className="precio-producto">
                             {formatearPrecioCLP(producto.precio)}
                           </span>
 
-                          <div style={{ width: '110px' }}>
+                          <div style={{ width: '108px' }}>
                             <div className="input-group input-group-sm">
                               <button
                                 type="button"
@@ -407,7 +442,7 @@ const ProductoList = () => {
 
                         <button
                           type="button"
-                          className={`btn btn-sm w-100 ${
+                          className={`btn btn-sm w-100 rounded-pill ${
                             recienAgregado
                               ? 'btn-success'
                               : 'btn-agregar-producto'
@@ -419,7 +454,7 @@ const ProductoList = () => {
                             className={`bi ${
                               recienAgregado
                                 ? 'bi-check-circle'
-                                : 'bi-cart-plus'
+                                : 'bi-bag-plus'
                             } me-1`}
                           ></i>
                           {agotado

@@ -32,109 +32,116 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-sm navbar-dark navbar-custom sticky-top">
-      <div className="container-fluid">
-        <Link className="navbar-brand fw-bold text-uppercase fs-4" to="/">
-          Moda &amp; Estilo
-        </Link>
+    <>
+      <div className="announcement-bar text-center d-none d-sm-block">
+        <span>
+          <i className="bi bi-stars text-gold me-2"></i>
+          Nueva Colección 2026 · Despacho a todo Chile · Cambios sin costo
+        </span>
+      </div>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#collapsibleNavbar"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+      <nav className="navbar navbar-expand-md navbar-dark navbar-custom sticky-top">
+        <div className="container">
+          <Link className="navbar-brand fw-bold text-uppercase" to="/">
+            Moda <span className="text-gold">&amp;</span> Estilo
+          </Link>
 
-        <div className="collapse navbar-collapse" id="collapsibleNavbar">
-          <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? 'active fw-semibold' : ''}`
-                }
-              >
-                Inicio
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/nosotros"
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? 'active fw-semibold' : ''}`
-                }
-              >
-                Nosotros
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/productos"
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? 'active fw-semibold' : ''}`
-                }
-              >
-                Productos
-              </NavLink>
-            </li>
-          </ul>
+          <button
+            className="navbar-toggler border-0"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapsibleNavbar"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
 
-          <ul className="navbar-nav ms-auto align-items-center">
-            <li className="nav-item">
-              <NavLink
-                to="/carrito"
-                className={({ isActive }) =>
-                  `nav-link position-relative me-3 ${isActive ? 'active' : ''}`
-                }
-              >
-                <i className="bi bi-cart3 fs-5"></i>
-                <span
-                  className="badge rounded-pill bg-warning text-dark position-absolute top-0 start-100 translate-middle"
-                  style={{ fontSize: '0.65rem' }}
+          <div className="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul className="navbar-nav me-auto ms-md-4">
+              <li className="nav-item">
+                <NavLink
+                  to="/"
+                  end
+                  className={({ isActive }) =>
+                    `nav-link nav-link-line ${isActive ? 'active fw-semibold' : ''}`
+                  }
                 >
-                  {totalUnidades}
-                </span>
-              </NavLink>
-            </li>
+                  Inicio
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/productos"
+                  className={({ isActive }) =>
+                    `nav-link nav-link-line ${isActive ? 'active fw-semibold' : ''}`
+                  }
+                >
+                  Catálogo
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/nosotros"
+                  className={({ isActive }) =>
+                    `nav-link nav-link-line ${isActive ? 'active fw-semibold' : ''}`
+                  }
+                >
+                  Nosotros
+                </NavLink>
+              </li>
+            </ul>
 
-            {!usuarioActivo ? (
-              <>
-                <li className="nav-item">
-                  <NavLink
-                    to="/mis-compras"
-                    className={({ isActive }) =>
-                      `nav-link ${isActive ? 'active fw-semibold' : ''}`
-                    }
+            <ul className="navbar-nav ms-auto align-items-md-center gap-md-2">
+              <li className="nav-item my-1 my-md-0">
+                <NavLink
+                  to="/carrito"
+                  className={({ isActive }) =>
+                    `nav-link nav-cart-pill ${isActive ? 'active' : ''}`
+                  }
+                >
+                  <i className="bi bi-bag fs-6"></i>
+                  <span className="small fw-semibold">Bolsa</span>
+                  <span
+                    className="badge rounded-pill bg-warning text-dark"
+                    style={{ fontSize: '0.7rem' }}
                   >
-                    <i className="bi bi-bag-check me-1"></i>
-                    Mis Compras
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink
-                    to="/login"
-                    className={({ isActive }) =>
-                      `nav-link ${isActive ? 'active fw-semibold' : ''}`
-                    }
-                  >
-                    Iniciar Sesión
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink
-                    to="/registro"
-                    className={({ isActive }) =>
-                      `nav-link ${isActive ? 'active fw-semibold' : ''}`
-                    }
-                  >
-                    Registrarse
-                  </NavLink>
-                </li>
-              </>
-            ) : (
+                    {totalUnidades}
+                  </span>
+                </NavLink>
+              </li>
+
+              {!usuarioActivo ? (
+                <>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/mis-compras"
+                      className={({ isActive }) =>
+                        `nav-link nav-link-line ${isActive ? 'active fw-semibold' : ''}`
+                      }
+                    >
+                      <i className="bi bi-bag-check me-1"></i>
+                      Mis Compras
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/login"
+                      className={({ isActive }) =>
+                        `nav-link nav-link-line ${isActive ? 'active fw-semibold' : ''}`
+                      }
+                    >
+                      Iniciar Sesión
+                    </NavLink>
+                  </li>
+                  <li className="nav-item mt-2 mt-md-0">
+                    <NavLink
+                      to="/registro"
+                      className="btn btn-gold btn-sm rounded-pill px-3"
+                    >
+                      Registrarse
+                    </NavLink>
+                  </li>
+                </>
+              ) : (
               <li className="nav-item dropdown">
                 <a
                   className="nav-link dropdown-toggle fw-semibold text-warning"
@@ -199,6 +206,7 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
+    </>
   );
 };
 

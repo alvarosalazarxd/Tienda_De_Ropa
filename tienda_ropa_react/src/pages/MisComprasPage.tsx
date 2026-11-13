@@ -65,14 +65,15 @@ const MisComprasPage = () => {
 
   return (
     <main className="container my-5" style={{ maxWidth: '850px' }}>
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4 pb-3 border-bottom">
         <div>
-          <h1 className="h3 fw-bold mb-1">Mis Compras</h1>
+          <span className="section-eyebrow">Historial de pedidos</span>
+          <h1 className="section-heading mb-1">Mis Compras</h1>
           <p className="text-muted small mb-0">
-            Revisa el estado de tus pedidos e historial de compras.
+            Revisa el estado de tus pedidos y detalles de despacho.
           </p>
         </div>
-        <Link to="/productos" className="btn btn-outline-dark btn-sm">
+        <Link to="/productos" className="btn btn-outline-dark btn-sm rounded-pill px-3">
           <i className="bi bi-arrow-left me-1"></i>
           Volver a la tienda
         </Link>

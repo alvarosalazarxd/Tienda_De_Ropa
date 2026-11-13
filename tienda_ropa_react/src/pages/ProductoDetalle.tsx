@@ -104,100 +104,146 @@ const ProductoDetalle = () => {
               Productos
             </Link>
           </li>
-          <li className="breadcrumb-item active text-gold fw-bold">
+          <li className="breadcrumb-item active text-gold-deep fw-bold">
             {producto.nombre}
           </li>
         </ol>
       </nav>
 
-      <section className="card card-custom border-0 shadow-sm p-4">
-        <div className="row g-4 align-items-center">
+      <section className="card card-custom border-0 shadow-sm p-4 p-lg-5">
+        <div className="row g-4 g-lg-5 align-items-center">
           <div className="col-md-6">
-            <img
-              src={obtenerImagenProducto(producto)}
-              alt={producto.nombre}
-              className="img-fluid rounded-3 shadow-sm w-100"
-              style={{ maxHeight: '480px', objectFit: 'cover' }}
-            />
+            <div className="detalle-imagen-frame shadow-sm position-relative">
+              {sinStock && (
+                <span className="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill">
+                  Agotado
+                </span>
+              )}
+              <img
+                src={obtenerImagenProducto(producto)}
+                alt={producto.nombre}
+              />
+            </div>
           </div>
 
           <div className="col-md-6">
-            <span className="badge bg-dark text-gold border border-gold mb-2 px-3 py-2 text-uppercase">
+            <span className="badge-categoria-pill d-inline-block mb-3">
               {obtenerNombreCategoria(producto.categoria)}
             </span>
 
-            <h1 className="fw-bold display-6 mb-1">{producto.nombre}</h1>
-            <p className="text-muted fs-6 mb-3">
-              Ref: #{String(producto.id).padStart(3, '0')}
+            <h1 className="font-editorial fw-bold display-5 mb-1">
+              {producto.nombre}
+            </h1>
+            <p className="text-muted small mb-3">
+              Código de referencia: #{String(producto.id).padStart(3, '0')}
             </p>
 
-            <h2 className="text-gold fw-bold display-6 my-3">
+            <h2 className="fw-bold display-6 my-3 text-dark">
               {formatearPrecioCLP(producto.precio)}
             </h2>
 
-            <p className="card-text text-secondary mb-4">
+            <p className="card-text text-secondary mb-4 lh-base">
               {producto.descripcion}
             </p>
 
-            <div className="mb-3">
-              <label htmlFor="tallaSelect" className="form-label fw-bold">
-                Seleccionar Talla:
+            <div className="mb-4">
+              <label className="form-label fw-bold small text-uppercase text-muted d-block mb-2">
+                Seleccionar talla
               </label>
-              <select
-                id="tallaSelect"
-                className="form-select w-50"
-                value={talla}
-                onChange={(e) => setTalla(e.target.value)}
-              >
+              <div className="d-flex flex-wrap gap-2">
                 {tallas.map((t) => (
-                  <option key={t} value={t}>
+                  <button
+                    key={t}
+                    type="button"
+                    className={`talla-btn ${talla === t ? 'active' : ''}`}
+                    onClick={() => setTalla(t)}
+                  >
                     {t}
-                  </option>
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
 
             <div className="mb-3">
-              <label htmlFor="cantidadInput" className="form-label fw-bold">
-                Cantidad:
+              <label
+                htmlFor="cantidadInput"
+                className="form-label fw-bold small text-uppercase text-muted d-block mb-2"
+              >
+                Cantidad
               </label>
-              <input
-                id="cantidadInput"
-                type="number"
-                className="form-control w-25"
-                min={1}
-                max={Math.max(1, producto.stock)}
-                value={cantidad}
-                disabled={sinStock}
-                onChange={(e) =>
-                  setCantidad(Math.max(1, Number(e.target.value) || 1))
-                }
-              />
+              <div className="input-group" style={{ width: '140px' }}>
+                <button
+                  type="button"
+                  className="btn btn-outline-dark"
+                  disabled={sinStock || cantidad <= 1}
+                  onClick={() => setCantidad((c) => Math.max(1, c - 1))}
+                >
+                  −
+                </button>
+                <input
+                  id="cantidadInput"
+                  type="number"
+                  className="form-control text-center fw-semibold"
+                  min={1}
+                  max={Math.max(1, producto.stock)}
+                  value={cantidad}
+                  disabled={sinStock}
+                  onChange={(e) =>
+                    setCantidad(
+                      Math.min(
+                        Math.max(1, producto.stock),
+                        Math.max(1, Number(e.target.value) || 1)
+                      )
+                    )
+                  }
+                />
+                <button
+                  type="button"
+                  className="btn btn-outline-dark"
+                  disabled={sinStock || cantidad >= producto.stock}
+                  onClick={() =>
+                    setCantidad((c) => Math.min(producto.stock, c + 1))
+                  }
+                >
+                  +
+                </button>
+              </div>
             </div>
 
-            <p
-              className={`small mb-4 ${
-                sinStock ? 'text-danger fw-bold' : 'text-muted'
-              }`}
-            >
-              {sinStock
-                ? 'Producto sin stock disponible.'
-                : `Quedan ${producto.stock} unidades disponibles.`}
-            </p>
+            <div className="mb-4">
+              <span
+                className={`badge rounded-pill px-3 py-2 ${
+                  sinStock
+                    ? 'bg-danger-subtle text-danger border border-danger-subtle'
+                    : producto.stock <= 5
+                      ? 'bg-warning-subtle text-dark border border-warning-subtle'
+                      : 'bg-success-subtle text-success border border-success-subtle'
+                }`}
+              >
+                <i
+                  className={`bi ${
+                    sinStock ? 'bi-x-circle' : 'bi-check2-circle'
+                  } me-1`}
+                ></i>
+                {sinStock
+                  ? 'Sin stock disponible'
+                  : `Disponible · ${producto.stock} unidades en inventario`}
+              </span>
+            </div>
 
             {error && <div className="alert alert-danger py-2">{error}</div>}
             {mensaje && (
               <div className="alert alert-success py-2">{mensaje}</div>
             )}
 
-            <div className="d-grid gap-2 d-md-block">
+            <div className="d-flex flex-wrap gap-2 mb-4">
               <button
                 type="button"
-                className="btn btn-fashion btn-lg rounded-pill px-4 me-md-2 fw-bold"
+                className="btn btn-fashion btn-lg rounded-pill px-4 fw-bold"
                 disabled={sinStock}
                 onClick={() => void handleAgregar()}
               >
-                <i className="bi bi-cart-plus me-2"></i>
+                <i className="bi bi-bag-plus me-2"></i>
                 Añadir al Carrito
               </button>
 
@@ -207,6 +253,30 @@ const ProductoDetalle = () => {
               >
                 Volver al Catálogo
               </Link>
+            </div>
+
+            <div className="row g-2">
+              <div className="col-sm-4">
+                <div className="trust-mini-box h-100">
+                  <i className="bi bi-truck text-gold-deep d-block fs-5 mb-1"></i>
+                  <strong className="d-block">Despacho rápido</strong>
+                  <span className="text-muted">A todo Chile</span>
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="trust-mini-box h-100">
+                  <i className="bi bi-shield-check text-gold-deep d-block fs-5 mb-1"></i>
+                  <strong className="d-block">Pago seguro</strong>
+                  <span className="text-muted">Compra protegida</span>
+                </div>
+              </div>
+              <div className="col-sm-4">
+                <div className="trust-mini-box h-100">
+                  <i className="bi bi-arrow-repeat text-gold-deep d-block fs-5 mb-1"></i>
+                  <strong className="d-block">Cambios ágiles</strong>
+                  <span className="text-muted">Garantía de talla</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

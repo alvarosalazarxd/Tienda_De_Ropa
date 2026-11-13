@@ -588,7 +588,7 @@ const CheckoutPage = () => {
 
               <div className="d-flex justify-content-between align-items-center fw-bold fs-4 my-2">
                 <span>Total</span>
-                <span className="text-gold">{formatearPrecioCLP(total)}</span>
+                <span className="text-dark">{formatearPrecioCLP(total)}</span>
               </div>
 
               <p className="text-muted small mb-0 text-center mt-3">

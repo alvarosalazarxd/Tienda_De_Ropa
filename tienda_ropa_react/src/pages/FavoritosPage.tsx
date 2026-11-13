@@ -69,9 +69,9 @@ const FavoritosPage = () => {
 
   return (
     <main className="container py-5">
-      <h1 className="h2 fw-bold mb-2">Mis favoritos</h1>
+      <h1 className="section-heading mb-1">Mis favoritos</h1>
       <p className="text-muted mb-4">
-        Tus productos guardados en tu cuenta para revisar después.
+        Tus prendas y accesorios guardados para revisar después.
       </p>
 
       {error && <div className="alert alert-danger">{error}</div>}
@@ -89,32 +89,34 @@ const FavoritosPage = () => {
           {productosFavoritos.map((producto) => {
             const agotado = producto.stock <= 0;
             return (
-              <div key={producto.id} className="col-12 col-sm-6 col-lg-3">
-                <article className="card h-100 shadow-sm border-0">
-                  <img
-                    src={obtenerImagenProducto(producto)}
-                    alt={producto.nombre}
-                    className="card-img-top"
-                    style={{ height: '230px', objectFit: 'cover' }}
-                  />
-                  <div className="card-body d-flex flex-column">
-                    <h2 className="h6 fw-bold">{producto.nombre}</h2>
-                    <p className="text-muted small">
-                      {obtenerNombreCategoria(producto.categoria)}
-                    </p>
-                    <p className="fw-bold text-gold">
-                      {formatearPrecioCLP(producto.precio)}
-                    </p>
+              <div key={producto.id} className="col-12 col-sm-6 col-lg-3 d-flex">
+                <article className="card producto-card shadow-sm w-100">
+                  <div className="producto-imagen-container">
                     {agotado && (
-                      <span className="badge bg-danger align-self-start mb-3">
+                      <span className="badge bg-danger position-absolute top-0 start-0 m-3 z-1 px-2 py-1 rounded-pill">
                         Sin stock
                       </span>
                     )}
+                    <Link to={`/productos/${producto.id}`}>
+                      <img
+                        src={obtenerImagenProducto(producto)}
+                        alt={producto.nombre}
+                      />
+                    </Link>
+                  </div>
+                  <div className="card-body d-flex flex-column p-3">
+                    <span className="badge-categoria-pill align-self-start mb-2">
+                      {obtenerNombreCategoria(producto.categoria)}
+                    </span>
+                    <h2 className="h6 fw-bold mb-1">{producto.nombre}</h2>
+                    <p className="precio-producto mb-3">
+                      {formatearPrecioCLP(producto.precio)}
+                    </p>
                     <div className="mt-auto d-grid gap-2">
                       {agotado ? (
                         <button
                           type="button"
-                          className="btn btn-secondary"
+                          className="btn btn-secondary rounded-pill"
                           disabled
                         >
                           Sin stock disponible
@@ -122,14 +124,14 @@ const FavoritosPage = () => {
                       ) : (
                         <Link
                           to={`/productos/${producto.id}`}
-                          className="btn btn-dark"
+                          className="btn btn-fashion rounded-pill"
                         >
                           Ver producto y elegir talla
                         </Link>
                       )}
                       <button
                         type="button"
-                        className="btn btn-outline-danger"
+                        className="btn btn-outline-danger rounded-pill"
                         onClick={() => void handleQuitarFavorito(producto.id)}
                       >
                         <i className="bi bi-heart-fill me-1"></i>

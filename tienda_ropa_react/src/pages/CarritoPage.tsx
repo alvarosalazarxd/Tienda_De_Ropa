@@ -53,15 +53,16 @@ const CarritoPage = () => {
 
   return (
     <div>
-      <header className="bg-dark text-white py-4 border-bottom border-gold mb-4">
+      <header className="catalogo-header mb-4">
         <div className="container">
-          <h1
-            className="h3 fw-bold text-uppercase mb-0"
-            style={{ letterSpacing: '1px' }}
-          >
-            <i className="bi bi-cart3 me-2 text-gold"></i>
-            Tu Carrito de Compras
+          <span className="text-gold fw-semibold text-uppercase small">
+            Moda &amp; Estilo
+          </span>
+          <h1 className="fw-bold text-uppercase mb-0 mt-1">
+            <i className="bi bi-bag me-2 text-gold"></i>
+            Tu Bolsa de Compras
           </h1>
+          <div className="catalogo-linea"></div>
         </div>
       </header>
 
@@ -241,7 +242,7 @@ const CarritoPage = () => {
 
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <span className="fw-bold fs-5">Total</span>
-                  <span className="fs-4 fw-bold text-gold">
+                  <span className="fs-4 fw-bold text-dark">
                     {formatearPrecioCLP(total)}
                   </span>
                 </div>
