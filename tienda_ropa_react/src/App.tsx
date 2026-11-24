@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from 'react-router';
+import { Link, Route, Routes, useLocation } from 'react-router';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -35,6 +35,31 @@ const App = () => {
           <Route path="/favoritos" element={<FavoritosPage />} />
           <Route path="/mis-compras" element={<MisComprasPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route
+            path="*"
+            element={
+              <main className="container py-5 text-center">
+                <i className="bi bi-compass display-1 text-gold-deep"></i>
+                <h1 className="font-editorial fw-bold mt-3">
+                  Página no encontrada
+                </h1>
+                <p className="text-muted mb-4">
+                  La ruta que buscas no existe o fue movida.
+                </p>
+                <div className="d-flex justify-content-center gap-2">
+                  <Link to="/" className="btn btn-fashion rounded-pill px-4">
+                    Volver al inicio
+                  </Link>
+                  <Link
+                    to="/productos"
+                    className="btn btn-outline-dark rounded-pill px-4"
+                  >
+                    Ir al catálogo
+                  </Link>
+                </div>
+              </main>
+            }
+          />
         </Routes>
       </div>
 

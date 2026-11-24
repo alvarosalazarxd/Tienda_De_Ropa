@@ -79,10 +79,11 @@ public class PedidoController {
     @PutMapping("/{id}/estado")
     public ResponseEntity<Pedido> cambiarEstado(
             @PathVariable("id") Long id,
-            @RequestParam("estado") EstadoPedido estado) {
+            @RequestParam("estado") EstadoPedido estado,
+            @RequestParam(value = "motivo", required = false) String motivo) {
 
         return ResponseEntity.ok(
-                pedidoService.cambiarEstado(id, estado)
+                pedidoService.cambiarEstado(id, estado, motivo)
         );
     }
 
@@ -92,10 +93,40 @@ public class PedidoController {
 
     @PatchMapping("/{id}/cancelar")
     public ResponseEntity<Pedido> cancelarPedido(
-            @PathVariable("id") Long id) {
+            @PathVariable("id") Long id,
+            @RequestParam(value = "motivo", required = false) String motivo) {
 
         return ResponseEntity.ok(
-                pedidoService.cancelarPedido(id)
+                pedidoService.cancelarPedido(id, motivo)
+        );
+    }
+
+    // =========================
+    // REEMBOLSAR PEDIDO COMPLETO
+    // =========================
+
+    @PostMapping("/{id}/reembolsar")
+    public ResponseEntity<Pedido> reembolsarPedido(
+            @PathVariable("id") Long id,
+            @RequestParam(value = "motivo", required = false) String motivo) {
+
+        return ResponseEntity.ok(
+                pedidoService.reembolsarPedido(id, motivo)
+        );
+    }
+
+    // =========================
+    // REEMBOLSAR ÍTEM ESPECÍFICO
+    // =========================
+
+    @PostMapping("/{id}/items/{itemId}/reembolsar")
+    public ResponseEntity<Pedido> reembolsarItem(
+            @PathVariable("id") Long id,
+            @PathVariable("itemId") Long itemId,
+            @RequestParam(value = "motivo", required = false) String motivo) {
+
+        return ResponseEntity.ok(
+                pedidoService.reembolsarItem(id, itemId, motivo)
         );
     }
 }

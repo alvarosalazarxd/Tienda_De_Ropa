@@ -26,6 +26,11 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    public List<Producto> obtenerActivos() {
+        return productoRepository.findAllActivos();
+    }
+
+    @Override
     public Optional<Producto> obtenerPorId(Long id) {
         return productoRepository.findById(id);
     }
@@ -36,20 +41,50 @@ public class ProductoServiceImpl implements ProductoService {
             throw new IllegalArgumentException("Debe indicar una categoría.");
         }
         CategoriaProducto catEnum = CategoriaProducto.valueOf(categoria.trim().toUpperCase());
-        return productoRepository.findByCategoria(catEnum);
+        return productoRepository.findActivosByCategoria(catEnum);
     }
 
     @Override
     public Producto guardar(Producto producto) {
+        validarDatosProducto(producto);
+        producto.setId(null);
+        producto.setNombre(producto.getNombre().trim());
+        producto.setDescripcion(producto.getDescripcion().trim());
+        producto.setActivo(true);
         return productoRepository.save(producto);
+    }
+
+    private void validarDatosProducto(Producto producto) {
+        if (producto == null) {
+            throw new IllegalArgumentException("Los datos del producto son obligatorios.");
+        }
+        if (producto.getNombre() == null || producto.getNombre().isBlank()) {
+            throw new IllegalArgumentException("El nombre del producto es obligatorio.");
+        }
+        if (producto.getDescripcion() == null || producto.getDescripcion().isBlank()) {
+            throw new IllegalArgumentException("La descripción del producto es obligatoria.");
+        }
+        if (producto.getPrecio() == null || !Double.isFinite(producto.getPrecio()) || producto.getPrecio() <= 0) {
+            throw new IllegalArgumentException("El precio debe ser mayor que cero.");
+        }
+        if (producto.getCategoria() == null) {
+            throw new IllegalArgumentException("La categoría es obligatoria.");
+        }
+        if (producto.getStock() == null || producto.getStock() < 0) {
+            throw new IllegalArgumentException("El stock no puede ser negativo.");
+        }
+        if (producto.getStockMinimo() == null || producto.getStockMinimo() < 0) {
+            throw new IllegalArgumentException("El stock mínimo no puede ser negativo.");
+        }
     }
 
     @Override
     @Transactional
     public Producto actualizar(Long id, Producto productoDetalles) {
+        validarDatosProducto(productoDetalles);
         return productoRepository.buscarParaActualizar(id).map(producto -> {
-            producto.setNombre(productoDetalles.getNombre());
-            producto.setDescripcion(productoDetalles.getDescripcion());
+            producto.setNombre(productoDetalles.getNombre().trim());
+            producto.setDescripcion(productoDetalles.getDescripcion().trim());
             producto.setPrecio(productoDetalles.getPrecio());
             producto.setCategoria(productoDetalles.getCategoria());
             // PUT reemplaza todos los campos: incluir stock y stockMinimo en el JSON.
@@ -60,8 +95,28 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
+        if (!productoRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado con id: " + id);
+        }
         productoRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public Producto desactivar(Long id) {
+        Producto producto = bloquear(id);
+        producto.desactivar();
+        return productoRepository.save(producto);
+    }
+
+    @Override
+    @Transactional
+    public Producto activar(Long id) {
+        Producto producto = bloquear(id);
+        producto.activar();
+        return productoRepository.save(producto);
     }
     @Override
     public Producto consultarStock(Long id) {
@@ -110,6 +165,9 @@ public class ProductoServiceImpl implements ProductoService {
     public Producto descontarStock(Long id, Integer cantidad) {
         validarCantidad(cantidad);
         Producto producto = bloquear(id);
+        if (!producto.estaActivo()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El producto fue retirado del catálogo y no está disponible.");
+        }
         if (!producto.tieneStock(cantidad)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Stock insuficiente.");
         }

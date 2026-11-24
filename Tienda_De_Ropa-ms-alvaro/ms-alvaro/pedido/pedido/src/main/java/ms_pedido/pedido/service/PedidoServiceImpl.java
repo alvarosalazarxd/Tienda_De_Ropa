@@ -1,6 +1,7 @@
 
 package ms_pedido.pedido.service;
 
+import ms_pedido.pedido.model.ItemPedido;
 import ms_pedido.pedido.model.Pedido;
 import ms_pedido.pedido.enums.EstadoPedido;
 import ms_pedido.pedido.repository.PedidoRepository;
@@ -30,6 +31,27 @@ public class PedidoServiceImpl implements PedidoService {
     @Transactional
     public Pedido crearPedido(Pedido pedido) {
 
+        if (pedido == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Los datos del pedido son obligatorios."
+            );
+        }
+
+        if (pedido.getUsuarioId() == null || pedido.getUsuarioId() <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El usuario del pedido es obligatorio."
+            );
+        }
+
+        if (pedido.getItems() == null || pedido.getItems().isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El pedido debe contener al menos un producto."
+            );
+        }
+
         // Evitar que se establezca un ID manualmente
         pedido.setId(null);
 
@@ -38,6 +60,15 @@ public class PedidoServiceImpl implements PedidoService {
 
         // Los pedidos nuevos comienzan pendientes
         pedido.setEstado(EstadoPedido.PENDIENTE);
+        pedido.setMontoReembolsado(0.0);
+        pedido.setMotivoEstado(null);
+
+        for (ItemPedido item : pedido.getItems()) {
+            item.setId(null);
+            item.setReembolsado(false);
+            item.setMotivoReembolso(null);
+            item.calcularSubtotal();
+        }
 
         // Calcular el total según los productos
         pedido.calcularTotal();
@@ -91,6 +122,12 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     @Transactional
     public Pedido cambiarEstado(Long id, EstadoPedido nuevoEstado) {
+        return cambiarEstado(id, nuevoEstado, null);
+    }
+
+    @Override
+    @Transactional
+    public Pedido cambiarEstado(Long id, EstadoPedido nuevoEstado, String motivo) {
 
         Pedido pedido = obtenerPedidoPorId(id);
 
@@ -106,28 +143,27 @@ public class PedidoServiceImpl implements PedidoService {
             return pedido;
         }
 
-        // Aplicar las reglas definidas en el modelo.
+        if (!pedido.puedeCambiarA(nuevoEstado)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "No se puede cambiar el pedido de " + pedido.getEstado() + " a " + nuevoEstado + "."
+            );
+        }
+
         switch (nuevoEstado) {
-
-            case PAGADO:
-                if (pedido.getEstado() != EstadoPedido.PENDIENTE) {
-                    throw new ResponseStatusException(
-                            HttpStatus.CONFLICT,
-                            "Solo se pueden pagar pedidos pendientes."
-                    );
-                }
-                pedido.marcarComoPagado();
-                break;
-
-            case CANCELADO:
+            case PAGADO -> pedido.marcarComoPagado();
+            case PREPARANDO, ENVIADO, ENTREGADO -> pedido.setEstado(nuevoEstado);
+            case CANCELADO -> {
                 cancelarEstado(pedido);
-                break;
-
-            case PENDIENTE:
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT,
-                        "No se puede volver un pedido a PENDIENTE."
-                );
+                if (motivo != null && !motivo.isBlank()) {
+                    pedido.setMotivoEstado(motivo.trim());
+                }
+            }
+            case REEMBOLSADO -> pedido.marcarComoReembolsado(motivo);
+            case PENDIENTE -> throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "No se puede volver un pedido a PENDIENTE."
+            );
         }
 
         return pedidoRepository.save(pedido);
@@ -140,12 +176,91 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     @Transactional
     public Pedido cancelarPedido(Long id) {
+        return cancelarPedido(id, null);
+    }
+
+    @Override
+    @Transactional
+    public Pedido cancelarPedido(Long id, String motivo) {
 
         Pedido pedido = obtenerPedidoPorId(id);
 
         cancelarEstado(pedido);
 
+        if (motivo != null && !motivo.isBlank()) {
+            pedido.setMotivoEstado(motivo.trim());
+        } else {
+            pedido.setMotivoEstado("Pedido cancelado antes de confirmar el pago");
+        }
+
         // Guardar CANCELADO sin borrar el pedido ni sus items.
+        return pedidoRepository.save(pedido);
+    }
+
+    // =========================
+    // REEMBOLSAR PEDIDO COMPLETO
+    // =========================
+
+    @Override
+    @Transactional
+    public Pedido reembolsarPedido(Long id, String motivo) {
+        return cambiarEstado(id, EstadoPedido.REEMBOLSADO, motivo);
+    }
+
+    // =========================
+    // REEMBOLSAR / RETIRAR UN ÍTEM DEL PEDIDO
+    // =========================
+
+    @Override
+    @Transactional
+    public Pedido reembolsarItem(Long pedidoId, Long itemId, String motivo) {
+        Pedido pedido = obtenerPedidoPorId(pedidoId);
+
+        if (pedido.getEstado() == EstadoPedido.CANCELADO || pedido.getEstado() == EstadoPedido.REEMBOLSADO) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El pedido ya está cerrado (" + pedido.getEstado() + ") y no permite reembolsar ítems."
+            );
+        }
+
+        ItemPedido item = pedido.getItems().stream()
+                .filter(i -> itemId != null && itemId.equals(i.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ítem no encontrado en el pedido #" + pedidoId
+                ));
+
+        if (item.estaReembolsado()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Este producto del pedido ya fue reembolsado o retirado."
+            );
+        }
+
+        String motivoFinal = (motivo != null && !motivo.isBlank())
+                ? motivo.trim()
+                : "Producto sin stock o retirado del catálogo";
+
+        item.setReembolsado(true);
+        item.setMotivoReembolso(motivoFinal);
+
+        if (pedido.getEstado() == EstadoPedido.PENDIENTE) {
+            pedido.recalcularTotalActivos();
+            if (pedido.todosLosItemsReembolsados()) {
+                pedido.setEstado(EstadoPedido.CANCELADO);
+                pedido.setMotivoEstado(motivoFinal);
+            }
+        } else {
+            pedido.recalcularMontoReembolsado();
+            if (pedido.todosLosItemsReembolsados()) {
+                pedido.setEstado(EstadoPedido.REEMBOLSADO);
+                pedido.setMotivoEstado(motivoFinal);
+            } else {
+                pedido.setMotivoEstado("Reembolso parcial: " + motivoFinal);
+            }
+        }
+
         return pedidoRepository.save(pedido);
     }
 
@@ -155,10 +270,10 @@ public class PedidoServiceImpl implements PedidoService {
 
     private void cancelarEstado(Pedido pedido) {
 
-        if (pedido.getEstado() == EstadoPedido.PAGADO) {
+        if (pedido.estaPagado()) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "No se puede cancelar un pedido pagado."
+                    "No se puede cancelar un pedido ya pagado; usa REEMBOLSADO para devolver el dinero al cliente."
             );
         }
 
@@ -166,6 +281,13 @@ public class PedidoServiceImpl implements PedidoService {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "El pedido ya está cancelado."
+            );
+        }
+
+        if (pedido.getEstado() == EstadoPedido.REEMBOLSADO) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El pedido ya está reembolsado."
             );
         }
 

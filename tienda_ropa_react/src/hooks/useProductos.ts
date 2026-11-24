@@ -11,9 +11,9 @@ interface UseProductosState {
   recargar: () => Promise<void>;
 }
 
-export const useProductos = (): UseProductosState => {
+export const useProductos = (incluirInactivos = false): UseProductosState => {
   const [productos, setProductos] = useState<Producto[]>(() =>
-    obtenerCacheProductos()
+    obtenerCacheProductos(incluirInactivos)
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -22,7 +22,7 @@ export const useProductos = (): UseProductosState => {
     setLoading(true);
     setError(null);
     try {
-      const data = await ProductoService.listar();
+      const data = await ProductoService.listar(incluirInactivos);
       setProductos(data);
     } catch (err) {
       const parsedError =
@@ -33,7 +33,7 @@ export const useProductos = (): UseProductosState => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [incluirInactivos]);
 
   useEffect(() => {
     void cargarProductos();

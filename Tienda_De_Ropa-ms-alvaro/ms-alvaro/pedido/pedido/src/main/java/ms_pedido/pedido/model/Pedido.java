@@ -22,11 +22,35 @@ public class Pedido {
     private LocalDateTime fecha = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 30, columnDefinition = "VARCHAR(30)")
     private EstadoPedido estado = EstadoPedido.PENDIENTE;
 
     @Column(nullable = false)
     private Double total = 0.0;
+
+    @Column(name = "metodo_pago", length = 80)
+    private String metodoPago;
+
+    @Column(name = "cliente_nombre", length = 150)
+    private String clienteNombre;
+
+    @Column(name = "cliente_email", length = 150)
+    private String clienteEmail;
+
+    @Column(name = "cliente_telefono", length = 40)
+    private String clienteTelefono;
+
+    @Column(length = 255)
+    private String direccion;
+
+    @Column(name = "comuna_region", length = 255)
+    private String comunaRegion;
+
+    @Column(name = "motivo_estado", length = 255)
+    private String motivoEstado;
+
+    @Column(name = "monto_reembolsado")
+    private Double montoReembolsado = 0.0;
 
     @OneToMany(
             cascade = CascadeType.ALL,
@@ -43,17 +67,51 @@ public class Pedido {
     // GESTIÓN DE ESTADOS
     // =========================
 
+    public boolean estaPagado() {
+        return estado == EstadoPedido.PAGADO
+                || estado == EstadoPedido.PREPARANDO
+                || estado == EstadoPedido.ENVIADO
+                || estado == EstadoPedido.ENTREGADO;
+    }
+
+    public boolean puedeCambiarA(EstadoPedido destino) {
+        if (destino == null || destino == estado) {
+            return false;
+        }
+        return switch (estado) {
+            case PENDIENTE -> destino == EstadoPedido.PAGADO
+                    || destino == EstadoPedido.CANCELADO;
+            case PAGADO -> destino == EstadoPedido.PREPARANDO
+                    || destino == EstadoPedido.ENVIADO
+                    || destino == EstadoPedido.ENTREGADO
+                    || destino == EstadoPedido.REEMBOLSADO;
+            case PREPARANDO -> destino == EstadoPedido.ENVIADO
+                    || destino == EstadoPedido.ENTREGADO
+                    || destino == EstadoPedido.REEMBOLSADO;
+            case ENVIADO -> destino == EstadoPedido.ENTREGADO
+                    || destino == EstadoPedido.REEMBOLSADO;
+            case ENTREGADO -> destino == EstadoPedido.REEMBOLSADO;
+            case CANCELADO, REEMBOLSADO -> false;
+        };
+    }
+
     public void cancelar() {
 
-        if (estado == EstadoPedido.PAGADO) {
+        if (estaPagado()) {
             throw new IllegalStateException(
-                    "No se puede cancelar un pedido pagado."
+                    "No se puede cancelar un pedido pagado; debes procesarlo como REEMBOLSADO."
             );
         }
 
         if (estado == EstadoPedido.CANCELADO) {
             throw new IllegalStateException(
                     "El pedido ya está cancelado."
+            );
+        }
+
+        if (estado == EstadoPedido.REEMBOLSADO) {
+            throw new IllegalStateException(
+                    "El pedido ya está reembolsado."
             );
         }
 
@@ -69,6 +127,29 @@ public class Pedido {
         }
 
         this.estado = EstadoPedido.PAGADO;
+    }
+
+    public void marcarComoReembolsado(String motivo) {
+        if (!estaPagado()) {
+            throw new IllegalStateException(
+                    "Solo se pueden reembolsar pedidos que ya fueron pagados."
+            );
+        }
+
+        String motivoFinal = (motivo != null && !motivo.isBlank())
+                ? motivo.trim()
+                : "Reembolso procesado por administración";
+
+        for (ItemPedido item : items) {
+            if (!item.estaReembolsado()) {
+                item.setReembolsado(true);
+                item.setMotivoReembolso(motivoFinal);
+            }
+        }
+
+        this.montoReembolsado = this.total != null ? this.total : 0.0;
+        this.motivoEstado = motivoFinal;
+        this.estado = EstadoPedido.REEMBOLSADO;
     }
 
     public boolean estaCancelado() {
@@ -90,6 +171,32 @@ public class Pedido {
                             : 0.0;
                 })
                 .sum();
+    }
+
+    public void recalcularTotalActivos() {
+        this.total = items.stream()
+                .filter(item -> !item.estaReembolsado())
+                .mapToDouble(item -> {
+                    item.calcularSubtotal();
+                    return item.getSubtotal() != null ? item.getSubtotal() : 0.0;
+                })
+                .sum();
+    }
+
+    public void recalcularMontoReembolsado() {
+        double suma = items.stream()
+                .filter(ItemPedido::estaReembolsado)
+                .mapToDouble(item -> {
+                    item.calcularSubtotal();
+                    return item.getSubtotal() != null ? item.getSubtotal() : 0.0;
+                })
+                .sum();
+        double tope = this.total != null ? this.total : suma;
+        this.montoReembolsado = Math.min(suma, tope);
+    }
+
+    public boolean todosLosItemsReembolsados() {
+        return !items.isEmpty() && items.stream().allMatch(ItemPedido::estaReembolsado);
     }
 
     // =========================
@@ -158,5 +265,71 @@ public class Pedido {
         this.items.addAll(new ArrayList<>(items));
 
         calcularTotal();
+    }
+
+    public String getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
+    }
+
+    public String getClienteNombre() {
+        return clienteNombre;
+    }
+
+    public void setClienteNombre(String clienteNombre) {
+        this.clienteNombre = clienteNombre;
+    }
+
+    public String getClienteEmail() {
+        return clienteEmail;
+    }
+
+    public void setClienteEmail(String clienteEmail) {
+        this.clienteEmail = clienteEmail;
+    }
+
+    public String getClienteTelefono() {
+        return clienteTelefono;
+    }
+
+    public void setClienteTelefono(String clienteTelefono) {
+        this.clienteTelefono = clienteTelefono;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getComunaRegion() {
+        return comunaRegion;
+    }
+
+    public void setComunaRegion(String comunaRegion) {
+        this.comunaRegion = comunaRegion;
+    }
+
+    public String getMotivoEstado() {
+        return motivoEstado;
+    }
+
+    public void setMotivoEstado(String motivoEstado) {
+        this.motivoEstado = motivoEstado;
+    }
+
+    public Double getMontoReembolsado() {
+        return montoReembolsado != null ? montoReembolsado : 0.0;
+    }
+
+    public void setMontoReembolsado(Double montoReembolsado) {
+        this.montoReembolsado = montoReembolsado != null && montoReembolsado >= 0
+                ? montoReembolsado
+                : 0.0;
     }
 }

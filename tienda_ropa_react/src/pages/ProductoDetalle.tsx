@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import ProductoService, {
+  esProductoActivo,
   formatearPrecioCLP,
   obtenerImagenProducto,
   obtenerNombreCategoria,
@@ -11,7 +12,7 @@ import useCarrito from '../hooks/useCarrito';
 
 const ProductoDetalle = () => {
   const { id } = useParams<{ id: string }>();
-  const { agregarAlCarrito } = useCarrito();
+  const { agregarAlCarrito, obtenerCantidadEnCarrito } = useCarrito();
 
   const [producto, setProducto] = useState<Producto | null>(null);
   const [talla, setTalla] = useState('');
@@ -52,14 +53,30 @@ const ProductoDetalle = () => {
 
   const handleAgregar = async () => {
     if (!producto) return;
-    if (cantidad < 1 || cantidad > producto.stock) {
-      setError('La cantidad supera el stock disponible.');
+    if (!esProductoActivo(producto)) {
+      setError('Este producto fue retirado del catálogo y no está disponible para la venta.');
+      return;
+    }
+    const yaEnCarrito = obtenerCantidadEnCarrito(producto.id);
+    if (cantidad < 1 || yaEnCarrito + cantidad > producto.stock) {
+      const restantes = Math.max(0, producto.stock - yaEnCarrito);
+      setError(
+        restantes === 0
+          ? `Ya tienes el máximo disponible (${producto.stock} u.) en tu carrito.`
+          : `Solo puedes agregar ${restantes} unidad(es) más (ya tienes ${yaEnCarrito} en tu carrito).`
+      );
       return;
     }
 
     setError(null);
     try {
-      await agregarAlCarrito(producto.id, producto.precio, cantidad, talla);
+      await agregarAlCarrito(
+        producto.id,
+        producto.precio,
+        cantidad,
+        talla,
+        producto.nombre
+      );
       setMensaje('Producto añadido al carrito exitosamente.');
     } catch {
       setError('No fue posible agregar el producto al carrito.');
@@ -88,7 +105,8 @@ const ProductoDetalle = () => {
   if (!producto) return null;
 
   const tallas = obtenerTallasProducto(producto);
-  const sinStock = producto.stock <= 0;
+  const retirado = !esProductoActivo(producto);
+  const sinStock = retirado || producto.stock <= 0;
 
   return (
     <main className="container my-5">
@@ -116,7 +134,7 @@ const ProductoDetalle = () => {
             <div className="detalle-imagen-frame shadow-sm position-relative">
               {sinStock && (
                 <span className="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill">
-                  Agotado
+                  {retirado ? 'Retirado del catálogo' : 'Agotado'}
                 </span>
               )}
               <img
@@ -215,7 +233,7 @@ const ProductoDetalle = () => {
                 className={`badge rounded-pill px-3 py-2 ${
                   sinStock
                     ? 'bg-danger-subtle text-danger border border-danger-subtle'
-                    : producto.stock <= 5
+                    : producto.stock <= producto.stockMinimo
                       ? 'bg-warning-subtle text-dark border border-warning-subtle'
                       : 'bg-success-subtle text-success border border-success-subtle'
                 }`}
@@ -225,9 +243,11 @@ const ProductoDetalle = () => {
                     sinStock ? 'bi-x-circle' : 'bi-check2-circle'
                   } me-1`}
                 ></i>
-                {sinStock
-                  ? 'Sin stock disponible'
-                  : `Disponible · ${producto.stock} unidades en inventario`}
+                {retirado
+                  ? 'Producto retirado del catálogo (no disponible para compra)'
+                  : sinStock
+                    ? 'Sin stock disponible'
+                    : `Disponible · ${producto.stock} unidades en inventario`}
               </span>
             </div>
 

@@ -17,5 +17,11 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     List<Producto> findByCategoria(CategoriaProducto categoria);
 
+    @Query("select p from Producto p where p.activo is null or p.activo = true")
+    List<Producto> findAllActivos();
+
+    @Query("select p from Producto p where p.categoria = :categoria and (p.activo is null or p.activo = true)")
+    List<Producto> findActivosByCategoria(@Param("categoria") CategoriaProducto categoria);
+
     boolean existsByNombre(String nombre);
 }

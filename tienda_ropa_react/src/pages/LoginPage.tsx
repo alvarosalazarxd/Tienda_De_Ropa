@@ -1,5 +1,12 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { extraerMensajeError } from '../services/api.config';
+import CarritoService, {
+  guardarTallaItemCarrito,
+  limpiarInvitadoId,
+  obtenerInvitadoIdSiExiste,
+  obtenerTallaItemCarrito
+} from '../services/carrito.service';
 import UsuarioService, {
   guardarSesionUsuario
 } from '../services/usuario.service';
@@ -39,6 +46,33 @@ const LoginPage = () => {
         return;
       }
 
+      // Si el usuario habia agregado prendas como invitado, las migramos a su carrito real
+      const invitadoId = obtenerInvitadoIdSiExiste();
+      if (invitadoId !== null && invitadoId !== usuario.id) {
+        try {
+          const carritoInvitado = await CarritoService.obtener(invitadoId);
+          if (carritoInvitado.items.length > 0) {
+            for (const item of carritoInvitado.items) {
+              const tallaInvitado = obtenerTallaItemCarrito(
+                invitadoId,
+                item.productoId
+              );
+              guardarTallaItemCarrito(usuario.id, item.productoId, tallaInvitado);
+              await CarritoService.agregarItem(usuario.id, {
+                productoId: item.productoId,
+                nombreProducto: item.nombreProducto ?? undefined,
+                cantidad: item.cantidad,
+                precioUnitario: item.precioUnitario
+              });
+            }
+            await CarritoService.vaciar(invitadoId);
+          }
+          limpiarInvitadoId();
+        } catch {
+          // Si falla la migracion del carrito invitado, no bloqueamos el inicio de sesion
+        }
+      }
+
       guardarSesionUsuario(usuario);
 
       if (usuario.rol === 'ADMIN') {
@@ -49,7 +83,10 @@ const LoginPage = () => {
     } catch (err) {
       console.error(err);
       setError(
-        'No fue posible conectar con el servicio de usuarios a través del Gateway (puerto 8080).'
+        extraerMensajeError(
+          err,
+          'No fue posible conectar con el servicio de usuarios a través del Gateway (puerto 8080).'
+        )
       );
     } finally {
       setLoading(false);

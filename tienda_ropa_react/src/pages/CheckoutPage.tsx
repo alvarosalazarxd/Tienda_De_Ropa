@@ -8,12 +8,14 @@ import {
   obtenerUsuarioIdCarrito
 } from '../services/carrito.service';
 import ProductoService, {
+  esProductoActivo,
   formatearPrecioCLP,
   Producto
 } from '../services/producto.service';
 import PedidoService, {
   guardarDespachoPedido
 } from '../services/pedido.service';
+import { extraerMensajeError } from '../services/api.config';
 import { obtenerSesionUsuario } from '../services/usuario.service';
 
 const regionesChile = [
@@ -39,7 +41,7 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const sesion = obtenerSesionUsuario();
   const { carrito, vaciar } = useCarrito();
-  const { productos } = useProductos();
+  const { productos } = useProductos(true);
 
   const partesNombre = (sesion?.nombre ?? '').split(' ');
   const [nombre, setNombre] = useState(partesNombre[0] ?? '');
@@ -79,6 +81,23 @@ const CheckoutPage = () => {
   const items = carrito?.items ?? [];
   const total = carrito?.total ?? 0;
 
+  const problemasItems = useMemo(() => {
+    const lista: string[] = [];
+    for (const item of items) {
+      const prod = mapaProductos.get(item.productoId);
+      const nombreProd =
+        item.nombreProducto || prod?.nombre || `Producto #${item.productoId}`;
+      if (!prod || !esProductoActivo(prod)) {
+        lista.push(`"${nombreProd}" fue retirado del catálogo y no está disponible.`);
+      } else if (prod.stock < item.cantidad) {
+        lista.push(
+          `"${nombreProd}" solo tiene ${prod.stock} unidad(es) disponible(s) (tienes ${item.cantidad} en tu bolsa).`
+        );
+      }
+    }
+    return lista;
+  }, [items, mapaProductos]);
+
   const formatearInputTarjeta = (valor: string) => {
     const digitos = valor.replace(/\D/g, '').slice(0, 16);
     const bloques = digitos.match(/.{1,4}/g);
@@ -101,13 +120,20 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (!correo.trim()) {
-      setError('Por favor ingresa un correo de contacto.');
+    if (problemasItems.length > 0) {
+      setError(
+        'Revisa tu bolsa antes de pagar: hay productos sin stock suficiente o retirados del catálogo.'
+      );
       return;
     }
 
-    if (!telefono.trim()) {
-      setError('Por favor ingresa un número de teléfono.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim())) {
+      setError('Por favor ingresa un correo electrónico válido (ej.: nombre@correo.cl).');
+      return;
+    }
+
+    if (telefono.replace(/\D/g, '').length < 8) {
+      setError('Por favor ingresa un número de teléfono válido (al menos 8 dígitos).');
       return;
     }
 
@@ -157,12 +183,45 @@ const CheckoutPage = () => {
         });
       }
 
-      // 2. Registramos el pedido en el microservicio de pedidos (puerto 8083)
+      // 2. Preparamos los datos históricos y de despacho para guardarlos en MySQL
+      const tallasMapa: Record<string, string> = {};
+      const nombresMapa: Record<string, string> = {};
+      items.forEach((i) => {
+        const prod = mapaProductos.get(i.productoId);
+        tallasMapa[String(i.productoId)] = obtenerTallaItemCarrito(
+          usuarioCarritoId,
+          i.productoId
+        );
+        nombresMapa[String(i.productoId)] =
+          i.nombreProducto || prod?.nombre || `Producto #${i.productoId}`;
+      });
+
+      const dirFormateada = `${calle.trim()} #${numero.trim()}${
+        depto.trim() ? `, Depto/Casa: ${depto.trim()}` : ''
+      }${referencia.trim() ? ` (Ref: ${referencia.trim()})` : ''}`;
+
+      const metodoPagoEtiqueta =
+        metodoPago === 'tarjeta'
+          ? 'Tarjeta de Crédito/Débito'
+          : 'Transferencia Bancaria';
+
+      const comunaRegionTexto = `${comuna.trim()}, ${ciudad.trim()}, ${region} (CP: ${codigoPostal})`;
+      const clienteNombreTexto = `${nombre.trim()} ${apellido.trim()}`.trim();
+
+      // Registramos el pedido completo en el microservicio de pedidos (puerto 8083)
       const usuarioPedidoId = sesion?.id ?? usuarioCarritoId;
       const nuevoPedido = await PedidoService.crear({
         usuarioId: usuarioPedidoId,
+        metodoPago: metodoPagoEtiqueta,
+        clienteNombre: clienteNombreTexto,
+        clienteEmail: correo.trim(),
+        clienteTelefono: telefono.trim(),
+        direccion: dirFormateada,
+        comunaRegion: comunaRegionTexto,
         items: items.map((item) => ({
           productoId: item.productoId,
+          nombreProducto: nombresMapa[String(item.productoId)],
+          talla: tallasMapa[String(item.productoId)],
           cantidad: item.cantidad,
           precioUnitario: item.precioUnitario
         }))
@@ -173,42 +232,30 @@ const CheckoutPage = () => {
         await PedidoService.cambiarEstado(nuevoPedido.id, 'PAGADO');
       }
 
-      // Guardamos los datos del despacho para verlos en Mis Compras y en el Panel Admin
-      const tallasMapa: Record<string, string> = {};
-      items.forEach((i) => {
-        tallasMapa[String(i.productoId)] = obtenerTallaItemCarrito(
-          usuarioCarritoId,
-          i.productoId
-        );
-      });
-
-      const dirFormateada = `${calle} #${numero}${
-        depto ? `, Depto/Casa: ${depto}` : ''
-      }${referencia ? ` (Ref: ${referencia})` : ''}`;
-
+      // Guardamos respaldo local para compatibilidad con vistas del navegador
       guardarDespachoPedido(nuevoPedido.id, {
-        clienteNombre: `${nombre} ${apellido}`.trim(),
+        clienteNombre: clienteNombreTexto,
         clienteEmail: correo.trim(),
         clienteTelefono: telefono.trim(),
         direccion: dirFormateada,
-        comunaRegion: `${comuna}, ${ciudad}, ${region} (CP: ${codigoPostal})`,
-        metodoPago:
-          metodoPago === 'tarjeta'
-            ? 'Tarjeta de Crédito/Débito'
-            : 'Transferencia Bancaria',
-        tallasPorProducto: tallasMapa
+        comunaRegion: comunaRegionTexto,
+        metodoPago: metodoPagoEtiqueta,
+        tallasPorProducto: tallasMapa,
+        nombresPorProducto: nombresMapa
       });
 
       // 4. Vaciamos el carrito en el microservicio de carrito (puerto 8084)
       await vaciar();
 
       setExito(
-        `¡Compra realizada con éxito! Tu pedido #${nuevoPedido.id} fue registrado.`
+        metodoPago === 'transferencia'
+          ? `¡Pedido #${nuevoPedido.id} registrado! Quedó en estado PENDIENTE hasta que el administrador verifique tu transferencia.`
+          : `¡Compra realizada con éxito! Tu pedido #${nuevoPedido.id} quedó PAGADO y listo para preparación.`
       );
 
       window.setTimeout(() => {
         navigate('/mis-compras');
-      }, 1400);
+      }, 1600);
     } catch (err) {
       console.error(err);
       // Si fallo la creacion del pedido devolvemos el stock que alcanzamos a descontar
@@ -219,21 +266,19 @@ const CheckoutPage = () => {
           // ignorar error secundario
         }
       }
-      if (axios.isAxiosError(err)) {
-        if (err.response?.status === 409) {
-          setError('No hay suficiente stock disponible para completar la compra.');
-        } else if (!err.response) {
-          setError(
-            'No se pudo conectar con los microservicios a través del Gateway (revisa que Gateway 8080, Productos 8085, Pedidos 8083 y Carrito 8084 estén encendidos).'
-          );
-        } else {
-          setError(
-            `Error del servidor (${err.response.status}) al procesar la compra. Revisa el stock y la conexión a MySQL.`
-          );
-        }
+      if (axios.isAxiosError(err) && err.response?.status === 409) {
+        setError(
+          extraerMensajeError(
+            err,
+            'No hay suficiente stock disponible o un producto fue retirado del catálogo.'
+          )
+        );
       } else {
         setError(
-          'No se pudo completar la compra. Revisa el stock disponible y que los microservicios estén activos.'
+          extraerMensajeError(
+            err,
+            'No se pudo completar la compra. Revisa el stock disponible y que los microservicios estén activos.'
+          )
         );
       }
     } finally {
@@ -260,9 +305,39 @@ const CheckoutPage = () => {
         <strong>12/99</strong> y CVV <strong>123</strong>.
       </div>
 
+      {problemasItems.length > 0 && (
+        <div className="alert alert-warning">
+          <strong>Revisa tu bolsa antes de confirmar:</strong>
+          <ul className="mb-1 mt-1">
+            {problemasItems.map((msg) => (
+              <li key={msg}>{msg}</li>
+            ))}
+          </ul>
+          <Link to="/carrito" className="btn btn-sm btn-outline-dark mt-1">
+            Corregir en mi bolsa
+          </Link>
+        </div>
+      )}
       {error && <div className="alert alert-danger">{error}</div>}
       {exito && <div className="alert alert-success">{exito}</div>}
 
+      {items.length === 0 && !exito ? (
+        <div className="card border-0 shadow-sm p-5 text-center">
+          <i className="bi bi-bag-x display-3 text-muted mb-3"></i>
+          <h4 className="fw-bold">Tu bolsa está vacía</h4>
+          <p className="text-muted mb-4">
+            Agrega al menos una prenda a tu bolsa antes de pasar al pago.
+          </p>
+          <div>
+            <Link
+              to="/productos"
+              className="btn btn-fashion rounded-pill px-4 fw-bold"
+            >
+              Ir al Catálogo
+            </Link>
+          </div>
+        </div>
+      ) : (
       <div className="row g-4">
         <div className="col-lg-8">
           <form onSubmit={(e) => void handleSubmit(e)}>
@@ -455,6 +530,7 @@ const CheckoutPage = () => {
                   <input
                     className="form-check-input"
                     type="radio"
+                    name="metodoPago"
                     id="pagoTarjeta"
                     checked={metodoPago === 'tarjeta'}
                     onChange={() => setMetodoPago('tarjeta')}
@@ -463,7 +539,7 @@ const CheckoutPage = () => {
                     className="form-check-label fw-semibold"
                     htmlFor="pagoTarjeta"
                   >
-                    Tarjeta de prueba (queda Pagado de inmediato)
+                    Tarjeta de Crédito / Débito (aprobación inmediata → Pagado)
                   </label>
                 </div>
 
@@ -524,6 +600,7 @@ const CheckoutPage = () => {
                   <input
                     className="form-check-input"
                     type="radio"
+                    name="metodoPago"
                     id="pagoTransferencia"
                     checked={metodoPago === 'transferencia'}
                     onChange={() => setMetodoPago('transferencia')}
@@ -532,16 +609,47 @@ const CheckoutPage = () => {
                     className="form-check-label fw-semibold"
                     htmlFor="pagoTransferencia"
                   >
-                    Transferencia bancaria (queda Pendiente de confirmación)
+                    Transferencia bancaria (queda Pendiente hasta verificación del administrador)
                   </label>
                 </div>
+
+                {metodoPago === 'transferencia' && (
+                  <div className="p-3 bg-light rounded mt-3 border small">
+                    <div className="fw-bold mb-2">
+                      <i className="bi bi-bank me-1 text-gold-deep"></i>
+                      Datos para transferencia bancaria
+                    </div>
+                    <p className="mb-1">
+                      <strong>Banco:</strong> Banco Estado ·{' '}
+                      <strong>Tipo:</strong> Cuenta Corriente
+                    </p>
+                    <p className="mb-1">
+                      <strong>N° Cuenta:</strong> 12345678-9 ·{' '}
+                      <strong>RUT:</strong> 76.543.210-K
+                    </p>
+                    <p className="mb-1">
+                      <strong>Titular:</strong> Moda &amp; Estilo SpA ·{' '}
+                      <strong>Correo:</strong> pagos@modaestilo.cl
+                    </p>
+                    <p className="text-muted mb-0 mt-2">
+                      Tu pedido se registrará en estado{' '}
+                      <span className="badge bg-warning text-dark">
+                        PENDIENTE
+                      </span>{' '}
+                      y pasará a <strong>PAGADO</strong> una vez que el
+                      administrador verifique el comprobante.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
             <button
               type="submit"
               className="btn btn-dark btn-lg w-100 fw-bold shadow-sm py-3"
-              disabled={procesando || items.length === 0}
+              disabled={
+                procesando || items.length === 0 || problemasItems.length > 0
+              }
             >
               {procesando ? 'Procesando pedido...' : 'Confirmar compra'}
             </button>
@@ -561,7 +669,9 @@ const CheckoutPage = () => {
                 items.map((item) => {
                   const prod = mapaProductos.get(item.productoId);
                   const nombreProd =
-                    prod?.nombre ?? `Producto #${item.productoId}`;
+                    item.nombreProducto ||
+                    prod?.nombre ||
+                    `Producto #${item.productoId}`;
                   const talla = obtenerTallaItemCarrito(
                     usuarioCarritoId,
                     item.productoId
@@ -599,6 +709,7 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };

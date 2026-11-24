@@ -5,6 +5,7 @@ import { obtenerSesionUsuario } from './usuario.service';
 export interface ItemCarrito {
   id: number;
   productoId: number;
+  nombreProducto?: string | null;
   cantidad: number;
   precioUnitario: number;
   subtotal: number;
@@ -95,14 +96,26 @@ export const CarritoService = {
 const INVITADO_KEY = 'carrito_invitado_id';
 const TALLAS_CARRITO_KEY = 'tallas_carrito_moda_estilo';
 
+export function obtenerInvitadoIdSiExiste(): number | null {
+  const guardado = localStorage.getItem(INVITADO_KEY);
+  if (guardado && !Number.isNaN(Number(guardado))) {
+    return Number(guardado);
+  }
+  return null;
+}
+
+export function limpiarInvitadoId(): void {
+  localStorage.removeItem(INVITADO_KEY);
+}
+
 export function obtenerUsuarioIdCarrito(): number {
   const sesion = obtenerSesionUsuario();
   if (sesion && sesion.id) {
     return sesion.id;
   }
-  const guardado = localStorage.getItem(INVITADO_KEY);
-  if (guardado && !Number.isNaN(Number(guardado))) {
-    return Number(guardado);
+  const existente = obtenerInvitadoIdSiExiste();
+  if (existente !== null) {
+    return existente;
   }
   const nuevoInvitado = Math.floor(900000 + Math.random() * 99999);
   localStorage.setItem(INVITADO_KEY, String(nuevoInvitado));

@@ -11,6 +11,8 @@ public class ItemCarrito {
     private Long id;
 
     private Long productoId;
+    @Column(name = "nombre_producto", length = 150)
+    private String nombreProducto;
     private Integer cantidad;
     private Double precioUnitario;
     private Double subtotal;
@@ -38,6 +40,13 @@ public class ItemCarrito {
 
     public Long getProductoId() { return productoId; }
     public void setProductoId(Long productoId) { this.productoId = productoId; }
+
+    public String getNombreProducto() { return nombreProducto; }
+    public void setNombreProducto(String nombreProducto) {
+        this.nombreProducto = nombreProducto != null && !nombreProducto.isBlank()
+                ? nombreProducto.trim()
+                : null;
+    }
 
     public Integer getCantidad() { return cantidad; }
     public void setCantidad(Integer cantidad) { 

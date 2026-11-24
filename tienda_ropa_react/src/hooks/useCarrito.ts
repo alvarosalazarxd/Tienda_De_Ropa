@@ -15,8 +15,10 @@ interface UseCarritoState {
     productoId: number,
     precioUnitario: number,
     cantidad: number,
-    talla?: string
+    talla?: string,
+    nombreProducto?: string
   ) => Promise<void>;
+  obtenerCantidadEnCarrito: (productoId: number) => number;
   cambiarCantidad: (itemId: number, nuevaCantidad: number) => Promise<void>;
   quitarItem: (itemId: number) => Promise<void>;
   vaciar: () => Promise<void>;
@@ -69,7 +71,8 @@ export const useCarrito = (): UseCarritoState => {
     productoId: number,
     precioUnitario: number,
     cantidad: number,
-    talla = 'Única'
+    talla = 'Única',
+    nombreProducto?: string
   ) => {
     const usuarioId = obtenerUsuarioIdCarrito();
     setLoading(true);
@@ -93,6 +96,7 @@ export const useCarrito = (): UseCarritoState => {
       } else {
         respuesta = await CarritoService.agregarItem(usuarioId, {
           productoId,
+          nombreProducto,
           cantidad,
           precioUnitario
         });
@@ -101,6 +105,13 @@ export const useCarrito = (): UseCarritoState => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const obtenerCantidadEnCarrito = (productoId: number): number => {
+    const existente = carrito?.items?.find(
+      (item) => item.productoId === productoId
+    );
+    return existente?.cantidad ?? 0;
   };
 
   const cambiarCantidad = async (itemId: number, nuevaCantidad: number) => {
@@ -150,6 +161,7 @@ export const useCarrito = (): UseCarritoState => {
     totalUnidades,
     recargar: cargarCarrito,
     agregarAlCarrito,
+    obtenerCantidadEnCarrito,
     cambiarCantidad,
     quitarItem,
     vaciar

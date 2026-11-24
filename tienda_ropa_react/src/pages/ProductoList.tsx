@@ -25,7 +25,7 @@ const CATEGORIAS_FILTRO = [
 const ProductoList = () => {
   // Hook personalizado que consulta el microservicio de productos en Spring Boot
   const { productos, loading, error, recargar } = useProductos();
-  const { agregarAlCarrito } = useCarrito();
+  const { agregarAlCarrito, obtenerCantidadEnCarrito } = useCarrito();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [busqueda, setBusqueda] = useState('');
@@ -143,8 +143,18 @@ const ProductoList = () => {
 
   const handleAgregarCarrito = async (producto: Producto) => {
     const cantidad = obtenerCantidad(producto.id);
-    if (producto.stock < cantidad) {
-      setMensaje(`Solo quedan ${producto.stock} unidades disponibles.`);
+    const yaEnCarrito = obtenerCantidadEnCarrito(producto.id);
+    if (producto.stock <= 0) {
+      setMensaje(`${producto.nombre} está agotado.`);
+      return;
+    }
+    if (yaEnCarrito + cantidad > producto.stock) {
+      const restantes = Math.max(0, producto.stock - yaEnCarrito);
+      setMensaje(
+        restantes === 0
+          ? `Ya tienes el máximo disponible (${producto.stock} u.) de ${producto.nombre} en tu carrito.`
+          : `Ya tienes ${yaEnCarrito} en tu carrito; solo puedes agregar ${restantes} unidad(es) más de ${producto.nombre}.`
+      );
       return;
     }
 
@@ -154,7 +164,8 @@ const ProductoList = () => {
         producto.id,
         producto.precio,
         cantidad,
-        tallas[0] ?? 'Única'
+        tallas[0] ?? 'Única',
+        producto.nombre
       );
       setProductoAgregadoId(producto.id);
       setMensaje(`${producto.nombre} se agregó al carrito.`);
@@ -321,7 +332,8 @@ const ProductoList = () => {
           <div className="row g-4">
             {productosFiltrados.map((producto) => {
               const agotado = producto.stock <= 0;
-              const bajoStock = producto.stock > 0 && producto.stock <= 5;
+              const bajoStock =
+                producto.stock > 0 && producto.stock <= producto.stockMinimo;
               const esFavorito = favoritos.includes(producto.id);
               const cantidad = obtenerCantidad(producto.id);
               const recienAgregado = productoAgregadoId === producto.id;

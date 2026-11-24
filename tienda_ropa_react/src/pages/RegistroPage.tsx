@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { extraerMensajeError } from '../services/api.config';
 import UsuarioService from '../services/usuario.service';
 
 const RegistroPage = () => {
@@ -38,6 +39,16 @@ const RegistroPage = () => {
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFinal)) {
+      setError('Por favor ingresa un correo electrónico válido.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
@@ -66,7 +77,10 @@ const RegistroPage = () => {
     } catch (err) {
       console.error(err);
       setError(
-        'Ocurrió un error al registrar el usuario. Verifica que el microservicio de usuarios esté corriendo.'
+        extraerMensajeError(
+          err,
+          'Ocurrió un error al registrar el usuario. Verifica que el microservicio de usuarios esté corriendo.'
+        )
       );
     } finally {
       setLoading(false);

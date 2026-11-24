@@ -62,6 +62,34 @@ public class UsuarioServiceImpl implements UsuarioService {
                     "Los datos del usuario son obligatorios.");
         }
 
+        if (usuario.getNombre() == null || usuario.getNombre().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El nombre del usuario es obligatorio.");
+        }
+
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank() || !usuario.getEmail().contains("@")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Debe ingresar un correo electrónico válido.");
+        }
+
+        if (usuario.getPassword() == null || usuario.getPassword().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La contraseña es obligatoria.");
+        }
+
+        String emailNormalizado = usuario.getEmail().trim().toLowerCase();
+        if (usuarioRepository.findByEmail(emailNormalizado).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El correo electrónico ya se encuentra registrado.");
+        }
+
+        usuario.setNombre(usuario.getNombre().trim());
+        usuario.setEmail(emailNormalizado);
+
         // No permitir asignar ADMIN desde el registro.
         usuario.setRol(RolUsuario.CLIENTE);
         usuario.setActivo(true);
@@ -112,6 +140,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         Usuario usuario = bloquear(id);
 
+        if (usuario.esAdministrador() && usuario.estaActivo() && nuevoRol != RolUsuario.ADMIN) {
+            long adminsActivos = usuarioRepository.countByRolAndActivoTrue(RolUsuario.ADMIN);
+            if (adminsActivos <= 1) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Debe existir al menos un administrador activo en el sistema.");
+            }
+        }
+
         usuario.setRol(nuevoRol);
 
         return usuarioRepository.save(usuario);
@@ -126,6 +163,15 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Usuario deshabilitar(Long id) {
 
         Usuario usuario = bloquear(id);
+
+        if (usuario.esAdministrador() && usuario.estaActivo()) {
+            long adminsActivos = usuarioRepository.countByRolAndActivoTrue(RolUsuario.ADMIN);
+            if (adminsActivos <= 1) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "No se puede deshabilitar al único administrador activo del sistema.");
+            }
+        }
 
         usuario.deshabilitar();
 

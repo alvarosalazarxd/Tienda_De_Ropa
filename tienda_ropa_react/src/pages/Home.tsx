@@ -265,7 +265,8 @@ const Home = () => {
           <div className="row g-4">
             {destacados.map((producto) => {
               const agotado = producto.stock <= 0;
-              const bajoStock = producto.stock > 0 && producto.stock <= 5;
+              const bajoStock =
+                producto.stock > 0 && producto.stock <= producto.stockMinimo;
               return (
                 <div
                   key={producto.id}

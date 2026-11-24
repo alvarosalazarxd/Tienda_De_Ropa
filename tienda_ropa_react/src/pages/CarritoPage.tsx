@@ -7,6 +7,7 @@ import {
   obtenerUsuarioIdCarrito
 } from '../services/carrito.service';
 import {
+  esProductoActivo,
   formatearPrecioCLP,
   obtenerImagenProducto,
   Producto
@@ -16,7 +17,7 @@ const CarritoPage = () => {
   const navigate = useNavigate();
   const { carrito, loading, error, cambiarCantidad, quitarItem, vaciar } =
     useCarrito();
-  const { productos } = useProductos();
+  const { productos } = useProductos(true);
   const [aviso, setAviso] = useState<string | null>(null);
 
   const usuarioId = obtenerUsuarioIdCarrito();
@@ -30,6 +31,13 @@ const CarritoPage = () => {
   const items = carrito?.items ?? [];
   const total = carrito?.total ?? 0;
 
+  const tieneProblemasDisponibilidad = useMemo(() => {
+    return items.some((item) => {
+      const prod = mapaProductos.get(item.productoId);
+      return !prod || !esProductoActivo(prod) || prod.stock < item.cantidad;
+    });
+  }, [items, mapaProductos]);
+
   const handleCambiarCantidad = async (
     itemId: number,
     productoId: number,
@@ -37,7 +45,11 @@ const CarritoPage = () => {
   ) => {
     if (!Number.isInteger(valor) || valor < 1) return;
     const prod = mapaProductos.get(productoId);
-    if (prod && valor > prod.stock) {
+    if (!prod || !esProductoActivo(prod)) {
+      setAviso('Este producto ya no está disponible en el catálogo. Quítalo de tu bolsa.');
+      return;
+    }
+    if (valor > prod.stock) {
       setAviso(`Solo quedan ${prod.stock} unidades disponibles de ${prod.nombre}.`);
       return;
     }
@@ -71,6 +83,13 @@ const CarritoPage = () => {
           <div className="alert alert-danger">
             No se pudo conectar con el servicio de carrito a través del Gateway
             (puerto 8080 / Carrito 8084).
+          </div>
+        )}
+
+        {tieneProblemasDisponibilidad && (
+          <div className="alert alert-warning">
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            Hay productos en tu bolsa que fueron retirados del catálogo o superan el stock disponible. Quítalos o ajusta la cantidad para poder continuar al pago.
           </div>
         )}
 
@@ -127,8 +146,13 @@ const CarritoPage = () => {
                       <tbody>
                         {items.map((item) => {
                           const prod = mapaProductos.get(item.productoId);
+                          const disponible = esProductoActivo(prod);
+                          const stockInsuficiente =
+                            disponible && prod && item.cantidad > prod.stock;
                           const nombre =
-                            prod?.nombre ?? `Producto #${item.productoId}`;
+                            item.nombreProducto ||
+                            prod?.nombre ||
+                            `Producto #${item.productoId}`;
                           const imagen = prod
                             ? obtenerImagenProducto(prod)
                             : '/img/urbana.jpg';
@@ -138,7 +162,14 @@ const CarritoPage = () => {
                           );
 
                           return (
-                            <tr key={item.id}>
+                            <tr
+                              key={item.id}
+                              className={
+                                !disponible || stockInsuficiente
+                                  ? 'table-warning'
+                                  : ''
+                              }
+                            >
                               <td>
                                 <div className="d-flex align-items-center">
                                   <img
@@ -153,30 +184,95 @@ const CarritoPage = () => {
                                   />
                                   <div>
                                     <h6 className="mb-0 fw-bold">{nombre}</h6>
-                                    <small className="text-muted">
+                                    <small className="text-muted d-block">
                                       Talla: {talla}
                                     </small>
+                                    {!disponible && (
+                                      <span className="badge bg-danger mt-1">
+                                        Producto retirado del catálogo
+                                      </span>
+                                    )}
+                                    {stockInsuficiente && prod && (
+                                      <div className="mt-1">
+                                        <span className="badge bg-warning text-dark me-2">
+                                          Solo quedan {prod.stock} u.
+                                        </span>
+                                        {prod.stock > 0 && (
+                                          <button
+                                            type="button"
+                                            className="btn btn-link btn-sm p-0 text-decoration-none fw-semibold"
+                                            onClick={() =>
+                                              void handleCambiarCantidad(
+                                                item.id,
+                                                item.productoId,
+                                                prod.stock
+                                              )
+                                            }
+                                          >
+                                            Ajustar a {prod.stock}
+                                          </button>
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </td>
                               <td>{formatearPrecioCLP(item.precioUnitario)}</td>
                               <td>
-                                <input
-                                  type="number"
-                                  className="form-control form-control-sm"
-                                  style={{ width: '75px' }}
-                                  min={1}
-                                  max={prod ? Math.max(1, prod.stock) : 20}
-                                  value={item.cantidad}
-                                  disabled={loading}
-                                  onChange={(e) =>
-                                    void handleCambiarCantidad(
-                                      item.id,
-                                      item.productoId,
-                                      Number(e.target.value)
-                                    )
-                                  }
-                                />
+                                <div
+                                  className="input-group input-group-sm"
+                                  style={{ width: '112px' }}
+                                >
+                                  <button
+                                    type="button"
+                                    className="btn btn-outline-dark"
+                                    disabled={
+                                      loading || !disponible || item.cantidad <= 1
+                                    }
+                                    onClick={() =>
+                                      void handleCambiarCantidad(
+                                        item.id,
+                                        item.productoId,
+                                        item.cantidad - 1
+                                      )
+                                    }
+                                  >
+                                    −
+                                  </button>
+                                  <input
+                                    type="number"
+                                    className="form-control text-center px-1"
+                                    min={1}
+                                    max={prod ? Math.max(1, prod.stock) : 20}
+                                    value={item.cantidad}
+                                    disabled={loading || !disponible}
+                                    onChange={(e) =>
+                                      void handleCambiarCantidad(
+                                        item.id,
+                                        item.productoId,
+                                        Number(e.target.value)
+                                      )
+                                    }
+                                  />
+                                  <button
+                                    type="button"
+                                    className="btn btn-outline-dark"
+                                    disabled={
+                                      loading ||
+                                      !disponible ||
+                                      (prod ? item.cantidad >= prod.stock : false)
+                                    }
+                                    onClick={() =>
+                                      void handleCambiarCantidad(
+                                        item.id,
+                                        item.productoId,
+                                        item.cantidad + 1
+                                      )
+                                    }
+                                  >
+                                    +
+                                  </button>
+                                </div>
                               </td>
                               <td className="fw-bold">
                                 {formatearPrecioCLP(item.subtotal)}
@@ -250,7 +346,9 @@ const CarritoPage = () => {
                 <button
                   type="button"
                   className="btn btn-fashion w-100 py-2 rounded-pill fw-bold text-uppercase"
-                  disabled={items.length === 0 || loading}
+                  disabled={
+                    items.length === 0 || loading || tieneProblemasDisponibilidad
+                  }
                   onClick={() => navigate('/checkout')}
                 >
                   <i className="bi bi-credit-card me-2"></i>

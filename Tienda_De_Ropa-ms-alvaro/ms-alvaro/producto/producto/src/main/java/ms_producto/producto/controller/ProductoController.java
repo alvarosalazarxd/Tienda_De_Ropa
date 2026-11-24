@@ -19,8 +19,12 @@ public class ProductoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Producto>> obtenerTodos() {
-        return ResponseEntity.ok(productoService.obtenerTodos());
+    public ResponseEntity<List<Producto>> obtenerTodos(
+            @RequestParam(value = "incluirInactivos", defaultValue = "false") boolean incluirInactivos) {
+        if (incluirInactivos) {
+            return ResponseEntity.ok(productoService.obtenerTodos());
+        }
+        return ResponseEntity.ok(productoService.obtenerActivos());
     }
 
     @GetMapping("/{id}")
@@ -49,6 +53,16 @@ public class ProductoController {
     public ResponseEntity<Void> eliminar(@PathVariable("id") Long id) {
         productoService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/desactivar")
+    public ResponseEntity<Producto> desactivar(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(productoService.desactivar(id));
+    }
+
+    @PatchMapping("/{id}/activar")
+    public ResponseEntity<Producto> activar(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(productoService.activar(id));
     }
 
     public record StockRespuesta(Long productoId, Integer stock, Integer stockMinimo,

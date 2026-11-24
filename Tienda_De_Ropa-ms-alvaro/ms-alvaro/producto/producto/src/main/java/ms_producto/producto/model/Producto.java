@@ -42,6 +42,9 @@ public class Producto {
     @Column(nullable = false)
     private Integer stockMinimo = 0;
 
+    @Column(name = "activo")
+    private Boolean activo = true;
+
     // CONSTRUCTOR VACÍO
     public Producto() {
     }
@@ -85,6 +88,18 @@ public class Producto {
         return stock != null
                 && stockMinimo != null
                 && stock <= stockMinimo;
+    }
+
+    public boolean estaActivo() {
+        return !Boolean.FALSE.equals(activo);
+    }
+
+    public void desactivar() {
+        this.activo = false;
+    }
+
+    public void activar() {
+        this.activo = true;
     }
 
     // GETTERS Y SETTERS
@@ -154,5 +169,13 @@ public class Producto {
                     "El stock mínimo no puede ser nulo ni negativo.");
         }
         this.stockMinimo = stockMinimo;
+    }
+
+    public Boolean getActivo() {
+        return estaActivo();
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = !Boolean.FALSE.equals(activo);
     }
 }

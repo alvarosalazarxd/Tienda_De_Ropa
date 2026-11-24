@@ -25,8 +25,16 @@ public interface PedidoService {
     // =========================
     Pedido cambiarEstado(Long id, EstadoPedido nuevoEstado);
 
+    Pedido cambiarEstado(Long id, EstadoPedido nuevoEstado, String motivo);
+
     // =========================
-    // CANCELAR PEDIDO
+    // CANCELAR Y REEMBOLSAR PEDIDO
     // =========================
     Pedido cancelarPedido(Long id);
+
+    Pedido cancelarPedido(Long id, String motivo);
+
+    Pedido reembolsarPedido(Long id, String motivo);
+
+    Pedido reembolsarItem(Long pedidoId, Long itemId, String motivo);
 }

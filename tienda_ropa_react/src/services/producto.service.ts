@@ -16,10 +16,15 @@ export interface Producto {
   categoria: CategoriaProducto;
   stock: number;
   stockMinimo: number;
+  activo?: boolean;
 }
 
-export type ProductoPayload = Omit<Producto, 'id'>;
+export type ProductoPayload = Omit<Producto, 'id' | 'activo'>;
 // Payload se usa para enviar los datos al crear o editar sin pasar el id (es autoincremental en MySQL)
+
+export function esProductoActivo(producto?: Producto | null): boolean {
+  return Boolean(producto && producto.activo !== false);
+}
 
 export interface StockRespuesta {
   productoId: number;
@@ -41,14 +46,34 @@ const apiClient = axios.create({
 const resource = '/productos';
 
 let cacheProductos: Producto[] = [];
+let cacheProductosTodos: Producto[] = [];
 let promesaListar: Promise<Producto[]> | null = null;
+let promesaListarTodos: Promise<Producto[]> | null = null;
 
-export function obtenerCacheProductos(): Producto[] {
-  return cacheProductos;
+export function obtenerCacheProductos(incluirInactivos = false): Producto[] {
+  return incluirInactivos ? cacheProductosTodos : cacheProductos;
 }
 
 export const ProductoService = {
-  async listar(): Promise<Producto[]> {
+  async listar(incluirInactivos = false): Promise<Producto[]> {
+    if (incluirInactivos) {
+      if (promesaListarTodos) {
+        return promesaListarTodos;
+      }
+      promesaListarTodos = apiClient
+        .get<Producto[]>(resource, { params: { incluirInactivos: true } })
+        .then(({ data }) => {
+          const lista = Array.isArray(data) ? data : [];
+          cacheProductosTodos = lista;
+          cacheProductos = lista.filter((p) => p.activo !== false);
+          return lista;
+        })
+        .finally(() => {
+          promesaListarTodos = null;
+        });
+      return promesaListarTodos;
+    }
+
     if (promesaListar) {
       return promesaListar;
     }
@@ -80,6 +105,7 @@ export const ProductoService = {
   async crear(producto: ProductoPayload): Promise<Producto> {
     const { data } = await apiClient.post<Producto>(resource, producto);
     cacheProductos = [...cacheProductos, data];
+    cacheProductosTodos = [...cacheProductosTodos, data];
     return data;
   },
 
@@ -89,12 +115,42 @@ export const ProductoService = {
       producto
     );
     cacheProductos = cacheProductos.map((p) => (p.id === id ? data : p));
+    cacheProductosTodos = cacheProductosTodos.map((p) =>
+      p.id === id ? data : p
+    );
     return data;
   },
 
   async eliminar(id: number): Promise<void> {
     await apiClient.delete(`${resource}/${id}`);
     cacheProductos = cacheProductos.filter((p) => p.id !== id);
+    cacheProductosTodos = cacheProductosTodos.filter((p) => p.id !== id);
+  },
+
+  async desactivar(id: number): Promise<Producto> {
+    const { data } = await apiClient.patch<Producto>(
+      `${resource}/${id}/desactivar`
+    );
+    cacheProductos = cacheProductos.filter((p) => p.id !== id);
+    cacheProductosTodos = cacheProductosTodos.map((p) =>
+      p.id === id ? data : p
+    );
+    return data;
+  },
+
+  async activar(id: number): Promise<Producto> {
+    const { data } = await apiClient.patch<Producto>(
+      `${resource}/${id}/activar`
+    );
+    if (!cacheProductos.some((p) => p.id === id)) {
+      cacheProductos = [...cacheProductos, data];
+    } else {
+      cacheProductos = cacheProductos.map((p) => (p.id === id ? data : p));
+    }
+    cacheProductosTodos = cacheProductosTodos.map((p) =>
+      p.id === id ? data : p
+    );
+    return data;
   },
 
   async consultarStock(id: number): Promise<StockRespuesta> {
@@ -112,6 +168,9 @@ export const ProductoService = {
     cacheProductos = cacheProductos.map((p) =>
       p.id === id ? { ...p, stock: data.stock } : p
     );
+    cacheProductosTodos = cacheProductosTodos.map((p) =>
+      p.id === id ? { ...p, stock: data.stock } : p
+    );
     return data;
   },
 
@@ -121,6 +180,9 @@ export const ProductoService = {
       { cantidad }
     );
     cacheProductos = cacheProductos.map((p) =>
+      p.id === id ? { ...p, stock: data.stock } : p
+    );
+    cacheProductosTodos = cacheProductosTodos.map((p) =>
       p.id === id ? { ...p, stock: data.stock } : p
     );
     return data;

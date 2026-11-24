@@ -15,10 +15,9 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 // Permitimos la conexion desde el proyecto de React en Vite
                 registry.addMapping("/**")
-                        .allowedOrigins(
-                                "http://localhost:5173",
-                                "http://localhost:5174",
-                                "http://localhost:3000"
+                        .allowedOriginPatterns(
+                                "http://localhost:*",
+                                "http://127.0.0.1:*"
                         )
                         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
